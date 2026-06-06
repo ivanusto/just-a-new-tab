@@ -46,11 +46,11 @@ let settings = {
     zoom: true,
     cloudQuotes: false,
     search: true,
-    rss: true
+    rss: false
   },
   clockType: "digital", // "digital" or "analog"
   clockShowSeconds: false,
-  linkOpenMode: "current", // "current" | "newtab" | "newwindow"
+  linkOpenMode: "newtab", // "current" | "newtab" | "newwindow"
   bgAutoRotate: false,
   bgRotateInterval: 180,
   searchEngine: "google",
@@ -546,7 +546,7 @@ async function loadCloudQuote() {
         }
       }
     } else {
-      // Default: type.fit (Optimized replacement for ZenQuotes with local caching to avoid latency/rate limits)
+      // Default: ZenQuotes (cached locally for 24h to avoid latency/rate limits)
       let cachedQuotes = null;
       let cacheTime = 0;
       
@@ -573,7 +573,7 @@ async function loadCloudQuote() {
         quotesList = cachedQuotes;
       } else {
         try {
-          const response = await fetch("https://type.fit/api/quotes", { signal: controller.signal });
+          const response = await fetch("https://zenquotes.io/api/quotes", { signal: controller.signal });
           clearTimeout(timeoutId);
           if (response.ok) {
             const data = await response.json();
@@ -597,10 +597,10 @@ async function loadCloudQuote() {
       if (quotesList.length > 0) {
         const randomIndex = Math.floor(Math.random() * quotesList.length);
         const item = quotesList[randomIndex];
-        const rawText = item.text;
-        let rawAuthor = item.author || 'Anonymous';
-        rawAuthor = rawAuthor.replace(/,\s*type\.fit/gi, "").trim();
-        if (rawAuthor.toLowerCase() === 'type.fit' || !rawAuthor) {
+        // ZenQuotes uses { q, a }; keep item.text/author fallback for any stale cache
+        const rawText = item.q || item.text || "";
+        let rawAuthor = (item.a || item.author || 'Anonymous').trim();
+        if (!rawAuthor || rawAuthor.toLowerCase() === 'zenquotes.io') {
           rawAuthor = 'Anonymous';
         }
         
@@ -922,7 +922,7 @@ function renderQuickLinks() {
   
   const addBtn = document.getElementById("add-link-btn");
   
-  const openMode = settings.linkOpenMode || "current";
+  const openMode = settings.linkOpenMode || "newtab";
 
   quickLinks.forEach((link, index) => {
     const card = document.createElement("a");
@@ -1207,7 +1207,7 @@ function initDrawer() {
       clockSubOptions.classList.add("disabled");
     }
 
-    linkOpenModeSelect.value = settings.linkOpenMode || "current";
+    linkOpenModeSelect.value = settings.linkOpenMode || "newtab";
     if (settings.widgets.links) {
       linksSubOptions.classList.remove("disabled");
     } else {
@@ -1754,6 +1754,25 @@ function showToast(message) {
    ZIP Theme Package Import
    ========================================================================== */
 
+// Lazy-load JSZip (~97KB) only when a theme package is actually imported,
+// so it never has to be parsed on a normal new-tab open.
+let jszipLoadPromise = null;
+function loadJSZip() {
+  if (typeof JSZip !== "undefined") return Promise.resolve();
+  if (jszipLoadPromise) return jszipLoadPromise;
+  jszipLoadPromise = new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = "jszip.min.js";
+    script.onload = () => resolve();
+    script.onerror = () => {
+      jszipLoadPromise = null;
+      reject(new Error("Failed to load jszip.min.js"));
+    };
+    document.head.appendChild(script);
+  });
+  return jszipLoadPromise;
+}
+
 function initZipImport() {
   const zipImportBox = document.getElementById("zip-import-box");
   const zipFileInput = document.getElementById("zip-file-input");
@@ -1808,6 +1827,7 @@ async function handleZipFile(fileOrBlob, customName = null) {
   const packageName = fileName.substring(0, fileName.lastIndexOf('.')) || fileName;
 
   try {
+    await loadJSZip();
     const jszip = new JSZip();
     const zip = await jszip.loadAsync(fileOrBlob);
     
@@ -2361,6 +2381,29 @@ function parseRSS(xmlText, sourceName) {
   return items;
 }
 
+// RSS can fetch arbitrary user-subscribed feeds, so the broad host access lives in
+// optional_host_permissions and is only requested (via a user gesture) when RSS is enabled.
+function requestHostPermission(origins) {
+  return new Promise((resolve) => {
+    try {
+      if (typeof browser !== "undefined" && browser.permissions && browser.permissions.request) {
+        browser.permissions.request({ origins }).then(resolve).catch(() => resolve(false));
+      } else if (typeof chrome !== "undefined" && chrome.permissions && chrome.permissions.request) {
+        chrome.permissions.request({ origins }, (granted) => resolve(!!granted));
+      } else {
+        resolve(true);
+      }
+    } catch (e) {
+      resolve(true);
+    }
+  });
+}
+
+// request() resolves true immediately (no prompt) if the permission is already granted.
+function ensureRssHostPermission() {
+  return requestHostPermission(["http://*/*", "https://*/*"]);
+}
+
 function initRssSettings() {
   const toggleRss = document.getElementById("toggle-rss");
   const btnAddRss = document.getElementById("btn-add-rss");
@@ -2370,6 +2413,15 @@ function initRssSettings() {
   if (toggleRss) {
     toggleRss.checked = settings.widgets.rss !== false;
     toggleRss.addEventListener("change", async () => {
+      // Acquire broad host access on demand the first time RSS is turned on.
+      if (toggleRss.checked) {
+        const granted = await ensureRssHostPermission();
+        if (!granted) {
+          toggleRss.checked = false;
+          showToast(isChineseUser ? "需要網路存取權限才能讀取 RSS 訂閱" : "Network access permission is required for RSS feeds");
+          return;
+        }
+      }
       settings.widgets.rss = toggleRss.checked;
       await saveSettings();
       applyWidgetVisibility();

@@ -21,9 +21,9 @@
     "https://v1.hitokoto.cn/",
     "https://api.mymemory.translated.net/",
     "https://api.animechan.io/",
-    "https://type.fit/",
-    "https://yblog.org/",
-    "https://cyberq.tw/",
+    "https://yblog.org/"
+  ],
+  "optional_host_permissions": [
     "http://*/*",
     "https://*/*"
   ],
