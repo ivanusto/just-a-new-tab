@@ -1,0 +1,2487 @@
+// Just a New Tab - Main Script
+
+// Curated Traditional Chinese Quotes
+const JUST_QUOTES = [
+  { text: "生活不是等待暴風雨過去，而是學習在雨中跳舞。", author: "維維安·格林" },
+  { text: "無論今天多麼黑暗，黎明總會如期而至。", author: "富蘭克林·羅斯福" },
+  { text: "生活不在於你走得有多快，而在於你是否懂得欣賞沿途的風景。", author: "拉爾夫·沃爾多·愛默生" },
+  { text: "每一天都是一個新的開始。深呼吸，微笑，然後重新出發。", author: "馬克·吐溫" },
+  { text: "生活就像騎自行車，要想保持平衡，就必須不斷前進。", author: "阿爾伯特·愛因斯坦" },
+  { text: "給自己一點時間，去成為你想成為的人。", author: "弗吉尼亞·伍爾芙" },
+  { text: "你的好心情，是給生活最好的禮物。", author: "林清玄" },
+  { text: "做一個溫柔的人，哪怕世界偶爾冷酷。", author: "泰戈爾" },
+  { text: "最美的風景，不在遠方，而在你對生活的熱愛裡。", author: "羅曼·羅蘭" },
+  { text: "慢慢來，比較快。找到自己的節奏，本身就是一種成就。", author: "老子" },
+  { text: "只要心裡有陽光，何處不是明媚的春天。", author: "席慕蓉" },
+  { text: "去熱愛，去前行，世界很大，你很溫柔。", author: "無名氏" },
+  { text: "生活中的小確幸，都藏在用心感受的細節裡。", author: "村上春樹" },
+  { text: "做你自己的太陽，無需憑藉誰的光。", author: "尼采" },
+  { text: "今天也是充滿希望的一天，加油！", author: "Just a New Tab" }
+];
+
+// Curated English Quotes
+const EN_QUOTES = [
+  { text: "Life is not about waiting for the storm to pass, it's about learning to dance in the rain.", author: "Vivian Greene" },
+  { text: "No matter how dark the moment, love and hope are always possible.", author: "George Alagiah" },
+  { text: "It does not matter how slowly you go as long as you do not stop.", author: "Confucius" },
+  { text: "In the middle of every difficulty lies opportunity.", author: "Albert Einstein" },
+  { text: "Be yourself; everyone else is already taken.", author: "Oscar Wilde" },
+  { text: "The only limit to our realization of tomorrow will be our doubts of today.", author: "Franklin D. Roosevelt" },
+  { text: "Keep your face always toward the sunshine - and shadows will fall behind you.", author: "Walt Whitman" },
+  { text: "Believe you can and you're halfway there.", author: "Theodore Roosevelt" },
+  { text: "Today is a beautiful day, enjoy it!", author: "Just a New Tab" }
+];
+
+// Default wallpapers count (1 to 6)
+const DEFAULT_BG_COUNT = 6;
+
+// State variables
+let settings = {
+  username: "",
+  widgets: {
+    clock: true,
+    greeting: true,
+    links: true,
+    quote: true,
+    zoom: true,
+    cloudQuotes: false,
+    search: true,
+    rss: true
+  },
+  clockType: "digital", // "digital" or "analog"
+  clockShowSeconds: false,
+  linkOpenMode: "current", // "current" | "newtab" | "newwindow"
+  bgAutoRotate: false,
+  bgRotateInterval: 180,
+  searchEngine: "google",
+  searchInNewTab: false,
+  cloudQuoteSource: "zenquotes",
+  activeDefaults: [1, 2, 3, 4, 5, 6],
+  activeCustoms: [],
+  hiddenDefaults: [],
+  customQuotes: [],
+  rssSubscriptions: [
+    { id: 1, name: "CyberQ", url: "https://cyberq.tw/feed" }
+  ]
+};
+
+let quickLinks = [
+  { name: "Google", url: "https://www.google.com" },
+  { name: "YouTube", url: "https://www.youtube.com" },
+  { name: "GitHub", url: "https://github.com" },
+  { name: "Gmail", url: "https://mail.google.com" },
+  { name: "CyberQ", url: "https://cyberq.tw" }
+];
+
+// Keep track of active blob URLs to revoke them and avoid memory leaks
+let activeBgBlobUrl = null;
+let currentActiveLayer = 1; // 1 or 2
+let thumbBlobUrls = [];
+let isChineseUser = true;
+let isSimplifiedChinese = false;
+
+// Synchronous execution using cached settings to prevent flickers
+(function preLoadCache() {
+  const cachedSettingsStr = localStorage.getItem("just_new_tab_settings");
+  const cachedLinksStr = localStorage.getItem("just_new_tab_links");
+  
+  // Detect UI language
+  const uiLang = (typeof chrome !== "undefined" && chrome.i18n) ? chrome.i18n.getUILanguage() : navigator.language;
+  isChineseUser = uiLang.startsWith("zh");
+  isSimplifiedChinese = uiLang.toLowerCase().replace('_', '-') === 'zh-cn';
+
+  if (cachedSettingsStr) {
+    try {
+      const cached = JSON.parse(cachedSettingsStr);
+      settings = { ...settings, ...cached };
+      if (cached.widgets) settings.widgets = { ...settings.widgets, ...cached.widgets };
+    } catch(e) {}
+  }
+  if (cachedLinksStr) {
+    try {
+      quickLinks = JSON.parse(cachedLinksStr);
+    } catch(e) {}
+  }
+})();
+
+// Initialize script
+document.addEventListener("DOMContentLoaded", async () => {
+  // 1. Instantly apply localization text tags
+  translatePage();
+  
+  // 2. Load cached widgets instantly (No flicker!)
+  initClock();
+  initGreeting();
+  initSearch();
+  initQuoteSearch();
+  applyWidgetVisibility();
+  
+  // Initialize shortcut buttons click handlers (Fixes the bug!)
+  initQuickLinks();
+  
+  // Handle Quote display intelligently:
+  // If cloud quotes are NOT enabled, render the local quote instantly to avoid any delay.
+  // If cloud quotes ARE enabled, we keep the quote hidden (opacity 0) while fetching.
+  if (!settings.widgets.cloudQuotes) {
+    renderLocalQuoteSynchronously();
+  } else {
+    document.getElementById("quote-widget").style.opacity = "0";
+  }
+  
+  // Render links
+  renderQuickLinks();
+
+  // 3. Load full settings asynchronously (source of truth)
+  await loadSettings();
+  
+  // 4. Update elements if needed after loading from storage
+  initGreeting();
+  initSearch();
+  initQuoteSearch();
+  applyWidgetVisibility();
+  renderQuickLinks();
+  
+  // 5. Initialize settings panel and upload handlers
+  initDrawer();
+  initUpload();
+  initZipImport();
+  initRssSettings();
+  initOfficialThemes();
+  
+  // 6. Set background and execute cloud quotes fetching if enabled
+  await setRandomBackground();
+  startBgAutoRotate();
+  initRssWidget();
+  
+  if (settings.widgets.cloudQuotes) {
+    await loadCloudQuote();
+  }
+});
+
+// Run translation of elements with data-i18n attributes
+function translatePage() {
+  if (typeof chrome !== "undefined" && chrome.i18n) {
+    const titleText = chrome.i18n.getMessage("extName");
+    if (titleText) document.title = titleText;
+  }
+
+  const elements = document.querySelectorAll("[data-i18n]");
+  elements.forEach(el => {
+    const key = el.getAttribute("data-i18n");
+    if (typeof chrome !== "undefined" && chrome.i18n) {
+      const msg = chrome.i18n.getMessage(key);
+      if (msg) {
+        if (el.tagName === "INPUT" && el.hasAttribute("placeholder")) {
+          el.setAttribute("placeholder", msg);
+        } else {
+          el.textContent = msg;
+        }
+      }
+    }
+  });
+
+  const titleElements = document.querySelectorAll("[data-i18n-title]");
+  titleElements.forEach(el => {
+    const key = el.getAttribute("data-i18n-title");
+    if (typeof chrome !== "undefined" && chrome.i18n) {
+      const msg = chrome.i18n.getMessage(key);
+      if (msg) {
+        el.setAttribute("title", msg);
+      }
+    }
+  });
+}
+
+// Load settings from Chrome local storage
+async function loadSettings() {
+  const defaultSettings = JSON.parse(JSON.stringify(settings)); // deep copy
+  
+  if (typeof browser !== "undefined" && browser.storage) {
+    const data = await browser.storage.local.get(["settings", "quickLinks"]);
+    if (data.settings) settings = { ...defaultSettings, ...data.settings };
+    if (data.quickLinks) quickLinks = data.quickLinks;
+  } else if (typeof chrome !== "undefined" && chrome.storage) {
+    await new Promise((resolve) => {
+      chrome.storage.local.get(["settings", "quickLinks"], (data) => {
+        if (data.settings) settings = { ...defaultSettings, ...data.settings };
+        if (data.quickLinks) quickLinks = data.quickLinks;
+        resolve();
+      });
+    });
+  }
+  
+  // Ensure nested structures are correctly merged
+  if (!settings.widgets) settings.widgets = defaultSettings.widgets;
+  else settings.widgets = { ...defaultSettings.widgets, ...settings.widgets };
+  
+  if (!settings.activeDefaults) settings.activeDefaults = defaultSettings.activeDefaults;
+  if (!settings.activeCustoms) settings.activeCustoms = defaultSettings.activeCustoms;
+  if (!settings.hiddenDefaults) settings.hiddenDefaults = defaultSettings.hiddenDefaults;
+  if (!settings.customQuotes) settings.customQuotes = defaultSettings.customQuotes;
+  if (!settings.rssSubscriptions) settings.rssSubscriptions = defaultSettings.rssSubscriptions;
+  if (settings.widgets.rss === undefined) settings.widgets.rss = defaultSettings.widgets.rss;
+
+  if (settings.searchInNewTab === undefined) settings.searchInNewTab = defaultSettings.searchInNewTab;
+  if (settings.cloudQuoteSource === undefined) {
+    settings.cloudQuoteSource = isSimplifiedChinese ? "hitokoto" : "zenquotes";
+  }
+
+  // Write back to localStorage to cache it
+  localStorage.setItem("just_new_tab_settings", JSON.stringify(settings));
+  localStorage.setItem("just_new_tab_links", JSON.stringify(quickLinks));
+}
+
+// Save settings to storage
+async function saveSettings() {
+  if (typeof browser !== "undefined" && browser.storage) {
+    await browser.storage.local.set({ settings, quickLinks });
+  } else if (typeof chrome !== "undefined" && chrome.storage) {
+    await new Promise((resolve) => {
+      chrome.storage.local.set({ settings, quickLinks }, () => resolve());
+    });
+  }
+  localStorage.setItem("just_new_tab_settings", JSON.stringify(settings));
+  localStorage.setItem("just_new_tab_links", JSON.stringify(quickLinks));
+}
+
+// Show widget state according to settings
+function applyWidgetVisibility() {
+  const clockWidget = document.getElementById("clock-widget");
+  const greetingWidget = document.getElementById("greeting-widget");
+  const linksWidget = document.getElementById("links-widget");
+  const quoteWidget = document.getElementById("quote-widget");
+  const searchWidget = document.getElementById("search-widget");
+  const searchSubOptions = document.getElementById("search-sub-options");
+  const cloudQuoteSubOptions = document.getElementById("cloud-quote-sub-options");
+
+  if (clockWidget) {
+    if (settings.widgets.clock) clockWidget.classList.remove("widget-hidden");
+    else clockWidget.classList.add("widget-hidden");
+  }
+
+  if (greetingWidget) {
+    if (settings.widgets.greeting) greetingWidget.classList.remove("widget-hidden");
+    else greetingWidget.classList.add("widget-hidden");
+  }
+
+  if (linksWidget) {
+    if (settings.widgets.links) linksWidget.classList.remove("widget-hidden");
+    else linksWidget.classList.add("widget-hidden");
+  }
+
+  if (quoteWidget) {
+    if (settings.widgets.quote) quoteWidget.classList.remove("widget-hidden");
+    else quoteWidget.classList.add("widget-hidden");
+  }
+
+  if (searchWidget) {
+    if (settings.widgets.search !== false) searchWidget.classList.remove("widget-hidden");
+    else searchWidget.classList.add("widget-hidden");
+  }
+
+  if (searchSubOptions) {
+    if (settings.widgets.search !== false) searchSubOptions.style.display = "block";
+    else searchSubOptions.style.display = "none";
+  }
+
+  if (cloudQuoteSubOptions) {
+    if (settings.widgets.quote && settings.widgets.cloudQuotes) cloudQuoteSubOptions.style.display = "block";
+    else cloudQuoteSubOptions.style.display = "none";
+  }
+
+  const rssWidget = document.getElementById("rss-widget");
+  if (rssWidget) {
+    if (settings.widgets.rss !== false) {
+      rssWidget.classList.remove("widget-hidden");
+    } else {
+      rssWidget.classList.add("widget-hidden");
+    }
+  }
+}
+
+/* ==========================================================================
+   Clock & Greeting Widget
+   ========================================================================== */
+
+function initClock() {
+  const timeEl = document.getElementById("clock-time");
+  const dateEl = document.getElementById("clock-date");
+  const digitalClock = timeEl;
+  const analogClock = document.getElementById("analog-clock");
+  const hourHand = document.getElementById("analog-hour");
+  const minuteHand = document.getElementById("analog-minute");
+  const secondHand = document.getElementById("analog-second");
+  
+  // Generate clock tick marks dynamically for Analog Clock
+  const clockFace = document.getElementById("clock-face");
+  if (clockFace && clockFace.querySelectorAll(".clock-mark").length === 0) {
+    for (let i = 0; i < 12; i++) {
+      const mark = document.createElement("div");
+      mark.className = "clock-mark" + (i % 3 === 0 ? " quarter" : "");
+      mark.style.transform = `rotate(${i * 30}deg)`;
+      clockFace.appendChild(mark);
+    }
+  }
+  
+  function updateClock() {
+    const now = new Date();
+    const showSeconds = settings.clockShowSeconds !== false;
+    const isAnalog = settings.clockType === "analog";
+    
+    if (isAnalog) {
+      digitalClock.style.display = "none";
+      analogClock.style.display = "flex";
+      
+      const hours = now.getHours();
+      const minutes = now.getMinutes();
+      const seconds = now.getSeconds();
+      
+      const hrDegrees = ((hours % 12) * 30) + (minutes * 0.5);
+      const minDegrees = (minutes * 6) + (seconds * 0.1);
+      const secDegrees = seconds * 6;
+      
+      hourHand.style.transform = `rotate(${hrDegrees}deg)`;
+      minuteHand.style.transform = `rotate(${minDegrees}deg)`;
+      
+      if (showSeconds) {
+        secondHand.style.display = "block";
+        secondHand.style.transform = `rotate(${secDegrees}deg)`;
+      } else {
+        secondHand.style.display = "none";
+      }
+    } else {
+      analogClock.style.display = "none";
+      digitalClock.style.display = "block";
+      
+      let hours = now.getHours().toString().padStart(2, '0');
+      let minutes = now.getMinutes().toString().padStart(2, '0');
+      if (showSeconds) {
+        let seconds = now.getSeconds().toString().padStart(2, '0');
+        digitalClock.textContent = `${hours}:${minutes}:${seconds}`;
+      } else {
+        digitalClock.textContent = `${hours}:${minutes}`;
+      }
+    }
+    
+    // Format Date based on system UI locale
+    const years = now.getFullYear();
+    const months = now.getMonth() + 1;
+    const days = now.getDate();
+    
+    if (isChineseUser) {
+      const weekDays = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
+      const weekDayStr = weekDays[now.getDay()];
+      dateEl.textContent = `${years}年${months}月${days}日 ${weekDayStr}`;
+    } else {
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      dateEl.textContent = now.toLocaleDateString(undefined, options);
+    }
+  }
+  
+  updateClock();
+  
+  if (window.clockInterval) {
+    clearInterval(window.clockInterval);
+  }
+  window.clockInterval = setInterval(updateClock, 1000);
+}
+
+function initGreeting() {
+  const greetingEl = document.getElementById("greeting-text");
+  
+  function updateGreeting() {
+    const now = new Date();
+    const hours = now.getHours();
+    let greetWord = "";
+    
+    if (isChineseUser) {
+      if (hours >= 5 && hours < 12) {
+        greetWord = "早安";
+      } else if (hours >= 12 && hours < 14) {
+        greetWord = "午安";
+      } else if (hours >= 14 && hours < 18) {
+        greetWord = "下午好";
+      } else if (hours >= 18 && hours < 22) {
+        greetWord = "晚安，辛苦了";
+      } else {
+        greetWord = "夜深了，早點休息";
+      }
+    } else {
+      if (hours >= 5 && hours < 12) {
+        greetWord = "Good morning";
+      } else if (hours >= 12 && hours < 17) {
+        greetWord = "Good afternoon";
+      } else if (hours >= 17 && hours < 22) {
+        greetWord = "Good evening";
+      } else {
+        greetWord = "Night time, rest well";
+      }
+    }
+    
+    const nameStr = settings.username.trim() ? `, ${settings.username.trim()}` : "";
+    greetingEl.textContent = `${greetWord}${nameStr}`;
+  }
+  
+  updateGreeting();
+  setInterval(updateGreeting, 60000);
+}
+
+/* ==========================================================================
+   Quote Widget
+   ========================================================================== */
+
+// Renders local quote instantly on load. No async fetch.
+function renderLocalQuoteSynchronously() {
+  const textEl = document.getElementById("quote-text");
+  const authorEl = document.getElementById("quote-author");
+  const quotePool = isChineseUser 
+    ? [...JUST_QUOTES, ...(settings.customQuotes || [])]
+    : [...EN_QUOTES, ...(settings.customQuotes || [])];
+    
+  if (quotePool.length === 0) {
+    textEl.textContent = isChineseUser ? "「今天也是充滿希望的一天，加油！」" : "\"Today is a beautiful day, enjoy it!\"";
+    authorEl.textContent = "— Just a New Tab";
+    return;
+  }
+  
+  const randomIndex = Math.floor(Math.random() * quotePool.length);
+  const quote = quotePool[randomIndex];
+  
+  textEl.textContent = isChineseUser ? `「${quote.text}」` : `"${quote.text}"`;
+  authorEl.textContent = `— ${quote.author || (isChineseUser ? '匿名' : 'Anonymous')}`;
+  
+  // Instant display
+  document.getElementById("quote-widget").style.opacity = "1";
+}
+
+// Fetch quote from cloud API asynchronously, with smooth fade transition
+// Translate English to Traditional Chinese using MyMemory API
+async function translateToTraditional(text) {
+  if (!text) return "";
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 2000); // 2 seconds timeout
+  try {
+    const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|zh-TW`;
+    const res = await fetch(url, { signal: controller.signal });
+    clearTimeout(timeoutId);
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.responseData && data.responseData.translatedText) {
+        return data.responseData.translatedText;
+      }
+    }
+  } catch (err) {
+    console.log("MyMemory translation failed or timed out:", err.message || err);
+  }
+  return text; // Fall back to original English text
+}
+
+async function loadCloudQuote() {
+  if (!settings.widgets.quote || !settings.widgets.cloudQuotes) return;
+  
+  const textEl = document.getElementById("quote-text");
+  const authorEl = document.getElementById("quote-author");
+  const widget = document.getElementById("quote-widget");
+  
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 2000); // 2s timeout
+  
+  try {
+    let quoteText = "";
+    let quoteAuthor = "";
+    const source = settings.cloudQuoteSource || (isSimplifiedChinese ? "hitokoto" : "zenquotes");
+    
+    if (source === "hitokoto") {
+      // Fetch from Hitokoto
+      const response = await fetch("https://v1.hitokoto.cn/?c=d&c=i", { signal: controller.signal });
+      clearTimeout(timeoutId);
+      if (response.ok) {
+        const data = await response.json();
+        quoteText = `“${data.hitokoto}”`;
+        quoteAuthor = `— ${data.from_author || data.from || '网络'}`;
+      }
+    } else if (source === "animechan") {
+      // Fetch from AnimeChan
+      const response = await fetch("https://api.animechan.io/v1/quotes/random", { signal: controller.signal });
+      clearTimeout(timeoutId);
+      if (response.ok) {
+        const data = await response.json();
+        let rawText = "";
+        let rawAuthor = "";
+        
+        if (data) {
+          if (data.status === "success" && data.data) {
+            rawText = data.data.content;
+            const charName = data.data.character ? data.data.character.name : "";
+            const animeName = data.data.anime ? data.data.anime.name : "";
+            rawAuthor = charName + (animeName ? ` (${animeName})` : "");
+          } else if (data.quote && data.character) {
+            rawText = data.quote;
+            rawAuthor = data.character + (data.anime ? ` (${data.anime})` : "");
+          }
+        }
+        
+        if (rawText) {
+          if (isChineseUser && !isSimplifiedChinese) {
+            // Translate English quote to Traditional Chinese
+            const translatedText = await translateToTraditional(rawText);
+            const isTranslated = translatedText !== rawText;
+            
+            let translatedAuthor = rawAuthor;
+            if (rawAuthor && isTranslated) {
+              translatedAuthor = await translateToTraditional(rawAuthor);
+            }
+            
+            if (isTranslated) {
+              quoteText = `「${translatedText}」`;
+            } else {
+              quoteText = `"${translatedText}"`;
+            }
+            quoteAuthor = `— ${translatedAuthor}`;
+          } else {
+            // English/Other -> Renders in English
+            quoteText = `"${rawText}"`;
+            quoteAuthor = `— ${rawAuthor || 'Anonymous'}`;
+          }
+        }
+      }
+    } else {
+      // Default: type.fit (Optimized replacement for ZenQuotes with local caching to avoid latency/rate limits)
+      let cachedQuotes = null;
+      let cacheTime = 0;
+      
+      const getStorageData = () => {
+        return new Promise((resolve) => {
+          if (typeof browser !== "undefined" && browser.storage) {
+            browser.storage.local.get(["cloudQuotesCache", "cloudQuotesCacheTime"]).then((data) => resolve(data || {}));
+          } else if (typeof chrome !== "undefined" && chrome.storage) {
+            chrome.storage.local.get(["cloudQuotesCache", "cloudQuotesCacheTime"], (data) => resolve(data || {}));
+          } else {
+            resolve({});
+          }
+        });
+      };
+      
+      const storageData = await getStorageData();
+      cachedQuotes = storageData.cloudQuotesCache;
+      cacheTime = storageData.cloudQuotesCacheTime || 0;
+      
+      const isCacheValid = cachedQuotes && Array.isArray(cachedQuotes) && cachedQuotes.length > 0 && (Date.now() - cacheTime < 24 * 60 * 60 * 1000);
+      
+      let quotesList = [];
+      if (isCacheValid) {
+        quotesList = cachedQuotes;
+      } else {
+        try {
+          const response = await fetch("https://type.fit/api/quotes", { signal: controller.signal });
+          clearTimeout(timeoutId);
+          if (response.ok) {
+            const data = await response.json();
+            if (Array.isArray(data) && data.length > 0) {
+              quotesList = data;
+              if (typeof browser !== "undefined" && browser.storage) {
+                await browser.storage.local.set({ cloudQuotesCache: data, cloudQuotesCacheTime: Date.now() });
+              } else if (typeof chrome !== "undefined" && chrome.storage) {
+                chrome.storage.local.set({ cloudQuotesCache: data, cloudQuotesCacheTime: Date.now() });
+              }
+            }
+          }
+        } catch (fetchErr) {
+          console.log("Failed to fetch cloud quotes from CDN, trying to use expired cache:", fetchErr.message || fetchErr);
+          if (cachedQuotes && Array.isArray(cachedQuotes) && cachedQuotes.length > 0) {
+            quotesList = cachedQuotes;
+          }
+        }
+      }
+      
+      if (quotesList.length > 0) {
+        const randomIndex = Math.floor(Math.random() * quotesList.length);
+        const item = quotesList[randomIndex];
+        const rawText = item.text;
+        let rawAuthor = item.author || 'Anonymous';
+        rawAuthor = rawAuthor.replace(/,\s*type\.fit/gi, "").trim();
+        if (rawAuthor.toLowerCase() === 'type.fit' || !rawAuthor) {
+          rawAuthor = 'Anonymous';
+        }
+        
+        if (isChineseUser && !isSimplifiedChinese) {
+          const translatedText = await translateToTraditional(rawText);
+          const isTranslated = translatedText !== rawText;
+          
+          let translatedAuthor = rawAuthor;
+          if (rawAuthor !== 'Anonymous' && isTranslated) {
+            translatedAuthor = await translateToTraditional(rawAuthor);
+          } else if (rawAuthor === 'Anonymous') {
+            translatedAuthor = '無名氏';
+          }
+          
+          if (isTranslated) {
+            quoteText = `「${translatedText}」`;
+          } else {
+            quoteText = `"${translatedText}"`;
+          }
+          quoteAuthor = `— ${translatedAuthor}`;
+        } else {
+          quoteText = `"${rawText}"`;
+          quoteAuthor = `— ${rawAuthor}`;
+        }
+      }
+    }
+
+    
+    if (quoteText && quoteAuthor) {
+      if (widget.style.opacity === "1") {
+        widget.style.opacity = "0";
+        setTimeout(() => {
+          textEl.textContent = quoteText;
+          authorEl.textContent = quoteAuthor;
+          widget.style.opacity = "1";
+        }, 300);
+      } else {
+        textEl.textContent = quoteText;
+        authorEl.textContent = quoteAuthor;
+        widget.style.opacity = "1";
+      }
+    } else {
+      renderLocalQuoteSynchronously();
+    }
+  } catch (err) {
+    console.log("Failed to fetch cloud quote, falling back to local list:", err.message || err);
+    if (widget.style.opacity === "0" || !widget.style.opacity) {
+      renderLocalQuoteSynchronously();
+    }
+  }
+}
+
+// Wrapper to re-initialize quote on demand (resets text or triggers load)
+function initQuote() {
+  if (settings.widgets.cloudQuotes) {
+    document.getElementById("quote-widget").style.opacity = "0";
+    loadCloudQuote();
+  } else {
+    renderLocalQuoteSynchronously();
+  }
+}
+
+/* ==========================================================================
+   v1.2 & v1.3 Search, Auto-rotation & Quote Utils
+   ========================================================================== */
+
+function initSearch() {
+  const searchWidget = document.getElementById("search-widget");
+  const searchForm = document.getElementById("search-form");
+  const searchInput = document.getElementById("search-input");
+  const searchEngineSelect = document.getElementById("search-engine-select");
+  
+  if (!searchWidget) return;
+
+  // Apply initial visibility
+  if (settings.widgets.search !== false) {
+    searchWidget.classList.remove("widget-hidden");
+  } else {
+    searchWidget.classList.add("widget-hidden");
+  }
+  
+  // Set initial search engine
+  if (settings.searchEngine) {
+    searchEngineSelect.value = settings.searchEngine;
+  } else {
+    settings.searchEngine = "google";
+    searchEngineSelect.value = "google";
+  }
+  
+  // Listen to engine selection change
+  if (!searchEngineSelect.dataset.listenerBound) {
+    searchEngineSelect.addEventListener("change", async () => {
+      settings.searchEngine = searchEngineSelect.value;
+      await saveSettings();
+    });
+    searchEngineSelect.dataset.listenerBound = "true";
+  }
+  
+  // Handle search submit
+  if (!searchForm.dataset.listenerBound) {
+    searchForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const query = searchInput.value.trim();
+      if (!query) return;
+      
+      const engine = searchEngineSelect.value;
+      let url = "";
+      
+      switch (engine) {
+        case "google":
+          url = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+          break;
+        case "baidu":
+          url = `https://www.baidu.com/s?wd=${encodeURIComponent(query)}`;
+          break;
+        case "bing":
+          url = `https://www.bing.com/search?q=${encodeURIComponent(query)}`;
+          break;
+        case "duckduckgo":
+          url = `https://duckduckgo.com/?q=${encodeURIComponent(query)}`;
+          break;
+        case "yahoo":
+          url = `https://search.yahoo.com/search?p=${encodeURIComponent(query)}`;
+          break;
+        case "chatgpt":
+          url = `https://chatgpt.com/?q=${encodeURIComponent(query)}`;
+          break;
+        case "claude":
+          url = `https://claude.ai/new?q=${encodeURIComponent(query)}`;
+          break;
+        case "perplexity":
+          url = `https://www.perplexity.ai/search?q=${encodeURIComponent(query)}`;
+          break;
+        default:
+          url = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+      }
+      
+      if (url) {
+        if (settings.searchInNewTab) {
+          window.open(url, "_blank");
+        } else {
+          window.location.href = url;
+        }
+      }
+    });
+    searchForm.dataset.listenerBound = "true";
+  }
+}
+
+function startBgAutoRotate() {
+  if (window.bgRotateIntervalId) {
+    clearInterval(window.bgRotateIntervalId);
+    window.bgRotateIntervalId = null;
+  }
+  if (settings.bgAutoRotate) {
+    let interval = parseInt(settings.bgRotateInterval, 10);
+    if (isNaN(interval) || interval < 15) interval = 15;
+    if (interval > 86400) interval = 86400;
+    
+    window.bgRotateIntervalId = setInterval(() => {
+      setRandomBackground();
+    }, interval * 1000);
+  }
+}
+
+function initQuoteSearch() {
+  const quoteWidget = document.getElementById("quote-widget");
+  if (!quoteWidget) return;
+  
+  if (!quoteWidget.dataset.listenerBound) {
+    quoteWidget.addEventListener("click", () => {
+      const textEl = document.getElementById("quote-text");
+      const authorEl = document.getElementById("quote-author");
+      if (!textEl) return;
+      
+      const text = textEl.textContent || "";
+      const cleanedText = text.replace(/[「」\"“”]/g, "").trim();
+      let query = cleanedText;
+      
+      if (authorEl) {
+        const author = authorEl.textContent || "";
+        const cleanedAuthor = author.replace(/^[—\-\s\u2014]+/, "").trim();
+        if (cleanedAuthor) {
+          query = `${cleanedText} ${cleanedAuthor}`;
+        }
+      }
+      
+      if (query) {
+        const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+        window.open(searchUrl, "_blank");
+      }
+    });
+    quoteWidget.dataset.listenerBound = "true";
+  }
+}
+
+function initQuoteSourceSelect() {
+  const select = document.getElementById("cloud-quote-source-select");
+  if (!select) return;
+  select.innerHTML = "";
+  
+  const getMsg = (key, fallback) => {
+    if (typeof chrome !== "undefined" && chrome.i18n) {
+      return chrome.i18n.getMessage(key) || fallback;
+    }
+    return fallback;
+  };
+  
+  if (isSimplifiedChinese) {
+    const optHito = document.createElement("option");
+    optHito.value = "hitokoto";
+    optHito.textContent = getMsg("quoteSourceHitokoto", "Hitokoto");
+    select.appendChild(optHito);
+    
+    const optZen = document.createElement("option");
+    optZen.value = "zenquotes";
+    optZen.textContent = getMsg("quoteSourceZenQuotes", "ZenQuotes (英文)");
+    select.appendChild(optZen);
+    
+    const optAnime = document.createElement("option");
+    optAnime.value = "animechan";
+    optAnime.textContent = getMsg("quoteSourceAnimeChan", "AnimeChan (英文)");
+    select.appendChild(optAnime);
+  } else if (isChineseUser) {
+    const optZen = document.createElement("option");
+    optZen.value = "zenquotes";
+    optZen.textContent = getMsg("quoteSourceZenQuotes", "ZenQuotes (翻譯)");
+    select.appendChild(optZen);
+    
+    const optAnime = document.createElement("option");
+    optAnime.value = "animechan";
+    optAnime.textContent = getMsg("quoteSourceAnimeChan", "AnimeChan (翻譯)");
+    select.appendChild(optAnime);
+    
+    const optHito = document.createElement("option");
+    optHito.value = "hitokoto";
+    optHito.textContent = getMsg("quoteSourceHitokoto", "Hitokoto (原生為簡體字輸出)");
+    select.appendChild(optHito);
+  } else {
+    const optZen = document.createElement("option");
+    optZen.value = "zenquotes";
+    optZen.textContent = getMsg("quoteSourceZenQuotes", "ZenQuotes");
+    select.appendChild(optZen);
+    
+    const optAnime = document.createElement("option");
+    optAnime.value = "animechan";
+    optAnime.textContent = getMsg("quoteSourceAnimeChan", "AnimeChan (Anime Quotes)");
+    select.appendChild(optAnime);
+  }
+  
+  select.value = settings.cloudQuoteSource || (isSimplifiedChinese ? "hitokoto" : "zenquotes");
+  
+  if (!select.dataset.listenerBound) {
+    select.addEventListener("change", async () => {
+      settings.cloudQuoteSource = select.value;
+      await saveSettings();
+      initQuote();
+    });
+    select.dataset.listenerBound = "true";
+  }
+}
+
+/* ==========================================================================
+   Quick Links Widget
+   ========================================================================== */
+
+function initQuickLinks() {
+  renderQuickLinks();
+  
+  const addBtn = document.getElementById("add-link-btn");
+  const modal = document.getElementById("link-modal");
+  const cancelBtn = document.getElementById("modal-cancel");
+  const saveBtn = document.getElementById("modal-save");
+  const nameInput = document.getElementById("link-name-input");
+  const urlInput = document.getElementById("link-url-input");
+  
+  // Open modal
+  addBtn.addEventListener("click", () => {
+    nameInput.value = "";
+    urlInput.value = "";
+    modal.classList.add("open");
+    nameInput.focus();
+  });
+  
+  // Close modal
+  cancelBtn.addEventListener("click", () => {
+    modal.classList.remove("open");
+  });
+  
+  // Save new shortcut
+  saveBtn.addEventListener("click", async () => {
+    const name = nameInput.value.trim();
+    let url = urlInput.value.trim();
+    
+    if (!name || !url) {
+      showToast(isChineseUser ? "請填寫完整資訊" : "Please fill in all details");
+      return;
+    }
+    
+    // Auto prefix http/https if missing
+    if (!/^https?:\/\//i.test(url)) {
+      url = "https://" + url;
+    }
+    
+    quickLinks.push({ name, url });
+    await saveSettings();
+    renderQuickLinks();
+    modal.classList.remove("open");
+    showToast(isChineseUser ? `已新增捷徑 ${name}` : `Shortcut ${name} added`);
+  });
+}
+
+function renderQuickLinks() {
+  const linksGrid = document.getElementById("links-grid");
+  
+  // Remove all existing cards except the "Add New" button
+  const cards = linksGrid.querySelectorAll(".link-card:not(.add-link-btn)");
+  cards.forEach(card => card.remove());
+  
+  const addBtn = document.getElementById("add-link-btn");
+  
+  const openMode = settings.linkOpenMode || "current";
+
+  quickLinks.forEach((link, index) => {
+    const card = document.createElement("a");
+    card.className = "link-card";
+    card.href = link.url;
+    card.title = link.name;
+
+    // Apply open behavior: current tab (default), new tab, or new window
+    if (openMode === "newtab") {
+      card.target = "_blank";
+      card.rel = "noopener noreferrer";
+    } else if (openMode === "newwindow") {
+      card.addEventListener("click", (e) => {
+        e.preventDefault();
+        window.open(link.url, "_blank", "noopener,noreferrer,width=1200,height=800");
+      });
+    }
+
+    // Delete Button
+    const deleteBtn = document.createElement("button");
+    deleteBtn.className = "link-delete-btn";
+    deleteBtn.title = isChineseUser ? "刪除捷徑" : "Delete Shortcut";
+    deleteBtn.innerHTML = `
+      <svg viewBox="0 0 24 24" width="12" height="12">
+        <path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/>
+      </svg>
+    `;
+    
+    deleteBtn.addEventListener("click", async (e) => {
+      e.preventDefault(); // Stop click navigation
+      e.stopPropagation(); // Stop click card
+      
+      quickLinks.splice(index, 1);
+      await saveSettings();
+      renderQuickLinks();
+      showToast(isChineseUser ? `已刪除捷徑 ${link.name}` : `Shortcut ${link.name} deleted`);
+    });
+    
+    // Icon
+    const iconWrapper = document.createElement("div");
+    iconWrapper.className = "link-icon-wrapper";
+    
+    // Attempt to get domain for favicon
+    let domain = "";
+    try {
+      domain = new URL(link.url).hostname;
+    } catch(e) {
+      domain = "";
+    }
+    
+    if (domain) {
+      const img = document.createElement("img");
+      img.className = "link-icon-img";
+      img.src = `https://www.google.com/s2/favicons?sz=64&domain=${domain}`;
+      img.alt = link.name;
+      
+      // Fallback in case Google favicon API fails or offline
+      img.onerror = () => {
+        img.remove();
+        iconWrapper.textContent = link.name.charAt(0).toUpperCase();
+      };
+      
+      iconWrapper.appendChild(img);
+    } else {
+      iconWrapper.textContent = link.name.charAt(0).toUpperCase();
+    }
+    
+    // Title
+    const titleSpan = document.createElement("span");
+    titleSpan.className = "link-title";
+    titleSpan.textContent = link.name;
+    
+    card.appendChild(deleteBtn);
+    card.appendChild(iconWrapper);
+    card.appendChild(titleSpan);
+    
+    // Insert before the add button
+    linksGrid.insertBefore(card, addBtn);
+  });
+}
+
+/* ==========================================================================
+   Background & Wallpaper Logic
+   ========================================================================== */
+
+async function setRandomBackground() {
+  const activeDefaults = settings.activeDefaults;
+  const activeCustoms = settings.activeCustoms;
+  const hiddenDefaults = settings.hiddenDefaults || [];
+  
+  // Custom wallpapers list from DB
+  let allCustoms = [];
+  try {
+    allCustoms = await window.justDB.getAllWallpapers();
+  } catch (err) {
+    console.error("Failed to read from IndexedDB:", err);
+  }
+  
+  // Build a pool of selectable background configs
+  const pool = [];
+  
+  // Add defaults to pool if enabled AND not hidden
+  activeDefaults.forEach(id => {
+    if (!hiddenDefaults.includes(id)) {
+      pool.push({ type: "default", id: id, path: `images/bg${id}.png` });
+    }
+  });
+  
+  // Add customs to pool if enabled and exist in DB
+  allCustoms.forEach(item => {
+    if (activeCustoms.includes(item.id)) {
+      pool.push({ type: "custom", id: item.id, blob: item.blob });
+    }
+  });
+  
+  // Absolute fallback
+  if (pool.length === 0) {
+    let fallbackIds = [];
+    for (let i = 1; i <= DEFAULT_BG_COUNT; i++) {
+      if (!hiddenDefaults.includes(i)) fallbackIds.push(i);
+    }
+    if (fallbackIds.length === 0) {
+      fallbackIds = [1, 2, 3, 4, 5, 6];
+    }
+    fallbackIds.forEach(id => {
+      pool.push({ type: "default", id: id, path: `images/bg${id}.png` });
+    });
+  }
+  
+  // Select random item
+  const selectedBg = pool[Math.floor(Math.random() * pool.length)];
+  
+  // Prepare background URL
+  let bgUrl = "";
+  let tempBlobUrl = null;
+  
+  if (selectedBg.type === "default") {
+    bgUrl = selectedBg.path;
+  } else {
+    // Custom uploaded image
+    tempBlobUrl = URL.createObjectURL(selectedBg.blob);
+    bgUrl = tempBlobUrl;
+  }
+  
+  // Perform cross-fade transition
+  const layer1 = document.getElementById("bg-layer-1");
+  const layer2 = document.getElementById("bg-layer-2");
+  
+  const activeLayer = currentActiveLayer === 1 ? layer1 : layer2;
+  const inactiveLayer = currentActiveLayer === 1 ? layer2 : layer1;
+  
+  // Apply background to inactive layer first, preload it
+  inactiveLayer.style.backgroundImage = `url('${bgUrl}')`;
+  
+  // Apply Ken Burns Zoom class
+  if (settings.widgets.zoom) {
+    inactiveLayer.classList.add("ken-burns");
+  } else {
+    inactiveLayer.classList.remove("ken-burns");
+  }
+  
+  // Wait for the background to load to avoid flickering
+  const img = new Image();
+  img.src = bgUrl;
+  
+  const applyTransition = () => {
+    // Swap classes
+    inactiveLayer.classList.add("active");
+    activeLayer.classList.remove("active");
+    
+    // Revoke previous blob URL after some time (allow transition to finish)
+    const oldBlobUrl = activeBgBlobUrl;
+    setTimeout(() => {
+      if (oldBlobUrl) {
+        URL.revokeObjectURL(oldBlobUrl);
+      }
+      activeLayer.style.backgroundImage = "";
+      activeLayer.classList.remove("ken-burns");
+    }, 1300);
+    
+    activeBgBlobUrl = tempBlobUrl;
+    currentActiveLayer = currentActiveLayer === 1 ? 2 : 1;
+  };
+  
+  img.onload = applyTransition;
+  img.onerror = applyTransition;
+}
+
+/* ==========================================================================
+   Settings Drawer Logic
+   ========================================================================== */
+
+function initDrawer() {
+  const drawer = document.getElementById("settings-drawer");
+  const btnSettings = document.getElementById("btn-settings");
+  const btnClose = document.getElementById("drawer-close");
+  const btnRandomize = document.getElementById("btn-randomize");
+  
+  const usernameInput = document.getElementById("username-input");
+  
+  const toggleClock = document.getElementById("toggle-clock");
+  const toggleGreeting = document.getElementById("toggle-greeting");
+  const toggleLinks = document.getElementById("toggle-links");
+  const toggleQuote = document.getElementById("toggle-quote");
+  const toggleCloudQuote = document.getElementById("toggle-cloud-quote");
+  const toggleZoom = document.getElementById("toggle-zoom");
+  
+  const toggleSearch = document.getElementById("toggle-search");
+  const toggleBgRotate = document.getElementById("toggle-bg-rotate");
+  const bgRotateSubOptions = document.getElementById("bg-rotate-sub-options");
+  const inputBgRotateInterval = document.getElementById("input-bg-rotate-interval");
+  
+  const toggleSearchNewTab = document.getElementById("toggle-search-newtab");
+  const searchSubOptions = document.getElementById("search-sub-options");
+  const cloudQuoteSourceSelect = document.getElementById("cloud-quote-source-select");
+  const cloudQuoteSubOptions = document.getElementById("cloud-quote-sub-options");
+
+  const toggleSeconds = document.getElementById("toggle-seconds");
+  const clockTypeSelect = document.getElementById("clock-type-select");
+  const clockSubOptions = document.getElementById("clock-sub-options");
+
+  const linkOpenModeSelect = document.getElementById("link-open-mode-select");
+  const linksSubOptions = document.getElementById("links-sub-options");
+  
+  const btnResetDefaults = document.getElementById("btn-reset-defaults");
+  
+  const quoteInputText = document.getElementById("quote-input-text");
+  const quoteInputAuthor = document.getElementById("quote-input-author");
+  const btnAddQuote = document.getElementById("btn-add-quote");
+  
+  // Set randomize and settings button localized titles in JS
+  btnRandomize.setAttribute("title", isChineseUser ? "隨機切換背景" : "Randomize Background");
+  btnSettings.setAttribute("title", isChineseUser ? "偏好設定" : "Settings");
+  document.getElementById("drawer-close").setAttribute("title", isChineseUser ? "關閉" : "Close");
+
+  // Drawer Tab Switching Logic
+  const tabButtons = drawer.querySelectorAll(".tab-btn");
+  const tabPanes = drawer.querySelectorAll(".tab-pane");
+
+  tabButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const targetTab = btn.getAttribute("data-tab");
+      
+      tabButtons.forEach(b => b.classList.remove("active"));
+      tabPanes.forEach(p => p.classList.remove("active"));
+      
+      btn.classList.add("active");
+      document.getElementById(targetTab).classList.add("active");
+    });
+  });
+
+  // Open Settings Drawer
+  btnSettings.addEventListener("click", () => {
+    usernameInput.value = settings.username;
+    toggleClock.checked = settings.widgets.clock;
+    const toggleRss = document.getElementById("toggle-rss");
+    if (toggleRss) {
+      toggleRss.checked = settings.widgets.rss !== false;
+    }
+    toggleGreeting.checked = settings.widgets.greeting;
+    toggleLinks.checked = settings.widgets.links;
+    toggleQuote.checked = settings.widgets.quote;
+    toggleCloudQuote.checked = settings.widgets.cloudQuotes || false;
+    toggleZoom.checked = settings.widgets.zoom;
+    toggleSearch.checked = settings.widgets.search !== false;
+    toggleSearchNewTab.checked = settings.searchInNewTab || false;
+    searchSubOptions.style.display = settings.widgets.search !== false ? "block" : "none";
+    
+    // Cloud quotes source dropdown
+    initQuoteSourceSelect();
+    cloudQuoteSubOptions.style.display = settings.widgets.cloudQuotes ? "block" : "none";
+    
+    toggleBgRotate.checked = settings.bgAutoRotate || false;
+    bgRotateSubOptions.style.display = settings.bgAutoRotate ? "block" : "none";
+    inputBgRotateInterval.value = settings.bgRotateInterval || 180;
+    
+    toggleSeconds.checked = settings.clockShowSeconds !== false;
+    clockTypeSelect.value = settings.clockType || "digital";
+    if (settings.widgets.clock) {
+      clockSubOptions.classList.remove("disabled");
+    } else {
+      clockSubOptions.classList.add("disabled");
+    }
+
+    linkOpenModeSelect.value = settings.linkOpenMode || "current";
+    if (settings.widgets.links) {
+      linksSubOptions.classList.remove("disabled");
+    } else {
+      linksSubOptions.classList.add("disabled");
+    }
+
+    // Switch to first tab (General) upon opening drawer
+    tabButtons.forEach(b => b.classList.remove("active"));
+    tabPanes.forEach(p => p.classList.remove("active"));
+    tabButtons[0].classList.add("active");
+    tabPanes[0].classList.add("active");
+    
+    renderDrawerWallpapers();
+    renderDrawerQuotes();
+    renderDrawerThemes();
+    renderDrawerRssSubscriptions();
+    
+    drawer.classList.add("open");
+  });
+  
+  // Close Settings Drawer
+  btnClose.addEventListener("click", () => {
+    drawer.classList.remove("open");
+    revokeThumbnails();
+  });
+  
+  // Randomize background button
+  btnRandomize.addEventListener("click", () => {
+    setRandomBackground();
+    showToast(isChineseUser ? "已為您切換隨機背景" : "Background randomized");
+  });
+  
+  // Handle basic configuration inputs
+  usernameInput.addEventListener("input", async () => {
+    settings.username = usernameInput.value;
+    await saveSettings();
+    initGreeting(); // update live
+  });
+  
+  // Reset Hidden Default Wallpapers
+  btnResetDefaults.addEventListener("click", async () => {
+    settings.hiddenDefaults = [];
+    for (let i = 1; i <= DEFAULT_BG_COUNT; i++) {
+      if (!settings.activeDefaults.includes(i)) {
+        settings.activeDefaults.push(i);
+      }
+    }
+    await saveSettings();
+    renderDrawerWallpapers();
+    showToast(isChineseUser ? "內建背景圖片已全部重置並顯示" : "Default wallpapers restored");
+  });
+  
+  // Add Custom Quote
+  btnAddQuote.addEventListener("click", async () => {
+    const text = quoteInputText.value.trim();
+    const author = quoteInputAuthor.value.trim();
+    
+    if (!text) {
+      showToast(isChineseUser ? "請輸入金句內容" : "Please enter quote text");
+      return;
+    }
+    
+    if (!settings.customQuotes) settings.customQuotes = [];
+    
+    const newQuote = {
+      id: Date.now(),
+      text: text,
+      author: author || (isChineseUser ? "自訂" : "Custom")
+    };
+    
+    settings.customQuotes.push(newQuote);
+    await saveSettings();
+    
+    quoteInputText.value = "";
+    quoteInputAuthor.value = "";
+    
+    renderDrawerQuotes();
+    showToast(isChineseUser ? "金句新增成功" : "Quote added successfully");
+    initQuote(); // update display live
+  });
+  
+  // Widget Toggles
+  const handleToggle = (key, checkbox) => {
+    checkbox.addEventListener("change", async () => {
+      settings.widgets[key] = checkbox.checked;
+      await saveSettings();
+      applyWidgetVisibility();
+      
+      // Special case for clock sub options
+      if (key === "clock") {
+        if (checkbox.checked) {
+          clockSubOptions.classList.remove("disabled");
+        } else {
+          clockSubOptions.classList.add("disabled");
+        }
+      }
+      
+      // Special case for zoom
+      if (key === "zoom") {
+        const activeLayer = currentActiveLayer === 1 ? document.getElementById("bg-layer-2") : document.getElementById("bg-layer-1");
+        if (checkbox.checked) {
+          activeLayer.classList.add("ken-burns");
+        } else {
+          activeLayer.classList.remove("ken-burns");
+        }
+      }
+      
+      // Special case for cloud quotes
+      if (key === "cloudQuotes" || key === "quote") {
+        initQuote();
+        if (key === "cloudQuotes") {
+          cloudQuoteSubOptions.style.display = checkbox.checked ? "block" : "none";
+        }
+      }
+
+      if (key === "search") {
+        searchSubOptions.style.display = checkbox.checked ? "block" : "none";
+      }
+
+      // Special case for quick links sub options
+      if (key === "links") {
+        if (checkbox.checked) {
+          linksSubOptions.classList.remove("disabled");
+        } else {
+          linksSubOptions.classList.add("disabled");
+        }
+      }
+    });
+  };
+  
+  handleToggle("clock", toggleClock);
+  handleToggle("greeting", toggleGreeting);
+  handleToggle("links", toggleLinks);
+  handleToggle("quote", toggleQuote);
+  handleToggle("cloudQuotes", toggleCloudQuote);
+  handleToggle("zoom", toggleZoom);
+  handleToggle("search", toggleSearch);
+
+  // Search In New Tab Listener
+  toggleSearchNewTab.addEventListener("change", async () => {
+    settings.searchInNewTab = toggleSearchNewTab.checked;
+    await saveSettings();
+  });
+  
+  // Auto Rotate Listeners
+  toggleBgRotate.addEventListener("change", async () => {
+    settings.bgAutoRotate = toggleBgRotate.checked;
+    bgRotateSubOptions.style.display = settings.bgAutoRotate ? "block" : "none";
+    await saveSettings();
+    startBgAutoRotate();
+  });
+  
+  const handleIntervalChange = async () => {
+    let val = parseInt(inputBgRotateInterval.value, 10);
+    if (isNaN(val) || val < 15) val = 15;
+    if (val > 86400) val = 86400;
+    inputBgRotateInterval.value = val;
+    settings.bgRotateInterval = val;
+    await saveSettings();
+    startBgAutoRotate();
+  };
+  
+  inputBgRotateInterval.addEventListener("change", handleIntervalChange);
+  inputBgRotateInterval.addEventListener("blur", handleIntervalChange);
+  
+  // Clock Style & Seconds listeners
+  clockTypeSelect.addEventListener("change", async () => {
+    settings.clockType = clockTypeSelect.value;
+    await saveSettings();
+    initClock();
+  });
+  
+  toggleSeconds.addEventListener("change", async () => {
+    settings.clockShowSeconds = toggleSeconds.checked;
+    await saveSettings();
+    initClock();
+  });
+
+  // Quick Link Open Mode listener
+  linkOpenModeSelect.addEventListener("change", async () => {
+    settings.linkOpenMode = linkOpenModeSelect.value;
+    await saveSettings();
+    renderQuickLinks();
+  });
+}
+
+// Render the list of wallpapers (default & custom) in the settings drawer
+async function renderDrawerWallpapers() {
+  revokeThumbnails();
+  
+  const defaultList = document.getElementById("default-wallpaper-list");
+  const customList = document.getElementById("custom-wallpaper-list");
+  const btnResetDefaults = document.getElementById("btn-reset-defaults");
+  
+  defaultList.innerHTML = "";
+  customList.innerHTML = "";
+  
+  const hiddenDefaults = settings.hiddenDefaults || [];
+  if (hiddenDefaults.length > 0) {
+    btnResetDefaults.style.display = "block";
+  } else {
+    btnResetDefaults.style.display = "none";
+  }
+  
+  // 1. Render Defaults (skipping hidden ones)
+  for (let i = 1; i <= DEFAULT_BG_COUNT; i++) {
+    if (hiddenDefaults.includes(i)) continue;
+    
+    const isActive = settings.activeDefaults.includes(i);
+    
+    const item = document.createElement("div");
+    item.className = `wallpaper-item ${isActive ? "selected" : ""}`;
+    item.dataset.id = i;
+    
+    const img = document.createElement("img");
+    img.className = "wallpaper-thumb";
+    img.src = `images/bg${i}.png`;
+    img.alt = `Default BG ${i}`;
+    
+    const overlay = document.createElement("div");
+    overlay.className = "wallpaper-item-overlay";
+    overlay.innerHTML = `
+      <svg class="wallpaper-check-icon" viewBox="0 0 24 24">
+        <path fill="none" stroke="currentColor" stroke-width="3" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+      </svg>
+    `;
+    
+    const deleteBtn = document.createElement("button");
+    deleteBtn.className = "wallpaper-delete-btn";
+    deleteBtn.title = isChineseUser ? "隱藏此內建背景" : "Hide default wallpaper";
+    deleteBtn.innerHTML = `
+      <svg viewBox="0 0 24 24" width="12" height="12">
+        <path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/>
+      </svg>
+    `;
+    
+    deleteBtn.addEventListener("click", async (e) => {
+      e.stopPropagation(); // Stop click item
+      
+      const visibleDefaults = DEFAULT_BG_COUNT - (settings.hiddenDefaults || []).length;
+      if (visibleDefaults + settings.activeCustoms.length <= 1) {
+        showToast(isChineseUser ? "必須保留至少一張背景圖片" : "Must keep at least one wallpaper active");
+        return;
+      }
+      
+      if (!settings.hiddenDefaults) settings.hiddenDefaults = [];
+      settings.hiddenDefaults.push(i);
+      
+      const idx = settings.activeDefaults.indexOf(i);
+      if (idx > -1) {
+        settings.activeDefaults.splice(idx, 1);
+      }
+      
+      await saveSettings();
+      renderDrawerWallpapers();
+      showToast(isChineseUser ? "已隱藏該內建背景圖片" : "Default wallpaper hidden");
+    });
+    
+    item.appendChild(img);
+    item.appendChild(overlay);
+    item.appendChild(deleteBtn);
+    
+    item.addEventListener("click", async () => {
+      const idx = settings.activeDefaults.indexOf(i);
+      if (idx > -1) {
+        if (settings.activeDefaults.length + settings.activeCustoms.length > 1) {
+          settings.activeDefaults.splice(idx, 1);
+          item.classList.remove("selected");
+        } else {
+          showToast(isChineseUser ? "必須保留至少一張背景圖片" : "Must keep at least one wallpaper active");
+        }
+      } else {
+        settings.activeDefaults.push(i);
+        item.classList.add("selected");
+      }
+      await saveSettings();
+    });
+    
+    defaultList.appendChild(item);
+  }
+  
+  // 2. Render Customs
+  let customItems = [];
+  try {
+    customItems = await window.justDB.getAllWallpapers();
+  } catch (err) {
+    console.error(err);
+  }
+  
+  if (customItems.length === 0) {
+    const emptyMsg = document.createElement("p");
+    emptyMsg.style.gridColumn = "span 2";
+    emptyMsg.style.fontSize = "0.8rem";
+    emptyMsg.style.color = "var(--text-muted)";
+    emptyMsg.style.textAlign = "center";
+    emptyMsg.textContent = isChineseUser ? "尚無自訂背景" : "No custom wallpapers";
+    customList.appendChild(emptyMsg);
+  } else {
+    customItems.forEach(itemData => {
+      const isActive = settings.activeCustoms.includes(itemData.id);
+      const blobUrl = URL.createObjectURL(itemData.blob);
+      thumbBlobUrls.push(blobUrl);
+      
+      const item = document.createElement("div");
+      item.className = `wallpaper-item ${isActive ? "selected" : ""}`;
+      
+      const img = document.createElement("img");
+      img.className = "wallpaper-thumb";
+      img.src = blobUrl;
+      img.alt = itemData.name;
+      
+      const overlay = document.createElement("div");
+      overlay.className = "wallpaper-item-overlay";
+      overlay.innerHTML = `
+        <svg class="wallpaper-check-icon" viewBox="0 0 24 24">
+          <path fill="none" stroke="currentColor" stroke-width="3" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+        </svg>
+      `;
+      
+      const deleteBtn = document.createElement("button");
+      deleteBtn.className = "wallpaper-delete-btn";
+      deleteBtn.title = isChineseUser ? "刪除此背景" : "Delete wallpaper";
+      deleteBtn.innerHTML = `
+        <svg viewBox="0 0 24 24" width="12" height="12">
+          <path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+        </svg>
+      `;
+      
+      deleteBtn.addEventListener("click", async (e) => {
+        e.stopPropagation();
+        
+        const actIdx = settings.activeCustoms.indexOf(itemData.id);
+        if (actIdx > -1) {
+          if (settings.activeDefaults.length + settings.activeCustoms.length > 1) {
+            settings.activeCustoms.splice(actIdx, 1);
+          } else {
+            showToast(isChineseUser ? "必須保留至少一張背景圖片" : "Must keep at least one wallpaper active");
+            return;
+          }
+        }
+        
+        try {
+          await window.justDB.deleteWallpaper(itemData.id);
+          await saveSettings();
+          renderDrawerWallpapers();
+          showToast(isChineseUser ? "自訂背景已刪除" : "Custom wallpaper deleted");
+        } catch (err) {
+          console.error(err);
+          showToast(isChineseUser ? "刪除失敗" : "Delete failed");
+        }
+      });
+      
+      item.appendChild(img);
+      item.appendChild(overlay);
+      item.appendChild(deleteBtn);
+      
+      item.addEventListener("click", async () => {
+        const actIdx = settings.activeCustoms.indexOf(itemData.id);
+        if (actIdx > -1) {
+          if (settings.activeDefaults.length + settings.activeCustoms.length > 1) {
+            settings.activeCustoms.splice(actIdx, 1);
+            item.classList.remove("selected");
+          } else {
+            showToast(isChineseUser ? "必須保留至少一張背景圖片" : "Must keep at least one wallpaper active");
+          }
+        } else {
+          settings.activeCustoms.push(itemData.id);
+          item.classList.add("selected");
+        }
+        await saveSettings();
+      });
+      
+      customList.appendChild(item);
+    });
+  }
+}
+
+// Render the list of custom quotes in the settings drawer
+function renderDrawerQuotes() {
+  const customQuotesList = document.getElementById("custom-quotes-list");
+  customQuotesList.innerHTML = "";
+  
+  const quotes = settings.customQuotes || [];
+  
+  if (quotes.length === 0) {
+    const emptyMsg = document.createElement("p");
+    emptyMsg.style.fontSize = "0.8rem";
+    emptyMsg.style.color = "var(--text-muted)";
+    emptyMsg.style.textAlign = "center";
+    emptyMsg.style.padding = "1rem 0";
+    emptyMsg.textContent = isChineseUser ? "尚無自訂金句" : "No custom quotes";
+    customQuotesList.appendChild(emptyMsg);
+    return;
+  }
+  
+  quotes.forEach((quote) => {
+    const item = document.createElement("div");
+    item.className = "custom-quote-item";
+    
+    const details = document.createElement("div");
+    details.className = "custom-quote-details";
+    
+    const textSpan = document.createElement("span");
+    textSpan.className = "custom-quote-text";
+    textSpan.textContent = quote.text;
+    
+    const authorSpan = document.createElement("span");
+    authorSpan.className = "custom-quote-author";
+    authorSpan.textContent = `— ${quote.author}`;
+    
+    details.appendChild(textSpan);
+    details.appendChild(authorSpan);
+    
+    const deleteBtn = document.createElement("button");
+    deleteBtn.className = "custom-quote-delete-btn";
+    deleteBtn.title = isChineseUser ? "刪除金句" : "Delete Quote";
+    deleteBtn.innerHTML = `
+      <svg viewBox="0 0 24 24" width="14" height="14">
+        <path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+      </svg>
+    `;
+    
+    deleteBtn.addEventListener("click", async () => {
+      const idx = settings.customQuotes.findIndex(q => q.id === quote.id);
+      if (idx > -1) {
+        settings.customQuotes.splice(idx, 1);
+        await saveSettings();
+        renderDrawerQuotes();
+        showToast(isChineseUser ? "自訂金句已刪除" : "Quote deleted");
+        initQuote();
+      }
+    });
+    
+    item.appendChild(details);
+    item.appendChild(deleteBtn);
+    customQuotesList.appendChild(item);
+  });
+}
+
+// Clean up thumbnail blob URLs to prevent memory leak
+function revokeThumbnails() {
+  thumbBlobUrls.forEach(url => URL.revokeObjectURL(url));
+  thumbBlobUrls = [];
+}
+
+/* ==========================================================================
+   File Upload & Drag & Drop
+   ========================================================================== */
+
+function initUpload() {
+  const uploadBox = document.getElementById("upload-box");
+  const fileInput = document.getElementById("file-input");
+  
+  uploadBox.addEventListener("click", () => {
+    fileInput.click();
+  });
+  
+  fileInput.addEventListener("change", async (e) => {
+    await handleUploadedFiles(e.target.files);
+    fileInput.value = "";
+  });
+  
+  uploadBox.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    uploadBox.classList.add("drag-over");
+  });
+  
+  uploadBox.addEventListener("dragleave", () => {
+    uploadBox.classList.remove("drag-over");
+  });
+  
+  uploadBox.addEventListener("drop", (e) => {
+    e.preventDefault();
+    uploadBox.classList.remove("drag-over");
+    handleUploadedFiles(e.dataTransfer.files);
+  });
+}
+
+async function handleUploadedFiles(files) {
+  if (!files || files.length === 0) return;
+  
+  let successCount = 0;
+  
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+    
+    if (!file.type.startsWith("image/")) {
+      showToast(isChineseUser ? `${file.name} 不是圖片檔案` : `${file.name} is not an image`);
+      continue;
+    }
+    
+    if (file.size > 12 * 1024 * 1024) {
+      showToast(isChineseUser ? `${file.name} 檔案過大 (大於 12MB)，已略過` : `${file.name} exceeds 12MB limit`);
+      continue;
+    }
+    
+    try {
+      const insertedId = await window.justDB.addWallpaper(file.name, file);
+      settings.activeCustoms.push(insertedId);
+      successCount++;
+    } catch (err) {
+      console.error(err);
+      showToast(isChineseUser ? `儲存 ${file.name} 失敗` : `Failed to save ${file.name}`);
+    }
+  }
+  
+  if (successCount > 0) {
+    await saveSettings();
+    await renderDrawerWallpapers();
+    showToast(isChineseUser 
+      ? `成功上傳了 ${successCount} 張背景圖片！` 
+      : `Successfully uploaded ${successCount} wallpapers!`);
+  }
+}
+
+/* ==========================================================================
+   Toast Notification Helper
+   ========================================================================== */
+
+let toastTimeout = null;
+
+function showToast(message) {
+  let toast = document.getElementById("app-toast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "app-toast";
+    toast.className = "toast-msg";
+    document.body.appendChild(toast);
+  }
+  
+  toast.textContent = message;
+  toast.classList.add("show");
+  
+  if (toastTimeout) {
+    clearTimeout(toastTimeout);
+  }
+  
+  toastTimeout = setTimeout(() => {
+    toast.classList.remove("show");
+  }, 2500);
+}
+
+/* ==========================================================================
+   ZIP Theme Package Import
+   ========================================================================== */
+
+function initZipImport() {
+  const zipImportBox = document.getElementById("zip-import-box");
+  const zipFileInput = document.getElementById("zip-file-input");
+
+  zipImportBox.addEventListener("click", () => {
+    zipFileInput.click();
+  });
+
+  zipFileInput.addEventListener("change", async (e) => {
+    await handleZipFile(e.target.files[0]);
+    zipFileInput.value = "";
+  });
+
+  zipImportBox.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    zipImportBox.classList.add("drag-over");
+  });
+
+  zipImportBox.addEventListener("dragleave", () => {
+    zipImportBox.classList.remove("drag-over");
+  });
+
+  zipImportBox.addEventListener("drop", async (e) => {
+    e.preventDefault();
+    zipImportBox.classList.remove("drag-over");
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      await handleZipFile(e.dataTransfer.files[0]);
+    }
+  });
+}
+
+async function handleZipFile(fileOrBlob, customName = null) {
+  if (!fileOrBlob) return;
+
+  const fileName = customName || fileOrBlob.name || "theme.zip";
+
+  if (!fileName.toLowerCase().endsWith(".zip")) {
+    showToast(isChineseUser ? "請上傳 ZIP 壓縮包檔案" : "Please upload a ZIP file");
+    return;
+  }
+
+  // Limit ZIP size to 50MB
+  if (fileOrBlob.size > 50 * 1024 * 1024) {
+    showToast(isChineseUser ? "ZIP 檔案過大 (大於 50MB)，已拒絕載入" : "ZIP file is too large (max 50MB)");
+    return;
+  }
+
+  showToast(isChineseUser ? "正在解析主題包，請稍候..." : "Parsing theme package, please wait...");
+
+  // Generate packageId and packageName
+  const packageId = `pkg_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+  const packageName = fileName.substring(0, fileName.lastIndexOf('.')) || fileName;
+
+  try {
+    const jszip = new JSZip();
+    const zip = await jszip.loadAsync(fileOrBlob);
+    
+    let imagesImported = 0;
+    let quotesImported = 0;
+    let customQuotesList = settings.customQuotes || [];
+
+    const filePromises = [];
+
+    zip.forEach((relativePath, zipEntry) => {
+      if (zipEntry.dir) return;
+
+      const nameLower = zipEntry.name.toLowerCase();
+
+      // Only allow JPG, JPEG, PNG
+      if (nameLower.endsWith(".jpg") || nameLower.endsWith(".jpeg") || nameLower.endsWith(".png")) {
+        const mimeType = nameLower.endsWith(".png") ? "image/png" : "image/jpeg";
+        
+        const promise = zipEntry.async("blob").then(async (blob) => {
+          if (blob.size > 12 * 1024 * 1024) {
+            console.warn(`Skipped ${zipEntry.name}: image too large`);
+            return;
+          }
+          
+          const fileBlob = new Blob([blob], { type: mimeType });
+          try {
+            const fileName = zipEntry.name.split("/").pop();
+            const insertedId = await window.justDB.addWallpaper(fileName, fileBlob, packageId, packageName);
+            settings.activeCustoms.push(insertedId);
+            imagesImported++;
+          } catch (err) {
+            console.error(`Failed to save image ${zipEntry.name}:`, err);
+          }
+        });
+        filePromises.push(promise);
+      }
+      
+      // Quotes from txt or json
+      else if (nameLower.endsWith("quotes.txt") || nameLower.endsWith("金句.txt")) {
+        const promise = zipEntry.async("string").then((text) => {
+          const lines = text.split(/\r?\n/);
+          lines.forEach(line => {
+            const trimmed = line.trim();
+            if (!trimmed) return;
+
+            let quoteText = trimmed;
+            let quoteAuthor = isChineseUser ? "主題包匯入" : "Theme Package";
+
+            if (trimmed.includes("|")) {
+              const parts = trimmed.split("|");
+              quoteText = parts[0].trim();
+              quoteAuthor = parts[1].trim() || quoteAuthor;
+            } else if (trimmed.includes(" — ")) {
+              const parts = trimmed.split(" — ");
+              quoteText = parts[0].trim();
+              quoteAuthor = parts[1].trim() || quoteAuthor;
+            } else if (trimmed.includes(" - ")) {
+              const parts = trimmed.split(" - ");
+              quoteText = parts[0].trim();
+              quoteAuthor = parts[1].trim() || quoteAuthor;
+            }
+
+            if (quoteText) {
+              customQuotesList.push({
+                id: Date.now() + Math.random(),
+                text: quoteText,
+                author: quoteAuthor,
+                packageId: packageId,
+                packageName: packageName
+              });
+              quotesImported++;
+            }
+          });
+        });
+        filePromises.push(promise);
+      }
+      
+      else if (nameLower.endsWith("quotes.json") || nameLower.endsWith("金句.json")) {
+        const promise = zipEntry.async("string").then((text) => {
+          try {
+            const data = JSON.parse(text);
+            if (Array.isArray(data)) {
+              data.forEach(item => {
+                if (item.text && item.text.trim()) {
+                  customQuotesList.push({
+                    id: Date.now() + Math.random(),
+                    text: item.text.trim(),
+                    author: item.author ? item.author.trim() : (isChineseUser ? "主題包匯入" : "Theme Package"),
+                    packageId: packageId,
+                    packageName: packageName
+                  });
+                  quotesImported++;
+                }
+              });
+            }
+          } catch (jsonErr) {
+            console.error("Failed to parse quotes.json:", jsonErr);
+          }
+        });
+        filePromises.push(promise);
+      }
+    });
+
+    await Promise.all(filePromises);
+
+    if (imagesImported > 0 || quotesImported > 0) {
+      settings.customQuotes = customQuotesList;
+      await saveSettings();
+      
+      await renderDrawerWallpapers();
+      renderDrawerQuotes();
+      await renderDrawerThemes();
+      initQuote();
+
+      const msg = isChineseUser
+        ? `主題包匯入成功！匯入了 ${imagesImported} 張背景與 ${quotesImported} 條金句。`
+        : `Theme package imported! Loaded ${imagesImported} wallpapers and ${quotesImported} quotes.`;
+      showToast(msg);
+    } else {
+      showToast(isChineseUser ? "主題包內未包含有效的圖片或金句檔案" : "No valid images or quotes found in ZIP");
+    }
+
+  } catch (err) {
+    console.error("ZIP import failure:", err);
+    showToast(isChineseUser ? "解析 ZIP 檔案失敗" : "Failed to parse ZIP file");
+  }
+}
+
+// Render list of imported ZIP theme packages and handle theme deletion
+async function renderDrawerThemes() {
+  const themesListEl = document.getElementById("imported-themes-list");
+  if (!themesListEl) return;
+  themesListEl.innerHTML = "";
+
+  let allCustoms = [];
+  try {
+    allCustoms = await window.justDB.getAllWallpapers();
+  } catch (err) {
+    console.error("Failed to get wallpapers for theme grouping:", err);
+  }
+
+  const quotes = settings.customQuotes || [];
+
+  // Group by packageId
+  const packagesMap = {};
+
+  allCustoms.forEach(item => {
+    if (item.packageId) {
+      if (!packagesMap[item.packageId]) {
+        packagesMap[item.packageId] = {
+          id: item.packageId,
+          name: item.packageName || item.packageId,
+          wallpapers: [],
+          quotes: []
+        };
+      }
+      packagesMap[item.packageId].wallpapers.push(item.id);
+    }
+  });
+
+  quotes.forEach(quote => {
+    if (quote.packageId) {
+      if (!packagesMap[quote.packageId]) {
+        packagesMap[quote.packageId] = {
+          id: quote.packageId,
+          name: quote.packageName || quote.packageId,
+          wallpapers: [],
+          quotes: []
+        };
+      }
+      packagesMap[quote.packageId].quotes.push(quote.id);
+    }
+  });
+
+  const packageIds = Object.keys(packagesMap);
+
+  if (packageIds.length === 0) {
+    const emptyMsg = document.createElement("p");
+    emptyMsg.style.fontSize = "0.8rem";
+    emptyMsg.style.color = "var(--text-muted)";
+    emptyMsg.style.textAlign = "center";
+    emptyMsg.style.padding = "1rem 0";
+    emptyMsg.textContent = isChineseUser ? "目前尚無匯入的主題包" : "No imported packages yet";
+    themesListEl.appendChild(emptyMsg);
+    return;
+  }
+
+  packageIds.forEach(pkgId => {
+    const pkg = packagesMap[pkgId];
+    
+    const card = document.createElement("div");
+    card.className = "theme-package-card";
+
+    const info = document.createElement("div");
+    info.className = "theme-package-info";
+
+    const nameSpan = document.createElement("span");
+    nameSpan.className = "theme-package-name";
+    nameSpan.textContent = pkg.name;
+
+    const statsSpan = document.createElement("span");
+    statsSpan.className = "theme-package-stats";
+    
+    const wallpapersText = isChineseUser ? `${pkg.wallpapers.length} 張背景` : `${pkg.wallpapers.length} wallpapers`;
+    const quotesText = isChineseUser ? `${pkg.quotes.length} 條金句` : `${pkg.quotes.length} quotes`;
+    statsSpan.textContent = `${wallpapersText}, ${quotesText}`;
+
+    info.appendChild(nameSpan);
+    info.appendChild(statsSpan);
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.className = "theme-delete-btn";
+    deleteBtn.title = isChineseUser ? "刪除此主題包" : "Delete Theme Package";
+    deleteBtn.innerHTML = `
+      <svg viewBox="0 0 24 24" width="16" height="16">
+        <path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+      </svg>
+    `;
+
+    deleteBtn.addEventListener("click", async () => {
+      const confirmText = isChineseUser
+        ? `您確定要刪除「${pkg.name}」主題包嗎？這將會一併移除該主題包內所有的背景圖片與自訂金句。`
+        : `Are you sure you want to delete "${pkg.name}"? This will remove all of its wallpapers and quotes.`;
+
+      if (confirm(confirmText)) {
+        showToast(isChineseUser ? `正在刪除主題包「${pkg.name}」...` : `Deleting theme "${pkg.name}"...`);
+        
+        // 1. Delete wallpapers from IndexedDB
+        for (const wpId of pkg.wallpapers) {
+          try {
+            await window.justDB.deleteWallpaper(wpId);
+            
+            // Remove from activeCustoms
+            const actIdx = settings.activeCustoms.indexOf(wpId);
+            if (actIdx > -1) {
+              settings.activeCustoms.splice(actIdx, 1);
+            }
+          } catch (err) {
+            console.error(`Failed to delete wallpaper ${wpId} from package ${pkg.name}:`, err);
+          }
+        }
+
+        // 2. Delete quotes from customQuotes
+        settings.customQuotes = (settings.customQuotes || []).filter(q => q.packageId !== pkgId);
+
+        await saveSettings();
+
+        // 3. Re-render UI panels
+        await renderDrawerWallpapers();
+        renderDrawerQuotes();
+        await renderDrawerThemes();
+        initQuote();
+        
+        showToast(isChineseUser ? `主題包「${pkg.name}」已成功刪除` : `Theme "${pkg.name}" deleted successfully`);
+      }
+    });
+
+    card.appendChild(info);
+    card.appendChild(deleteBtn);
+    themesListEl.appendChild(card);
+  });
+}
+
+/* ==========================================================================
+   Version 1.45: RSS Widget & Recommended Themes Logic
+   ========================================================================== */
+
+const OFFICIAL_THEMES = [
+  {
+    name: "Christian Theme Pack",
+    url: "https://yblog.org/wp-content/uploads/2026/06/christian_pack.zip",
+    desc: "精選基督教主題背景與溫暖金句"
+  },
+  {
+    name: "Classic Moody Pack",
+    url: "https://yblog.org/wp-content/uploads/2026/06/classic_moody.zip",
+    desc: "極簡暗黑、深邃星空與哲學思考金句"
+  },
+  {
+    name: "Nature & Zen Pack",
+    url: "https://yblog.org/wp-content/uploads/2026/06/nature_zen.zip",
+    desc: "寧靜自然風景與禪意生活金句"
+  }
+];
+
+function initOfficialThemes() {
+  const container = document.getElementById("official-themes-list");
+  if (!container) return;
+  container.innerHTML = "";
+
+  OFFICIAL_THEMES.forEach(theme => {
+    const card = document.createElement("div");
+    card.className = "official-theme-card";
+
+    const info = document.createElement("div");
+    info.className = "official-theme-info";
+
+    const nameSpan = document.createElement("span");
+    nameSpan.className = "official-theme-name";
+    nameSpan.textContent = theme.name;
+
+    const descSpan = document.createElement("span");
+    descSpan.className = "official-theme-desc";
+    descSpan.textContent = isChineseUser ? theme.desc : theme.name;
+
+    info.appendChild(nameSpan);
+    info.appendChild(descSpan);
+
+    const btn = document.createElement("button");
+    btn.className = "official-theme-download-btn";
+    btn.innerHTML = `
+      <svg viewBox="0 0 24 24" width="12" height="12">
+        <path fill="currentColor" d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/>
+      </svg>
+      <span>下載匯入</span>
+    `;
+
+    // Localize download button text
+    btn.querySelector("span").textContent = isChineseUser ? "下載匯入" : "Install";
+
+    btn.addEventListener("click", async () => {
+      btn.classList.add("loading");
+      btn.disabled = true;
+      btn.querySelector("span").textContent = isChineseUser ? "下載中..." : "Downloading...";
+
+      showToast(isChineseUser ? `開始下載主題包 ${theme.name}...` : `Downloading theme ${theme.name}...`);
+
+      try {
+        const response = await fetch(theme.url);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const blob = await response.blob();
+        const filename = theme.url.split("/").pop() || `${theme.name}.zip`;
+        
+        await handleZipFile(blob, filename);
+      } catch (err) {
+        console.error("Failed to download preset theme package:", err);
+        showToast(isChineseUser ? `下載主題包 ${theme.name} 失敗` : `Failed to download theme ${theme.name}`);
+      } finally {
+        btn.classList.remove("loading");
+        btn.disabled = false;
+        btn.querySelector("span").textContent = isChineseUser ? "下載匯入" : "Install";
+      }
+    });
+
+    card.appendChild(info);
+    card.appendChild(btn);
+    container.appendChild(card);
+  });
+}
+
+function initRssWidget() {
+  const refreshBtn = document.getElementById("btn-rss-refresh");
+  if (refreshBtn && !refreshBtn.dataset.listenerBound) {
+    refreshBtn.addEventListener("click", () => {
+      loadRssFeeds(true);
+    });
+    refreshBtn.dataset.listenerBound = "true";
+  }
+
+  if (settings.widgets.rss !== false) {
+    loadRssFeeds();
+  }
+}
+
+let rssRotationInterval = null;
+let currentRssIndex = 0;
+
+function startRssRotation(items) {
+  if (rssRotationInterval) {
+    clearInterval(rssRotationInterval);
+  }
+  
+  const linkEl = document.getElementById("rss-ticker-link");
+  if (!linkEl || !items || items.length === 0) return;
+
+  currentRssIndex = 0;
+  
+  const displayItem = (index) => {
+    const item = items[index];
+    
+    // Smooth transition
+    linkEl.classList.add("fade-out");
+    
+    setTimeout(() => {
+      linkEl.href = item.link;
+      linkEl.textContent = `[${item.source}] ${item.title}`;
+      linkEl.classList.remove("fade-out");
+      linkEl.classList.add("fade-in");
+      
+      // Request reflow
+      void linkEl.offsetWidth;
+      
+      linkEl.classList.remove("fade-in");
+    }, 300);
+  };
+  
+  // Display first item
+  displayItem(currentRssIndex);
+  
+  // Rotate every 5 seconds
+  rssRotationInterval = setInterval(() => {
+    currentRssIndex = (currentRssIndex + 1) % items.length;
+    displayItem(currentRssIndex);
+  }, 5000);
+}
+
+async function loadRssFeeds(forceRefresh = false) {
+  const linkEl = document.getElementById("rss-ticker-link");
+  if (!linkEl) return;
+
+  const cacheKey = "just_new_tab_rss_cache";
+  const cacheTimeKey = "just_new_tab_rss_cache_time";
+  const cachedData = localStorage.getItem(cacheKey);
+  const cachedTime = localStorage.getItem(cacheTimeKey) || 0;
+
+  // Cache is valid for 15 minutes
+  if (!forceRefresh && cachedData && (Date.now() - cachedTime < 15 * 60 * 1000)) {
+    try {
+      const items = JSON.parse(cachedData);
+      startRssRotation(items);
+      return;
+    } catch(e) {
+      console.error("Failed to parse cached RSS data:", e);
+    }
+  }
+
+  linkEl.innerHTML = `
+    <div class="rss-loading-spinner"></div>
+    <span>載入中...</span>
+  `;
+  linkEl.querySelector("span").textContent = isChineseUser ? "正在讀取訂閱內容..." : "Loading subscriptions...";
+  linkEl.href = "#";
+
+  const subscriptions = settings.rssSubscriptions || [];
+  if (subscriptions.length === 0) {
+    linkEl.textContent = isChineseUser ? "目前無訂閱來源，請至設定新增" : "No subscribed feeds. Add in settings.";
+    return;
+  }
+
+  const allItems = [];
+  const fetchPromises = subscriptions.map(async (sub) => {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 6000); // 6s timeout
+      const response = await fetch(sub.url, { signal: controller.signal });
+      clearTimeout(timeoutId);
+
+      if (!response.ok) throw new Error(`Status ${response.status}`);
+      const xmlText = await response.text();
+      const items = parseRSS(xmlText, sub.name);
+      allItems.push(...items);
+    } catch(err) {
+      console.error(`Failed to fetch RSS feed from ${sub.name} (${sub.url}):`, err.message || err);
+    }
+  });
+
+  await Promise.allSettled(fetchPromises);
+
+  // Sort by date descending
+  allItems.sort((a, b) => b.date.getTime() - a.date.getTime());
+
+  // Limit to top 15 items
+  const finalItems = allItems.slice(0, 15);
+
+  if (finalItems.length === 0) {
+    linkEl.textContent = isChineseUser ? "讀取失敗，請檢查網路或連結格式" : "Failed to load feeds. Check connections.";
+    return;
+  }
+
+  // Cache final items
+  try {
+    localStorage.setItem(cacheKey, JSON.stringify(finalItems));
+    localStorage.setItem(cacheTimeKey, Date.now());
+  } catch(e) {}
+
+  startRssRotation(finalItems);
+}
+
+function parseRSS(xmlText, sourceName) {
+  const parser = new DOMParser();
+  const xmlDoc = parser.parseFromString(xmlText, "text/xml");
+  const items = [];
+
+  const getCleanText = (el) => {
+    if (!el) return "";
+    return el.textContent || el.text || "";
+  };
+
+  // RSS 2.0
+  const rssItems = xmlDoc.querySelectorAll("item");
+  if (rssItems && rssItems.length > 0) {
+    rssItems.forEach(node => {
+      const title = getCleanText(node.querySelector("title")) || "Untitled";
+      
+      let link = "";
+      const linkEl = node.querySelector("link");
+      if (linkEl) {
+        link = linkEl.textContent || linkEl.text || linkEl.innerHTML || "";
+        link = link.trim();
+      }
+      
+      const pubDateText = getCleanText(node.querySelector("pubDate")) || getCleanText(node.querySelector("date")) || "";
+      let date = null;
+      if (pubDateText) {
+        try { date = new Date(pubDateText); } catch(e) {}
+      }
+
+      if (link) {
+        items.push({
+          title,
+          link,
+          date: date && !isNaN(date.getTime()) ? date : new Date(),
+          source: sourceName
+        });
+      }
+    });
+  } else {
+    // Atom
+    const atomEntries = xmlDoc.querySelectorAll("entry");
+    if (atomEntries && atomEntries.length > 0) {
+      atomEntries.forEach(node => {
+        const title = getCleanText(node.querySelector("title")) || "Untitled";
+        
+        let link = "";
+        const linkNode = node.querySelector("link");
+        if (linkNode) {
+          link = linkNode.getAttribute("href") || linkNode.textContent || "";
+          link = link.trim();
+        }
+
+        const updatedText = getCleanText(node.querySelector("updated")) || getCleanText(node.querySelector("published")) || "";
+        let date = null;
+        if (updatedText) {
+          try { date = new Date(updatedText); } catch(e) {}
+        }
+
+        if (link) {
+          items.push({
+            title,
+            link,
+            date: date && !isNaN(date.getTime()) ? date : new Date(),
+            source: sourceName
+          });
+        }
+      });
+    }
+  }
+
+  return items;
+}
+
+function initRssSettings() {
+  const toggleRss = document.getElementById("toggle-rss");
+  const btnAddRss = document.getElementById("btn-add-rss");
+  const rssInputName = document.getElementById("rss-input-name");
+  const rssInputUrl = document.getElementById("rss-input-url");
+
+  if (toggleRss) {
+    toggleRss.checked = settings.widgets.rss !== false;
+    toggleRss.addEventListener("change", async () => {
+      settings.widgets.rss = toggleRss.checked;
+      await saveSettings();
+      applyWidgetVisibility();
+      if (settings.widgets.rss !== false) {
+        loadRssFeeds(true);
+      }
+    });
+  }
+
+  if (btnAddRss) {
+    btnAddRss.addEventListener("click", async () => {
+      const name = rssInputName.value.trim();
+      let url = rssInputUrl.value.trim();
+
+      if (!name || !url) {
+        showToast(isChineseUser ? "請填寫訂閱名稱與連結網址" : "Please fill in subscription name and URL");
+        return;
+      }
+
+      if (!/^https?:\/\//i.test(url)) {
+        url = "https://" + url;
+      }
+
+      if (!settings.rssSubscriptions) {
+        settings.rssSubscriptions = [];
+      }
+
+      const newSub = {
+        id: Date.now(),
+        name: name,
+        url: url
+      };
+
+      settings.rssSubscriptions.push(newSub);
+      await saveSettings();
+
+      rssInputName.value = "";
+      rssInputUrl.value = "";
+
+      renderDrawerRssSubscriptions();
+      showToast(isChineseUser ? "成功訂閱 RSS 來源" : "RSS subscription added");
+      
+      if (settings.widgets.rss !== false) {
+        loadRssFeeds(true);
+      }
+    });
+  }
+}
+
+function renderDrawerRssSubscriptions() {
+  const listEl = document.getElementById("rss-feeds-list");
+  if (!listEl) return;
+  listEl.innerHTML = "";
+
+  const subs = settings.rssSubscriptions || [];
+
+  if (subs.length === 0) {
+    const emptyMsg = document.createElement("p");
+    emptyMsg.style.fontSize = "0.8rem";
+    emptyMsg.style.color = "var(--text-muted)";
+    emptyMsg.style.textAlign = "center";
+    emptyMsg.style.padding = "1rem 0";
+    emptyMsg.textContent = isChineseUser ? "目前尚無訂閱來源" : "No subscribed feeds yet";
+    listEl.appendChild(emptyMsg);
+    return;
+  }
+
+  subs.forEach((sub) => {
+    const item = document.createElement("div");
+    item.className = "custom-quote-item";
+
+    const details = document.createElement("div");
+    details.className = "custom-quote-details";
+
+    const nameSpan = document.createElement("span");
+    nameSpan.className = "custom-quote-text";
+    nameSpan.style.fontWeight = "600";
+    nameSpan.textContent = sub.name;
+
+    const urlSpan = document.createElement("span");
+    urlSpan.className = "custom-quote-author";
+    urlSpan.style.textAlign = "left";
+    urlSpan.textContent = sub.url;
+
+    details.appendChild(nameSpan);
+    details.appendChild(urlSpan);
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.className = "rss-delete-btn";
+    deleteBtn.title = isChineseUser ? "刪除此訂閱" : "Delete subscription";
+    deleteBtn.innerHTML = `
+      <svg viewBox="0 0 24 24" width="14" height="14">
+        <path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+      </svg>
+    `;
+
+    deleteBtn.addEventListener("click", async () => {
+      const idx = settings.rssSubscriptions.findIndex(s => s.id === sub.id);
+      if (idx > -1) {
+        settings.rssSubscriptions.splice(idx, 1);
+        await saveSettings();
+        renderDrawerRssSubscriptions();
+        showToast(isChineseUser ? "已刪除訂閱來源" : "Subscription deleted");
+        
+        if (settings.widgets.rss !== false) {
+          loadRssFeeds(true);
+        }
+      }
+    });
+
+    item.appendChild(details);
+    item.appendChild(deleteBtn);
+    listEl.appendChild(item);
+  });
+}
