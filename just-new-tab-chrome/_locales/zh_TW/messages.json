@@ -1,0 +1,212 @@
+{
+  "extName": {
+    "message": "Just a New Tab"
+  },
+  "extDesc": {
+    "message": "開啟新分頁，帶給您一整天的好心情。支援隨機背景、時鐘、自訂捷徑與金句小工具。"
+  },
+  "drawerTitle": {
+    "message": "個性化設定"
+  },
+  "generalSettings": {
+    "message": "基本設定"
+  },
+  "usernameLabel": {
+    "message": "您的名字"
+  },
+  "usernamePlaceholder": {
+    "message": "例如：Ivan"
+  },
+  "displayWidgets": {
+    "message": "顯示小工具"
+  },
+  "toggleClock": {
+    "message": "顯示時間與日期"
+  },
+  "toggleGreeting": {
+    "message": "顯示親切問候語"
+  },
+  "toggleLinks": {
+    "message": "顯示捷徑清單"
+  },
+  "toggleQuote": {
+    "message": "顯示每日金句"
+  },
+  "toggleCloudQuote": {
+    "message": "從網路獲取金句"
+  },
+  "toggleZoom": {
+    "message": "背景微動縮放效果 (Ken Burns)"
+  },
+  "bgGallery": {
+    "message": "背景圖片庫"
+  },
+  "bgGalleryDesc": {
+    "message": "勾選的圖片會加入每次新分頁的隨機輪播池中。"
+  },
+  "defaultBgs": {
+    "message": "內建精美背景"
+  },
+  "resetAll": {
+    "message": "全部重置"
+  },
+  "customBgs": {
+    "message": "自訂背景圖片"
+  },
+  "noCustomBgs": {
+    "message": "尚無自訂背景"
+  },
+  "uploadText": {
+    "message": "拖曳圖片至此，或點擊上傳"
+  },
+  "uploadSubtext": {
+    "message": "支援多張上傳，圖片將存於本機資料庫"
+  },
+  "customQuotes": {
+    "message": "自訂金句庫"
+  },
+  "customQuotesDesc": {
+    "message": "新增您喜愛的金句，它將與預設金句一同在頁面隨機輪播。"
+  },
+  "quoteInputText": {
+    "message": "輸入金句內容..."
+  },
+  "quoteInputAuthor": {
+    "message": "作者 (選填)..."
+  },
+  "addBtn": {
+    "message": "新增"
+  },
+  "noCustomQuotes": {
+    "message": "尚無自訂金句"
+  },
+  "modalTitle": {
+    "message": "新增快捷網頁"
+  },
+  "modalName": {
+    "message": "名稱"
+  },
+  "modalNamePlaceholder": {
+    "message": "例如：Google"
+  },
+  "modalUrl": {
+    "message": "網址 (URL)"
+  },
+  "modalCancel": {
+    "message": "取消"
+  },
+  "modalSave": {
+    "message": "儲存"
+  },
+  "addLinkText": {
+    "message": "新增捷徑"
+  },
+  "clockTypeLabel": {
+    "message": "時鐘樣式"
+  },
+  "clockTypeDigital": {
+    "message": "數字時鐘"
+  },
+  "clockTypeAnalog": {
+    "message": "指針時鐘"
+  },
+  "linkOpenModeLabel": {
+    "message": "捷徑開啟方式"
+  },
+  "linkOpenCurrent": {
+    "message": "目前分頁"
+  },
+  "linkOpenNewTab": {
+    "message": "新分頁"
+  },
+  "linkOpenNewWindow": {
+    "message": "新視窗"
+  },
+  "toggleSeconds": {
+    "message": "顯示秒數"
+  },
+  "zipImportTitle": {
+    "message": "主題包匯入 (.zip)"
+  },
+  "zipImportDesc": {
+    "message": "匯入包含自訂背景（限 jpg/png）與金句文字檔的主題壓縮包。"
+  },
+  "zipUploadText": {
+    "message": "拖曳 ZIP 檔案至此，或點擊上傳"
+  },
+  "zipUploadSubtext": {
+    "message": "支援包含背景圖及 quotes.txt / quotes.json 的主題包"
+  },
+  "tabGeneral": {
+    "message": "一般設定"
+  },
+  "tabWallpapers": {
+    "message": "背景圖片"
+  },
+  "tabQuotes": {
+    "message": "金句小工具"
+  },
+  "tabThemes": {
+    "message": "主題包管理"
+  },
+  "importedThemesTitle": {
+    "message": "已匯入主題包清單"
+  },
+  "noImportedThemes": {
+    "message": "目前尚無匯入的主題包"
+  },
+  "themeDeleteConfirm": {
+    "message": "您確定要刪除這個主題包嗎？這將會一併移除該主題包內所有的背景圖片與自訂金句。"
+  },
+  "toggleSearch": {
+    "message": "顯示搜尋框"
+  },
+  "toggleBgRotate": {
+    "message": "開啟分頁原地定時輪播圖片"
+  },
+  "bgRotateIntervalLabel": {
+    "message": "輪播間隔時間 (秒)"
+  },
+  "searchPlaceholder": {
+    "message": "搜尋網頁或輸入問題..."
+  },
+  "toggleSearchNewTab": {
+    "message": "在新分頁開啟搜尋結果"
+  },
+  "quoteSearchTooltip": {
+    "message": "點擊在 Google 搜尋此金句"
+  },
+  "cloudQuoteSourceLabel": {
+    "message": "金句來源"
+  },
+  "quoteSourceZenQuotes": {
+    "message": "ZenQuotes (翻譯)"
+  },
+  "quoteSourceAnimeChan": {
+    "message": "AnimeChan (翻譯)"
+  },
+  "quoteSourceHitokoto": {
+    "message": "Hitokoto (原生為簡體字輸出)"
+  },
+  "officialThemesTitle": {
+    "message": "官方推薦主題包"
+  },
+  "officialThemesDesc": {
+    "message": "由官方預先製作的主題包，點擊按鈕即可下載並自動匯入背景與金句。"
+  },
+  "tabRss": {
+    "message": "RSS訂閱"
+  },
+  "rssToggleTitle": {
+    "message": "RSS 閱讀看板"
+  },
+  "toggleRss": {
+    "message": "顯示 RSS 聚合閱讀看板"
+  },
+  "rssManageTitle": {
+    "message": "訂閱來源管理"
+  },
+  "rssManageDesc": {
+    "message": "新增或修改您訂閱的 RSS 連結，點選文章將另開新視窗開啟。"
+  }
+}

@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="extName">Just New Tab</title>
+  <link rel="stylesheet" href="newtab.css">
+</head>
+<body>
+  <!-- Background Layers for Smooth Transitions -->
+  <div class="bg-container">
+    <div id="bg-layer-1" class="bg-layer active"></div>
+    <div id="bg-layer-2" class="bg-layer"></div>
+    <div class="bg-overlay"></div>
+  </div>
+
+  <!-- Main App Layout -->
+  <div class="app-wrapper">
+    <main class="main-content">
+      <!-- Widgets Section -->
+      <div class="widgets-container">
+        <!-- Clock & Date -->
+        <div id="clock-widget" class="widget-item clock-wrapper">
+          <!-- Digital Clock -->
+          <h1 id="clock-time">00:00</h1>
+          
+          <!-- Analog Clock -->
+          <div id="analog-clock" class="analog-clock-container" style="display: none;">
+            <div class="clock-face" id="clock-face">
+              <div class="hand hour-hand" id="analog-hour"></div>
+              <div class="hand minute-hand" id="analog-minute"></div>
+              <div class="hand second-hand" id="analog-second"></div>
+              <div class="clock-center"></div>
+            </div>
+          </div>
+          
+          <p id="clock-date">2026年6月5日 星期五</p>
+        </div>
+
+        <!-- Greeting -->
+        <div id="greeting-widget" class="widget-item greeting-wrapper">
+          <span id="greeting-text">您好</span>
+        </div>
+
+        <!-- Search Box -->
+        <div id="search-widget" class="widget-item search-wrapper">
+          <form id="search-form">
+            <div class="search-input-container">
+              <select id="search-engine-select" name="engine" title="搜尋引擎">
+                <option value="google">Google</option>
+                <option value="chatgpt">ChatGPT (AI)</option>
+                <option value="claude">Claude (AI)</option>
+                <option value="perplexity">Perplexity (AI)</option>
+                <option value="duckduckgo">DuckDuckGo</option>
+                <option value="bing">Bing</option>
+                <option value="yahoo">Yahoo</option>
+                <option value="baidu">Baidu</option>
+              </select>
+              <input type="text" name="q" id="search-input" data-i18n="searchPlaceholder" placeholder="搜尋網頁或輸入問題..." autocomplete="off">
+              <button type="submit" class="search-submit-btn" title="搜尋">
+                <svg viewBox="0 0 24 24" width="18" height="18">
+                  <path fill="currentColor" d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                </svg>
+              </button>
+            </div>
+          </form>
+        </div>
+        
+        <!-- Quick Links -->
+        <div id="links-widget" class="widget-item links-wrapper">
+          <div class="links-grid" id="links-grid">
+            <!-- Dynamic links injected here -->
+            <button class="link-card add-link-btn" id="add-link-btn" data-i18n-title="addLinkText" title="新增捷徑">
+              <div class="link-icon-wrapper add-icon">
+                <svg viewBox="0 0 24 24" width="24" height="24">
+                  <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                </svg>
+              </div>
+              <span class="link-title" data-i18n="addLinkText">新增捷徑</span>
+            </button>
+          </div>
+        </div>
+        
+        <!-- RSS Ticker Widget -->
+        <div id="rss-widget" class="rss-ticker-container widget-hidden">
+          <svg class="rss-ticker-icon" viewBox="0 0 24 24" width="14" height="14">
+            <path fill="currentColor" d="M6.18 15.64a2.18 2.18 0 1 1 0 4.36 2.18 2.18 0 0 1 0-4.36zM4 4.44A15.56 15.56 0 0 1 19.56 20h-2.83A12.73 12.73 0 0 0 4 7.27V4.44zm0 5.66a9.9 9.9 0 0 1 9.9 9.9h-2.83A7.07 7.07 0 0 0 4 12.93v-2.83z"/>
+          </svg>
+          <span class="rss-ticker-label">即時追蹤:</span>
+          <div class="rss-ticker-content">
+            <a id="rss-ticker-link" class="rss-ticker-link" href="#" target="_blank" rel="noopener noreferrer">載入中...</a>
+          </div>
+          <button class="rss-refresh-btn" id="btn-rss-refresh" title="重新整理 RSS" style="margin-left: auto;">
+            <svg viewBox="0 0 24 24" width="12" height="12">
+              <path fill="currentColor" d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer Quote -->
+    <footer class="app-footer">
+      <div id="quote-widget" class="quote-wrapper" data-i18n-title="quoteSearchTooltip" title="點擊在 Google 搜尋此金句">
+        <p id="quote-text" class="quote-content"></p>
+        <p id="quote-author" class="quote-author"></p>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Bottom Floating Control Buttons -->
+  <div class="floating-controls">
+    <button class="control-btn" id="btn-randomize" title="隨機切換背景">
+      <svg viewBox="0 0 24 24" width="20" height="20">
+        <path fill="currentColor" d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+      </svg>
+    </button>
+    <button class="control-btn" id="btn-settings" title="偏好設定">
+      <svg viewBox="0 0 24 24" width="20" height="20">
+        <path fill="currentColor" d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Settings Drawer (Slides out from right) -->
+  <div class="settings-drawer" id="settings-drawer">
+    <div class="drawer-header">
+      <h2 data-i18n="drawerTitle">個性化設定</h2>
+      <button class="close-btn" id="drawer-close" title="關閉">
+        <svg viewBox="0 0 24 24" width="24" height="24">
+          <path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/>
+        </svg>
+      </button>
+    </div>
+    
+    <!-- Tab Navigation Header -->
+    <div class="drawer-tabs">
+      <button class="tab-btn active" data-tab="tab-general" data-i18n="tabGeneral">一般設定</button>
+      <button class="tab-btn" data-tab="tab-wallpapers" data-i18n="tabWallpapers">背景圖片</button>
+      <button class="tab-btn" data-tab="tab-quotes" data-i18n="tabQuotes">金句小工具</button>
+      <button class="tab-btn" data-tab="tab-themes" data-i18n="tabThemes">主題包管理</button>
+      <button class="tab-btn" data-tab="tab-rss" data-i18n="tabRss">RSS訂閱</button>
+    </div>
+    
+    <div class="drawer-content">
+      <!-- Tab 1: General Settings -->
+      <div class="tab-pane active" id="tab-general">
+        <!-- Section: General -->
+        <div class="drawer-section">
+          <h3 data-i18n="generalSettings">基本設定</h3>
+          <div class="form-group">
+            <label for="username-input" data-i18n="usernameLabel">您的名字</label>
+            <input type="text" id="username-input" data-i18n="usernamePlaceholder" placeholder="例如：Ivan" maxlength="20">
+          </div>
+        </div>
+
+        <!-- Section: Display Toggles -->
+        <div class="drawer-section">
+          <h3 data-i18n="displayWidgets">顯示小工具</h3>
+          <div class="toggle-group">
+            <label class="toggle-switch">
+              <input type="checkbox" id="toggle-clock" checked>
+              <span class="slider"></span>
+            </label>
+            <span data-i18n="toggleClock">顯示時間與日期</span>
+          </div>
+          <!-- Clock Style Sub-options -->
+          <div id="clock-sub-options" class="sub-options-group">
+            <div class="form-group-inline">
+              <span data-i18n="clockTypeLabel">時鐘樣式</span>
+              <select id="clock-type-select">
+                <option value="digital" data-i18n="clockTypeDigital">數字時鐘</option>
+                <option value="analog" data-i18n="clockTypeAnalog">指針時鐘</option>
+              </select>
+            </div>
+            <div class="toggle-group sub-toggle">
+              <label class="toggle-switch">
+                <input type="checkbox" id="toggle-seconds" checked>
+                <span class="slider"></span>
+              </label>
+              <span data-i18n="toggleSeconds">顯示秒數</span>
+            </div>
+          </div>
+          <div class="toggle-group">
+            <label class="toggle-switch">
+              <input type="checkbox" id="toggle-greeting" checked>
+              <span class="slider"></span>
+            </label>
+            <span data-i18n="toggleGreeting">顯示親切問候語</span>
+          </div>
+          <div class="toggle-group">
+            <label class="toggle-switch">
+              <input type="checkbox" id="toggle-links" checked>
+              <span class="slider"></span>
+            </label>
+            <span data-i18n="toggleLinks">顯示捷徑清單</span>
+          </div>
+          <!-- Quick Links Sub-options -->
+          <div id="links-sub-options" class="sub-options-group">
+            <div class="form-group-inline">
+              <span data-i18n="linkOpenModeLabel">捷徑開啟方式</span>
+              <select id="link-open-mode-select">
+                <option value="current" data-i18n="linkOpenCurrent">目前分頁</option>
+                <option value="newtab" data-i18n="linkOpenNewTab">新分頁</option>
+                <option value="newwindow" data-i18n="linkOpenNewWindow">新視窗</option>
+              </select>
+            </div>
+          </div>
+          <div class="toggle-group">
+            <label class="toggle-switch">
+              <input type="checkbox" id="toggle-search" checked>
+              <span class="slider"></span>
+            </label>
+            <span data-i18n="toggleSearch">顯示搜尋框</span>
+          </div>
+          <!-- Search Box Sub-options -->
+          <div id="search-sub-options" class="sub-options-group" style="display: none;">
+            <div class="toggle-group sub-toggle">
+              <label class="toggle-switch">
+                <input type="checkbox" id="toggle-search-newtab">
+                <span class="slider"></span>
+              </label>
+              <span data-i18n="toggleSearchNewTab">在新分頁開啟搜尋結果</span>
+            </div>
+          </div>
+          <div class="toggle-group">
+            <label class="toggle-switch">
+              <input type="checkbox" id="toggle-zoom" checked>
+              <span class="slider"></span>
+            </label>
+            <span data-i18n="toggleZoom">背景微動縮放效果 (Ken Burns)</span>
+          </div>
+          <!-- Timed rotation of wallpaper -->
+          <div class="toggle-group">
+            <label class="toggle-switch">
+              <input type="checkbox" id="toggle-bg-rotate">
+              <span class="slider"></span>
+            </label>
+            <span data-i18n="toggleBgRotate">自動輪播背景圖片</span>
+          </div>
+          <div id="bg-rotate-sub-options" class="sub-options-group" style="display: none;">
+            <div class="form-group-inline">
+              <span data-i18n="bgRotateIntervalLabel">輪播間隔時間 (秒)</span>
+              <input type="number" id="input-bg-rotate-interval" min="15" max="86400" value="180">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Wallpapers -->
+      <div class="tab-pane" id="tab-wallpapers">
+        <!-- Section: Wallpaper Pool Management -->
+        <div class="drawer-section">
+          <h3 data-i18n="bgGallery">背景圖片庫</h3>
+          <p class="section-desc" data-i18n="bgGalleryDesc">勾選的圖片會加入每次新分頁的隨機輪播池中。</p>
+          
+          <!-- Default Wallpapers -->
+          <div class="sub-section-header">
+            <h4 class="sub-section-title" data-i18n="defaultBgs">內建精美背景</h4>
+            <button class="text-action-btn" id="btn-reset-defaults" style="display: none;" data-i18n="resetAll">全部重置</button>
+          </div>
+          <div class="wallpaper-list" id="default-wallpaper-list">
+            <!-- Populated by JS -->
+          </div>
+
+          <!-- Custom Wallpapers -->
+          <h4 class="sub-section-title" data-i18n="customBgs">自訂背景圖片</h4>
+          <div class="wallpaper-list" id="custom-wallpaper-list">
+            <!-- Populated by JS -->
+          </div>
+
+          <!-- Upload Box -->
+          <div class="upload-box" id="upload-box">
+            <input type="file" id="file-input" accept="image/*" multiple style="display: none;">
+            <svg viewBox="0 0 24 24" width="32" height="32" class="upload-icon">
+              <path fill="currentColor" d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
+            </svg>
+            <span class="upload-text" data-i18n="uploadText">拖曳圖片至此，或點擊上傳</span>
+            <span class="upload-subtext" data-i18n="uploadSubtext">支援多張上傳，圖片將存於本機資料庫</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Quotes -->
+      <div class="tab-pane" id="tab-quotes">
+        <!-- Section: Toggles for Quote -->
+        <div class="drawer-section">
+          <h3 data-i18n="displayWidgets">顯示小工具</h3>
+          <div class="toggle-group">
+            <label class="toggle-switch">
+              <input type="checkbox" id="toggle-quote" checked>
+              <span class="slider"></span>
+            </label>
+            <span data-i18n="toggleQuote">顯示每日金句</span>
+          </div>
+          <div class="toggle-group" id="toggle-cloud-quote-group">
+            <label class="toggle-switch">
+              <input type="checkbox" id="toggle-cloud-quote">
+              <span class="slider"></span>
+            </label>
+            <span data-i18n="toggleCloudQuote">從網路獲取金句</span>
+          </div>
+          <!-- Cloud Quote Source Sub-options -->
+          <div id="cloud-quote-sub-options" class="sub-options-group" style="display: none;">
+            <div class="form-group-inline">
+              <span data-i18n="cloudQuoteSourceLabel">金句來源</span>
+              <select id="cloud-quote-source-select">
+                <!-- Populated dynamically in JS -->
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section: Custom Quotes Management -->
+        <div class="drawer-section">
+          <h3 data-i18n="customQuotes">自訂金句庫</h3>
+          <p class="section-desc" data-i18n="customQuotesDesc">新增您喜愛的金句，它將與預設金句一同在頁面隨機輪播。</p>
+          
+          <!-- Add Quote Form -->
+          <div class="quote-add-form">
+            <div class="form-group">
+              <input type="text" id="quote-input-text" data-i18n="quoteInputText" placeholder="輸入金句內容..." maxlength="120">
+            </div>
+            <div class="form-group-row">
+              <input type="text" id="quote-input-author" data-i18n="quoteInputAuthor" placeholder="作者 (選填)..." maxlength="20">
+              <button class="add-quote-btn" id="btn-add-quote" data-i18n="addBtn">新增</button>
+            </div>
+          </div>
+
+          <!-- Custom Quotes List -->
+          <div class="custom-quotes-list" id="custom-quotes-list">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 4: Theme Packages -->
+      <div class="tab-pane" id="tab-themes">
+        <!-- Section: Official Themes -->
+        <div class="drawer-section">
+          <h3 data-i18n="officialThemesTitle">官方推薦主題包</h3>
+          <p class="section-desc" data-i18n="officialThemesDesc">由官方預先製作的主題包，點擊按鈕即可下載並自動匯入背景與金句。</p>
+          <div class="official-themes-list" id="official-themes-list">
+            <!-- Populated dynamically by JS -->
+          </div>
+        </div>
+
+        <!-- Section: ZIP Theme Package Import -->
+        <div class="drawer-section">
+          <h3 data-i18n="zipImportTitle">主題包匯入 (.zip)</h3>
+          <p class="section-desc" data-i18n="zipImportDesc">匯入包含自訂背景（限 jpg/png）與金句文字檔的主題壓縮包。</p>
+          <div class="upload-box" id="zip-import-box">
+            <input type="file" id="zip-file-input" accept=".zip" style="display: none;">
+            <svg viewBox="0 0 24 24" width="32" height="32" class="upload-icon">
+              <path fill="currentColor" d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM12 17l-4-4h3V9h2v4h3l-4 4z"/>
+            </svg>
+            <span class="upload-text" data-i18n="zipUploadText">拖曳 ZIP 檔案至此，或點擊上傳</span>
+            <span class="upload-subtext" data-i18n="zipUploadSubtext">支援包含背景圖及 quotes.txt / quotes.json 的主題包</span>
+          </div>
+        </div>
+
+        <!-- Section: Theme Package List -->
+        <div class="drawer-section">
+          <h3 data-i18n="importedThemesTitle">已匯入主題包清單</h3>
+          <div class="themes-list" id="imported-themes-list">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 5: RSS Feed Subscriptions -->
+      <div class="tab-pane" id="tab-rss">
+        <!-- Section: Toggle RSS -->
+        <div class="drawer-section">
+          <h3 data-i18n="rssToggleTitle">RSS 閱讀看板</h3>
+          <div class="toggle-group">
+            <label class="toggle-switch">
+              <input type="checkbox" id="toggle-rss" checked>
+              <span class="slider"></span>
+            </label>
+            <span data-i18n="toggleRss">顯示 RSS 聚合閱讀看板</span>
+          </div>
+        </div>
+
+        <!-- Section: Subscriptions Management -->
+        <div class="drawer-section">
+          <h3 data-i18n="rssManageTitle">訂閱來源管理</h3>
+          <p class="section-desc" data-i18n="rssManageDesc">新增或修改您訂閱的 RSS 連結，點選文章將另開新視窗開啟。</p>
+          
+          <!-- Add RSS Form -->
+          <div class="quote-add-form">
+            <div class="form-group">
+              <input type="text" id="rss-input-name" placeholder="訂閱名稱 (例如: CyberQ)..." maxlength="30">
+            </div>
+            <div class="form-group-row">
+              <input type="url" id="rss-input-url" placeholder="RSS Feed 網址 (https://...)...">
+              <button class="add-quote-btn" id="btn-add-rss" data-i18n="addBtn">新增</button>
+            </div>
+          </div>
+
+          <!-- RSS feeds list -->
+          <div class="custom-quotes-list" id="rss-feeds-list">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Link Dialog/Modal -->
+  <div class="modal-overlay" id="link-modal">
+    <div class="modal-box">
+      <h3 data-i18n="modalTitle">新增快捷網頁</h3>
+      <div class="form-group">
+        <label for="link-name-input" data-i18n="modalName">名稱</label>
+        <input type="text" id="link-name-input" data-i18n="modalNamePlaceholder" placeholder="例如：Google" maxlength="15">
+      </div>
+      <div class="form-group">
+        <label for="link-url-input" data-i18n="modalUrl">網址 (URL)</label>
+        <input type="url" id="link-url-input" placeholder="https://example.com">
+      </div>
+      <div class="modal-actions">
+        <button class="modal-btn secondary" id="modal-cancel" data-i18n="modalCancel">取消</button>
+        <button class="modal-btn primary" id="modal-save" data-i18n="modalSave">儲存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JSZip, IndexedDB Manager and Main Script -->
+  <script src="jszip.min.js"></script>
+  <script src="db.js"></script>
+  <script src="newtab.js"></script>
+</body>
+</html>

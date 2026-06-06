@@ -1,0 +1,212 @@
+{
+  "extName": {
+    "message": "Just a New Tab"
+  },
+  "extDesc": {
+    "message": "Open a new tab with a beautiful random wallpaper, clock, greeting, quotes, and quick link shortcuts."
+  },
+  "drawerTitle": {
+    "message": "Personalization Settings"
+  },
+  "generalSettings": {
+    "message": "General Settings"
+  },
+  "usernameLabel": {
+    "message": "Your Name"
+  },
+  "usernamePlaceholder": {
+    "message": "e.g., Ivan"
+  },
+  "displayWidgets": {
+    "message": "Display Widgets"
+  },
+  "toggleClock": {
+    "message": "Show Clock & Date"
+  },
+  "toggleGreeting": {
+    "message": "Show Personalized Greeting"
+  },
+  "toggleLinks": {
+    "message": "Show Quick Links"
+  },
+  "toggleQuote": {
+    "message": "Show Daily Quote"
+  },
+  "toggleCloudQuote": {
+    "message": "Fetch Quotes from Cloud"
+  },
+  "toggleZoom": {
+    "message": "Background Zoom Effect (Ken Burns)"
+  },
+  "bgGallery": {
+    "message": "Background Gallery"
+  },
+  "bgGalleryDesc": {
+    "message": "Checked wallpapers will be included in the random new tab rotation pool."
+  },
+  "defaultBgs": {
+    "message": "Default Wallpapers"
+  },
+  "resetAll": {
+    "message": "Reset All"
+  },
+  "customBgs": {
+    "message": "Custom Wallpapers"
+  },
+  "noCustomBgs": {
+    "message": "No custom wallpapers"
+  },
+  "uploadText": {
+    "message": "Drag & drop images here, or click to upload"
+  },
+  "uploadSubtext": {
+    "message": "Supports multiple files. Stored locally in browser DB."
+  },
+  "customQuotes": {
+    "message": "Custom Quotes Pool"
+  },
+  "customQuotesDesc": {
+    "message": "Add your favorite quotes. They will rotate along with defaults."
+  },
+  "quoteInputText": {
+    "message": "Enter quote text..."
+  },
+  "quoteInputAuthor": {
+    "message": "Author (optional)..."
+  },
+  "addBtn": {
+    "message": "Add"
+  },
+  "noCustomQuotes": {
+    "message": "No custom quotes"
+  },
+  "modalTitle": {
+    "message": "Add Quick Link"
+  },
+  "modalName": {
+    "message": "Name"
+  },
+  "modalNamePlaceholder": {
+    "message": "e.g., Google"
+  },
+  "modalUrl": {
+    "message": "URL"
+  },
+  "modalCancel": {
+    "message": "Cancel"
+  },
+  "modalSave": {
+    "message": "Save"
+  },
+  "addLinkText": {
+    "message": "Add Shortcut"
+  },
+  "clockTypeLabel": {
+    "message": "Clock Style"
+  },
+  "clockTypeDigital": {
+    "message": "Digital"
+  },
+  "clockTypeAnalog": {
+    "message": "Analog"
+  },
+  "linkOpenModeLabel": {
+    "message": "Shortcut Open Mode"
+  },
+  "linkOpenCurrent": {
+    "message": "Current Tab"
+  },
+  "linkOpenNewTab": {
+    "message": "New Tab"
+  },
+  "linkOpenNewWindow": {
+    "message": "New Window"
+  },
+  "toggleSeconds": {
+    "message": "Show Seconds"
+  },
+  "zipImportTitle": {
+    "message": "Import Theme Package (.zip)"
+  },
+  "zipImportDesc": {
+    "message": "Import a ZIP package containing custom wallpapers (JPG/PNG only) and quotes."
+  },
+  "zipUploadText": {
+    "message": "Drag & drop ZIP here, or click to upload"
+  },
+  "zipUploadSubtext": {
+    "message": "Supports ZIP containing wallpapers and quotes.txt / quotes.json"
+  },
+  "tabGeneral": {
+    "message": "General"
+  },
+  "tabWallpapers": {
+    "message": "Wallpapers"
+  },
+  "tabQuotes": {
+    "message": "Quotes"
+  },
+  "tabThemes": {
+    "message": "Themes"
+  },
+  "importedThemesTitle": {
+    "message": "Imported Theme Packages"
+  },
+  "noImportedThemes": {
+    "message": "No imported packages yet"
+  },
+  "themeDeleteConfirm": {
+    "message": "Are you sure you want to delete this theme package? This will remove all of its wallpapers and quotes."
+  },
+  "toggleSearch": {
+    "message": "Show Search Box"
+  },
+  "toggleBgRotate": {
+    "message": "Timed Wallpaper Rotation on Active Tab"
+  },
+  "bgRotateIntervalLabel": {
+    "message": "Rotation Interval (seconds)"
+  },
+  "searchPlaceholder": {
+    "message": "Search the web or ask a question..."
+  },
+  "toggleSearchNewTab": {
+    "message": "Open search results in a new tab"
+  },
+  "quoteSearchTooltip": {
+    "message": "Click to search this quote on Google"
+  },
+  "cloudQuoteSourceLabel": {
+    "message": "Quote Source"
+  },
+  "quoteSourceZenQuotes": {
+    "message": "ZenQuotes"
+  },
+  "quoteSourceAnimeChan": {
+    "message": "AnimeChan (Anime Quotes)"
+  },
+  "quoteSourceHitokoto": {
+    "message": "Hitokoto"
+  },
+  "officialThemesTitle": {
+    "message": "Official Recommended Themes"
+  },
+  "officialThemesDesc": {
+    "message": "Pre-made theme packages from official sources. Click download to fetch and automatically import wallpapers and quotes."
+  },
+  "tabRss": {
+    "message": "RSS Feed"
+  },
+  "rssToggleTitle": {
+    "message": "RSS Dashboard"
+  },
+  "toggleRss": {
+    "message": "Show RSS Reader Panel"
+  },
+  "rssManageTitle": {
+    "message": "RSS Subscriptions"
+  },
+  "rssManageDesc": {
+    "message": "Add or modify your RSS feed links. Clicking an article will open it in a new window."
+  }
+}
