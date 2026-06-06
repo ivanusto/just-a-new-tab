@@ -1,4 +1,4 @@
-# Just New Tab
+# Just a New Tab
 
 自訂新分頁瀏覽器擴充套件，提供時鐘、問候語、搜尋框、捷徑、每日金句、背景圖庫、主題包匯入與 RSS 看板。
 
@@ -25,7 +25,13 @@
 
 ## 修改共用檔案後的同步
 
-修改 `just-new-tab/` 的共用檔案後，複製到 `just-new-tab-chrome/`（manifest 除外），並用 `node --check newtab.js` 驗證語法。
+`just-new-tab/` 為共用檔案的「來源」。修改後執行 `./sync.sh`，會自動把共用檔案（`manifest.json` 除外）複製到 `just-new-tab-chrome/`，確保兩邊一致。
+
+## 權限設計
+
+- `host_permissions`：僅列出金句／翻譯／官方主題等固定 API 網域（窄範圍，利於商店審核）。
+- `optional_host_permissions`：`http://*/*`、`https://*/*`，**僅在使用者於設定中開啟 RSS 時才動態索取**（用於抓取任意訂閱來源）。
+- 預設行為：RSS 看板預設關閉、捷徑預設以「新分頁」開啟，使用者可自行調整。
 
 ## 版本
 
