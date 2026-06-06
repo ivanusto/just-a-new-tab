@@ -1754,23 +1754,80 @@ function showToast(message) {
    ZIP Theme Package Import
    ========================================================================== */
 
-// Lazy-load JSZip (~97KB) only when a theme package is actually imported,
-// so it never has to be parsed on a normal new-tab open.
-let jszipLoadPromise = null;
-function loadJSZip() {
-  if (typeof JSZip !== "undefined") return Promise.resolve();
-  if (jszipLoadPromise) return jszipLoadPromise;
-  jszipLoadPromise = new Promise((resolve, reject) => {
-    const script = document.createElement("script");
-    script.src = "jszip.min.js";
-    script.onload = () => resolve();
-    script.onerror = () => {
-      jszipLoadPromise = null;
-      reject(new Error("Failed to load jszip.min.js"));
+// Minimal ZIP reader built on the browser's native DecompressionStream.
+// Replaces the bundled JSZip library entirely (no ~97KB dependency, no
+// eval/Function-constructor warning). Parses the central directory and
+// inflates each entry on demand.
+async function inflateRaw(bytes) {
+  const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream("deflate-raw"));
+  return new Uint8Array(await new Response(stream).arrayBuffer());
+}
+
+async function readZip(fileOrBlob) {
+  const buf = new Uint8Array(await fileOrBlob.arrayBuffer());
+  const dv = new DataView(buf.buffer, buf.byteOffset, buf.byteLength);
+  const utf8 = new TextDecoder("utf-8");
+
+  // Locate the End Of Central Directory record (scanning back over any comment).
+  let eocd = -1;
+  const minPos = Math.max(0, buf.length - 22 - 0xffff);
+  for (let i = buf.length - 22; i >= minPos; i--) {
+    if (dv.getUint32(i, true) === 0x06054b50) { eocd = i; break; }
+  }
+  if (eocd < 0) throw new Error("Invalid ZIP: end-of-central-directory not found");
+
+  const entryCount = dv.getUint16(eocd + 10, true);
+  let p = dv.getUint32(eocd + 16, true); // start of central directory
+
+  const records = [];
+  for (let i = 0; i < entryCount; i++) {
+    if (dv.getUint32(p, true) !== 0x02014b50) break; // central directory header
+    const method     = dv.getUint16(p + 10, true);
+    const compSize   = dv.getUint32(p + 20, true);
+    const nameLen    = dv.getUint16(p + 28, true);
+    const extraLen   = dv.getUint16(p + 30, true);
+    const commentLen = dv.getUint16(p + 32, true);
+    const localOff   = dv.getUint32(p + 42, true);
+    const name = utf8.decode(buf.subarray(p + 46, p + 46 + nameLen));
+    records.push({ name, method, compSize, localOff });
+    p += 46 + nameLen + extraLen + commentLen;
+  }
+
+  const makeEntry = (e) => {
+    let dataPromise = null;
+    const getData = () => {
+      if (!dataPromise) {
+        dataPromise = (async () => {
+          if (dv.getUint32(e.localOff, true) !== 0x04034b50) {
+            throw new Error("Invalid ZIP: bad local header for " + e.name);
+          }
+          const nLen = dv.getUint16(e.localOff + 26, true);
+          const xLen = dv.getUint16(e.localOff + 28, true);
+          const start = e.localOff + 30 + nLen + xLen;
+          const raw = buf.subarray(start, start + e.compSize);
+          if (e.method === 0) return raw;             // stored
+          if (e.method === 8) return inflateRaw(raw); // deflate
+          throw new Error("Unsupported ZIP compression method " + e.method);
+        })();
+      }
+      return dataPromise;
     };
-    document.head.appendChild(script);
-  });
-  return jszipLoadPromise;
+    return {
+      name: e.name,
+      dir: e.name.endsWith("/"),
+      async: async (type) => {
+        const data = await getData();
+        if (type === "string") return utf8.decode(data);
+        if (type === "blob") return new Blob([data]);
+        return data;
+      }
+    };
+  };
+
+  const entries = records.map(makeEntry);
+  return {
+    forEach(cb) { entries.forEach((en) => cb(en.name, en)); }
+  };
 }
 
 function initZipImport() {
@@ -1827,9 +1884,7 @@ async function handleZipFile(fileOrBlob, customName = null) {
   const packageName = fileName.substring(0, fileName.lastIndexOf('.')) || fileName;
 
   try {
-    await loadJSZip();
-    const jszip = new JSZip();
-    const zip = await jszip.loadAsync(fileOrBlob);
+    const zip = await readZip(fileOrBlob);
     
     let imagesImported = 0;
     let quotesImported = 0;
