@@ -15,8 +15,9 @@
 
 - `newtab.html` / `newtab.css` / `newtab.js` — 新分頁主頁面與邏輯
 - `db.js` — IndexedDB 背景圖儲存
-- `jszip.min.js` — 主題包 ZIP 解析（vendored）
 - `_locales/{en,zh_TW,zh_CN}/messages.json` — i18n 字串
+
+主題包 ZIP 解析改用瀏覽器原生 `DecompressionStream`（`newtab.js` 內的 `readZip`），不再依賴第三方函式庫。
 
 ## 本機開發 / 載入測試
 

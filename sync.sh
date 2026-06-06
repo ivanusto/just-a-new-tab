@@ -18,7 +18,6 @@ SHARED_FILES=(
   newtab.css
   newtab.js
   db.js
-  jszip.min.js
   privacy_policy.md
   store_description.md
 )
