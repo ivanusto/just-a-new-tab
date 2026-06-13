@@ -98,6 +98,18 @@
   "modalSave": {
     "message": "保存"
   },
+  "modalIcon": {
+    "message": "自定义图标（选填）"
+  },
+  "modalIconUpload": {
+    "message": "上传图标"
+  },
+  "modalIconReset": {
+    "message": "使用默认"
+  },
+  "modalIconHint": {
+    "message": "建议方形小图；上传后会自动缩成 64×64。"
+  },
   "addLinkText": {
     "message": "新增快捷网页"
   },
@@ -109,6 +121,30 @@
   },
   "clockTypeAnalog": {
     "message": "指针时钟"
+  },
+  "clockPositionLabel": {
+    "message": "时钟位置"
+  },
+  "clockPosLeft": {
+    "message": "靠左"
+  },
+  "clockPosCenter": {
+    "message": "居中"
+  },
+  "clockPosRight": {
+    "message": "靠右"
+  },
+  "clockSizeLabel": {
+    "message": "时钟大小"
+  },
+  "clockSizeSmall": {
+    "message": "小"
+  },
+  "clockSizeStandard": {
+    "message": "标准"
+  },
+  "clockSizeLarge": {
+    "message": "大"
   },
   "linkOpenModeLabel": {
     "message": "快捷方式打开方式"
@@ -208,5 +244,32 @@
   },
   "rssManageDesc": {
     "message": "新增或修改您订阅的 RSS 链接，点击文章将另开新窗口打开。"
+  },
+  "rssTickerLabel": {
+    "message": "实时追踪:"
+  },
+  "rssRefreshTitle": {
+    "message": "刷新 RSS"
+  },
+  "searchEngineTitle": {
+    "message": "搜索引擎"
+  },
+  "searchSubmitTitle": {
+    "message": "搜索"
+  },
+  "randomizeTitle": {
+    "message": "随机切换背景"
+  },
+  "settingsBtnTitle": {
+    "message": "偏好设置"
+  },
+  "closeBtnTitle": {
+    "message": "关闭"
+  },
+  "rssInputName": {
+    "message": "订阅名称 (例如: CyberQ)..."
+  },
+  "rssInputUrl": {
+    "message": "RSS Feed 网址 (https://...)..."
   }
 }
