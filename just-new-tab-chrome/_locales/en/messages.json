@@ -98,6 +98,18 @@
   "modalSave": {
     "message": "Save"
   },
+  "modalIcon": {
+    "message": "Custom icon (optional)"
+  },
+  "modalIconUpload": {
+    "message": "Upload icon"
+  },
+  "modalIconReset": {
+    "message": "Use default"
+  },
+  "modalIconHint": {
+    "message": "Square images work best; resized to 64×64 on upload."
+  },
   "addLinkText": {
     "message": "Add Shortcut"
   },
@@ -109,6 +121,30 @@
   },
   "clockTypeAnalog": {
     "message": "Analog"
+  },
+  "clockPositionLabel": {
+    "message": "Clock Position"
+  },
+  "clockPosLeft": {
+    "message": "Left"
+  },
+  "clockPosCenter": {
+    "message": "Center"
+  },
+  "clockPosRight": {
+    "message": "Right"
+  },
+  "clockSizeLabel": {
+    "message": "Clock Size"
+  },
+  "clockSizeSmall": {
+    "message": "Small"
+  },
+  "clockSizeStandard": {
+    "message": "Standard"
+  },
+  "clockSizeLarge": {
+    "message": "Large"
   },
   "linkOpenModeLabel": {
     "message": "Shortcut Open Mode"
@@ -208,5 +244,32 @@
   },
   "rssManageDesc": {
     "message": "Add or modify your RSS feed links. Clicking an article will open it in a new window."
+  },
+  "rssTickerLabel": {
+    "message": "Live Feed:"
+  },
+  "rssRefreshTitle": {
+    "message": "Refresh RSS"
+  },
+  "searchEngineTitle": {
+    "message": "Search engine"
+  },
+  "searchSubmitTitle": {
+    "message": "Search"
+  },
+  "randomizeTitle": {
+    "message": "Random background"
+  },
+  "settingsBtnTitle": {
+    "message": "Settings"
+  },
+  "closeBtnTitle": {
+    "message": "Close"
+  },
+  "rssInputName": {
+    "message": "Feed name (e.g., CyberQ)..."
+  },
+  "rssInputUrl": {
+    "message": "RSS feed URL (https://...)..."
   }
 }

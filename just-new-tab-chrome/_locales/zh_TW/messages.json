@@ -98,6 +98,18 @@
   "modalSave": {
     "message": "儲存"
   },
+  "modalIcon": {
+    "message": "自訂圖示（選填）"
+  },
+  "modalIconUpload": {
+    "message": "上傳圖示"
+  },
+  "modalIconReset": {
+    "message": "使用預設"
+  },
+  "modalIconHint": {
+    "message": "建議方形小圖；上傳後會自動縮成 64×64。"
+  },
   "addLinkText": {
     "message": "新增捷徑"
   },
@@ -109,6 +121,30 @@
   },
   "clockTypeAnalog": {
     "message": "指針時鐘"
+  },
+  "clockPositionLabel": {
+    "message": "時鐘位置"
+  },
+  "clockPosLeft": {
+    "message": "靠左"
+  },
+  "clockPosCenter": {
+    "message": "置中"
+  },
+  "clockPosRight": {
+    "message": "靠右"
+  },
+  "clockSizeLabel": {
+    "message": "時鐘大小"
+  },
+  "clockSizeSmall": {
+    "message": "小"
+  },
+  "clockSizeStandard": {
+    "message": "標準"
+  },
+  "clockSizeLarge": {
+    "message": "大"
   },
   "linkOpenModeLabel": {
     "message": "捷徑開啟方式"
@@ -208,5 +244,32 @@
   },
   "rssManageDesc": {
     "message": "新增或修改您訂閱的 RSS 連結，點選文章將另開新視窗開啟。"
+  },
+  "rssTickerLabel": {
+    "message": "即時追蹤:"
+  },
+  "rssRefreshTitle": {
+    "message": "重新整理 RSS"
+  },
+  "searchEngineTitle": {
+    "message": "搜尋引擎"
+  },
+  "searchSubmitTitle": {
+    "message": "搜尋"
+  },
+  "randomizeTitle": {
+    "message": "隨機切換背景"
+  },
+  "settingsBtnTitle": {
+    "message": "偏好設定"
+  },
+  "closeBtnTitle": {
+    "message": "關閉"
+  },
+  "rssInputName": {
+    "message": "訂閱名稱 (例如: CyberQ)..."
+  },
+  "rssInputUrl": {
+    "message": "RSS Feed 網址 (https://...)..."
   }
 }

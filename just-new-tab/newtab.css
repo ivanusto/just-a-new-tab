@@ -143,6 +143,28 @@ body {
   text-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
 }
 
+/* Clock horizontal position (shift to avoid covering the background subject) */
+#clock-widget.clock-pos-left {
+  align-self: flex-start;
+  text-align: left;
+}
+#clock-widget.clock-pos-right {
+  align-self: flex-end;
+  text-align: right;
+}
+/* Keep the round analog face aligned with the chosen side */
+#clock-widget.clock-pos-left .analog-clock-container { margin-left: 0; margin-right: auto; }
+#clock-widget.clock-pos-right .analog-clock-container { margin-left: auto; margin-right: 0; }
+
+/* Clock size */
+#clock-widget.clock-size-small #clock-time { font-size: 4.2rem; }
+#clock-widget.clock-size-small #clock-date { font-size: 1rem; }
+#clock-widget.clock-size-small .analog-clock-container { width: 150px; height: 150px; }
+
+#clock-widget.clock-size-large #clock-time { font-size: 8.5rem; }
+#clock-widget.clock-size-large #clock-date { font-size: 1.5rem; }
+#clock-widget.clock-size-large .analog-clock-container { width: 290px; height: 290px; }
+
 #clock-time {
   font-size: 6.5rem;
   font-weight: 700;
@@ -276,6 +298,81 @@ body {
 .link-delete-btn:hover {
   background-color: rgb(220, 38, 38);
   transform: scale(1.1);
+}
+
+/* Edit button mirrors the delete button on the opposite (top-left) corner */
+.link-edit-btn {
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: rgba(59, 130, 246, 0.9);
+  color: white;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+.link-card:hover .link-edit-btn {
+  opacity: 1;
+}
+
+.link-edit-btn:hover {
+  background-color: rgb(37, 99, 235);
+  transform: scale(1.1);
+}
+
+/* Drag-and-drop reordering states */
+.link-card.dragging {
+  opacity: 0.4;
+}
+
+.link-card.drag-over {
+  border-color: var(--glass-border-focus);
+  box-shadow: 0 0 0 2px var(--glass-border-focus);
+}
+
+/* Custom-icon upload row inside the add/edit modal */
+.icon-upload-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.icon-preview {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: var(--text-primary);
+}
+
+.icon-preview img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.icon-upload-btn,
+.icon-reset-btn {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.8rem;
 }
 
 .add-link-btn {

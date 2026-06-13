@@ -28,6 +28,17 @@
 
 `just-new-tab/` 為共用檔案的「來源」。修改後執行 `./sync.sh`，會自動把共用檔案（`manifest.json` 除外）複製到 `just-new-tab-chrome/`，確保兩邊一致。
 
+## 主題包打包
+
+每個主題包為一個獨立的頂層資料夾，內含背景圖（`bg*.jpg` / `bg*.png`）與 `quotes.txt`。執行 `./package-themes.sh` 會把每個「已備妥背景圖」的資料夾打包成根目錄的 `<資料夾>.zip`（檔案置於 zip 根層，與既有的 `nature_zen.zip`、`christian_pack.zip` 一致）。尚未放入背景圖的資料夾會自動略過。
+
+```bash
+./package-themes.sh                 # 打包所有已備妥的主題包
+./package-themes.sh pets gaming     # 只打包指定資料夾
+```
+
+打包完成後：將 `.zip` 上傳至下載主機，再於 `just-new-tab/newtab.js` 的 `OFFICIAL_THEMES` 加入對應項目並執行 `./sync.sh`。產生的 `.zip` 已被 `.gitignore` 排除。
+
 ## 權限設計
 
 - `host_permissions`：僅列出金句／翻譯／官方主題等固定 API 網域（窄範圍，利於商店審核）。
@@ -36,4 +47,4 @@
 
 ## 版本
 
-目前版本：1.46（定義於各自的 `manifest.json`）
+目前版本：1.51（定義於各自的 `manifest.json`）

@@ -21,11 +21,11 @@
       <svg class="rss-ticker-icon" viewBox="0 0 24 24" width="14" height="14">
         <path fill="currentColor" d="M6.18 15.64a2.18 2.18 0 1 1 0 4.36 2.18 2.18 0 0 1 0-4.36zM4 4.44A15.56 15.56 0 0 1 19.56 20h-2.83A12.73 12.73 0 0 0 4 7.27V4.44zm0 5.66a9.9 9.9 0 0 1 9.9 9.9h-2.83A7.07 7.07 0 0 0 4 12.93v-2.83z"/>
       </svg>
-      <span class="rss-ticker-label">即時追蹤:</span>
+      <span class="rss-ticker-label" data-i18n="rssTickerLabel">即時追蹤:</span>
       <div class="rss-ticker-content">
         <a id="rss-ticker-link" class="rss-ticker-link" href="#" target="_blank" rel="noopener noreferrer">載入中...</a>
       </div>
-      <button class="rss-refresh-btn" id="btn-rss-refresh" title="重新整理 RSS" style="margin-left: auto;">
+      <button class="rss-refresh-btn" id="btn-rss-refresh" data-i18n-title="rssRefreshTitle" title="重新整理 RSS" style="margin-left: auto;">
         <svg viewBox="0 0 24 24" width="12" height="12">
           <path fill="currentColor" d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
         </svg>
@@ -62,7 +62,7 @@
         <div id="search-widget" class="widget-item search-wrapper">
           <form id="search-form">
             <div class="search-input-container">
-              <select id="search-engine-select" name="engine" title="搜尋引擎">
+              <select id="search-engine-select" name="engine" data-i18n-title="searchEngineTitle" title="搜尋引擎">
                 <option value="google">Google</option>
                 <option value="chatgpt">ChatGPT (AI)</option>
                 <option value="claude">Claude (AI)</option>
@@ -73,7 +73,7 @@
                 <option value="baidu">Baidu</option>
               </select>
               <input type="text" name="q" id="search-input" data-i18n="searchPlaceholder" placeholder="搜尋網頁或輸入問題..." autocomplete="off">
-              <button type="submit" class="search-submit-btn" title="搜尋">
+              <button type="submit" class="search-submit-btn" data-i18n-title="searchSubmitTitle" title="搜尋">
                 <svg viewBox="0 0 24 24" width="18" height="18">
                   <path fill="currentColor" d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
                 </svg>
@@ -110,12 +110,12 @@
 
   <!-- Bottom Floating Control Buttons -->
   <div class="floating-controls">
-    <button class="control-btn" id="btn-randomize" title="隨機切換背景">
+    <button class="control-btn" id="btn-randomize" data-i18n-title="randomizeTitle" title="隨機切換背景">
       <svg viewBox="0 0 24 24" width="20" height="20">
         <path fill="currentColor" d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
       </svg>
     </button>
-    <button class="control-btn" id="btn-settings" title="偏好設定">
+    <button class="control-btn" id="btn-settings" data-i18n-title="settingsBtnTitle" title="偏好設定">
       <svg viewBox="0 0 24 24" width="20" height="20">
         <path fill="currentColor" d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/>
       </svg>
@@ -126,7 +126,7 @@
   <div class="settings-drawer" id="settings-drawer">
     <div class="drawer-header">
       <h2 data-i18n="drawerTitle">個性化設定</h2>
-      <button class="close-btn" id="drawer-close" title="關閉">
+      <button class="close-btn" id="drawer-close" data-i18n-title="closeBtnTitle" title="關閉">
         <svg viewBox="0 0 24 24" width="24" height="24">
           <path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/>
         </svg>
@@ -171,6 +171,22 @@
               <select id="clock-type-select">
                 <option value="digital" data-i18n="clockTypeDigital">數字時鐘</option>
                 <option value="analog" data-i18n="clockTypeAnalog">指針時鐘</option>
+              </select>
+            </div>
+            <div class="form-group-inline">
+              <span data-i18n="clockPositionLabel">時鐘位置</span>
+              <select id="clock-position-select">
+                <option value="left" data-i18n="clockPosLeft">靠左</option>
+                <option value="center" data-i18n="clockPosCenter">置中</option>
+                <option value="right" data-i18n="clockPosRight">靠右</option>
+              </select>
+            </div>
+            <div class="form-group-inline">
+              <span data-i18n="clockSizeLabel">時鐘大小</span>
+              <select id="clock-size-select">
+                <option value="small" data-i18n="clockSizeSmall">小</option>
+                <option value="standard" data-i18n="clockSizeStandard">標準</option>
+                <option value="large" data-i18n="clockSizeLarge">大</option>
               </select>
             </div>
             <div class="toggle-group sub-toggle">
@@ -336,16 +352,7 @@
 
       <!-- Tab 4: Theme Packages -->
       <div class="tab-pane" id="tab-themes">
-        <!-- Section: Official Themes -->
-        <div class="drawer-section">
-          <h3 data-i18n="officialThemesTitle">官方推薦主題包</h3>
-          <p class="section-desc" data-i18n="officialThemesDesc">由官方預先製作的主題包，點擊按鈕即可下載並自動匯入背景與金句。</p>
-          <div class="official-themes-list" id="official-themes-list">
-            <!-- Populated dynamically by JS -->
-          </div>
-        </div>
-
-        <!-- Section: ZIP Theme Package Import -->
+        <!-- Section: ZIP Theme Package Import (customizable options first) -->
         <div class="drawer-section">
           <h3 data-i18n="zipImportTitle">主題包匯入 (.zip)</h3>
           <p class="section-desc" data-i18n="zipImportDesc">匯入包含自訂背景（限 jpg/png）與金句文字檔的主題壓縮包。</p>
@@ -364,6 +371,15 @@
           <h3 data-i18n="importedThemesTitle">已匯入主題包清單</h3>
           <div class="themes-list" id="imported-themes-list">
             <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <!-- Section: Official Themes (download catalog, kept at the bottom) -->
+        <div class="drawer-section">
+          <h3 data-i18n="officialThemesTitle">官方推薦主題包</h3>
+          <p class="section-desc" data-i18n="officialThemesDesc">由官方預先製作的主題包，點擊按鈕即可下載並自動匯入背景與金句。</p>
+          <div class="official-themes-list" id="official-themes-list">
+            <!-- Populated dynamically by JS -->
           </div>
         </div>
       </div>
@@ -390,10 +406,10 @@
           <!-- Add RSS Form -->
           <div class="quote-add-form">
             <div class="form-group">
-              <input type="text" id="rss-input-name" placeholder="訂閱名稱 (例如: CyberQ)..." maxlength="30">
+              <input type="text" id="rss-input-name" data-i18n="rssInputName" placeholder="訂閱名稱 (例如: CyberQ)..." maxlength="30">
             </div>
             <div class="form-group-row">
-              <input type="url" id="rss-input-url" placeholder="RSS Feed 網址 (https://...)...">
+              <input type="url" id="rss-input-url" data-i18n="rssInputUrl" placeholder="RSS Feed 網址 (https://...)...">
               <button class="add-quote-btn" id="btn-add-rss" data-i18n="addBtn">新增</button>
             </div>
           </div>
@@ -407,10 +423,10 @@
     </div>
   </div>
 
-  <!-- Add Link Dialog/Modal -->
+  <!-- Add/Edit Link Dialog/Modal -->
   <div class="modal-overlay" id="link-modal">
     <div class="modal-box">
-      <h3 data-i18n="modalTitle">新增快捷網頁</h3>
+      <h3 id="link-modal-title" data-i18n="modalTitle">新增快捷網頁</h3>
       <div class="form-group">
         <label for="link-name-input" data-i18n="modalName">名稱</label>
         <input type="text" id="link-name-input" data-i18n="modalNamePlaceholder" placeholder="例如：Google" maxlength="15">
@@ -418,6 +434,18 @@
       <div class="form-group">
         <label for="link-url-input" data-i18n="modalUrl">網址 (URL)</label>
         <input type="url" id="link-url-input" placeholder="https://example.com">
+      </div>
+      <div class="form-group">
+        <label data-i18n="modalIcon">自訂圖示（選填）</label>
+        <div class="icon-upload-row">
+          <div class="icon-preview" id="link-icon-preview">
+            <!-- Shows uploaded icon, favicon, or first letter -->
+          </div>
+          <input type="file" id="link-icon-input" accept="image/*" style="display: none;">
+          <button type="button" class="modal-btn secondary icon-upload-btn" id="link-icon-upload-btn" data-i18n="modalIconUpload">上傳圖示</button>
+          <button type="button" class="modal-btn secondary icon-reset-btn" id="link-icon-reset-btn" data-i18n="modalIconReset">使用預設</button>
+        </div>
+        <span class="upload-subtext" data-i18n="modalIconHint">建議方形小圖；上傳後會自動縮成 64×64。</span>
       </div>
       <div class="modal-actions">
         <button class="modal-btn secondary" id="modal-cancel" data-i18n="modalCancel">取消</button>
