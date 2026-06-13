@@ -24,3 +24,6 @@ web-ext-artifacts/
 *.log
 .cache/
 tmp/
+
+# AI tool metadata files
+*.metadata.json
