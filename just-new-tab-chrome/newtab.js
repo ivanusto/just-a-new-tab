@@ -2408,6 +2408,54 @@ const OFFICIAL_THEMES = [
     url: "https://yblog.org/wp-content/uploads/2026/06/beauty_pack.zip",
     desc: "唯美浪漫背景與百句戀愛金句",
     descEn: "Romantic backgrounds with 100 love quotes"
+  },
+  {
+    name: "Anime & Manga Pack",
+    url: "https://yblog.org/wp-content/uploads/2026/06/anime_manga.zip",
+    desc: "動漫風格背景與動漫角色熱血金句",
+    descEn: "Anime-style backgrounds with iconic quotes from beloved anime"
+  },
+  {
+    name: "Couple & Love Pack",
+    url: "https://yblog.org/wp-content/uploads/2026/06/couple_love.zip",
+    desc: "浪漫愛情場景與甜蜜戀愛金句",
+    descEn: "Romantic couple scenes with sweet love quotes"
+  },
+  {
+    name: "Elderly Nostalgia Pack",
+    url: "https://yblog.org/wp-content/uploads/2026/06/elderly_nostalgia.zip",
+    desc: "懷舊復古場景與長者人生智慧金句",
+    descEn: "Vintage nostalgic scenes with timeless life wisdom from elders"
+  },
+  {
+    name: "Funny & Humor Pack",
+    url: "https://yblog.org/wp-content/uploads/2026/06/funny_humor.zip",
+    desc: "趣味插圖背景與爆笑日常幽默金句",
+    descEn: "Playful illustrated backgrounds with relatable everyday humor quotes"
+  },
+  {
+    name: "Gaming Pack",
+    url: "https://yblog.org/wp-content/uploads/2026/06/gaming.zip",
+    desc: "電玩主題場景與遊戲智慧金句",
+    descEn: "Gaming-themed backgrounds with gamer wisdom and wit"
+  },
+  {
+    name: "Pets Pack",
+    url: "https://yblog.org/wp-content/uploads/2026/06/pets.zip",
+    desc: "可愛寵物場景與溫馨動物金句",
+    descEn: "Adorable pet backgrounds with heartwarming quotes from pet lovers"
+  },
+  {
+    name: "Politics Pack",
+    url: "https://yblog.org/wp-content/uploads/2026/06/politics.zip",
+    desc: "政治場景與民主自由名言金句",
+    descEn: "Political landmarks with quotes on democracy, power and freedom"
+  },
+  {
+    name: "Satire Pack",
+    url: "https://yblog.org/wp-content/uploads/2026/06/satire.zip",
+    desc: "諷刺插畫背景與辛辣反諷金句",
+    descEn: "Satirical illustration backgrounds with sharp social commentary quotes"
   }
 ];
 
