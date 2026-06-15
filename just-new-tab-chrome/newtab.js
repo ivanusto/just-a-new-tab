@@ -3188,11 +3188,38 @@ function fmtAgendaWhen(d, allDay) {
 
 /* -------------------------- Tier 1: Local reminders ----------------------- */
 
+// Parse a freely-typed time into { h, m } using a strict numeric whitelist, so
+// users can type "9", "930", "0930" or "9:30" instead of fiddling with the
+// native spinner. Returns null for anything invalid (the caller rejects it).
+function parseFlexibleTime(raw) {
+  const s = String(raw == null ? "" : raw).trim();
+  if (!s) return null;
+  let h, m;
+  if (s.includes(":")) {
+    const parts = s.split(":");
+    if (parts.length !== 2 || !/^\d{1,2}$/.test(parts[0]) || !/^\d{1,2}$/.test(parts[1])) return null;
+    h = parseInt(parts[0], 10);
+    m = parseInt(parts[1], 10);
+  } else {
+    if (!/^\d{1,4}$/.test(s)) return null;
+    if (s.length <= 2) { h = parseInt(s, 10); m = 0; }
+    else if (s.length === 3) { h = parseInt(s.slice(0, 1), 10); m = parseInt(s.slice(1), 10); }
+    else { h = parseInt(s.slice(0, 2), 10); m = parseInt(s.slice(2), 10); }
+  }
+  if (!(Number.isInteger(h) && Number.isInteger(m) && h >= 0 && h <= 23 && m >= 0 && m <= 59)) return null;
+  return { h, m };
+}
+
+function pad2(n) {
+  return String(n).padStart(2, "0");
+}
+
 function initReminders() {
   const toggle = document.getElementById("toggle-reminders");
   const addBtn = document.getElementById("btn-add-reminder");
   const inputText = document.getElementById("reminder-input-text");
-  const inputDue = document.getElementById("reminder-input-due");
+  const inputDate = document.getElementById("reminder-input-date");
+  const inputTime = document.getElementById("reminder-input-time");
 
   if (toggle) {
     toggle.checked = !!settings.widgets.reminders;
@@ -3204,6 +3231,14 @@ function initReminders() {
     });
   }
 
+  // Normalise the typed time to HH:MM on blur when it's valid (e.g. 930 -> 09:30).
+  if (inputTime) {
+    inputTime.addEventListener("blur", () => {
+      const parsed = parseFlexibleTime(inputTime.value);
+      if (parsed) inputTime.value = `${pad2(parsed.h)}:${pad2(parsed.m)}`;
+    });
+  }
+
   if (addBtn) {
     addBtn.addEventListener("click", async () => {
       const text = inputText.value.trim();
@@ -3212,10 +3247,38 @@ function initReminders() {
         return;
       }
 
+      const dateVal = inputDate ? inputDate.value : "";        // "YYYY-MM-DD" or ""
+      const timeRaw = inputTime ? inputTime.value.trim() : ""; // free-typed
+
       let due = null;
-      if (inputDue && inputDue.value) {
-        const parsed = new Date(inputDue.value);
-        if (!isNaN(parsed.getTime())) due = parsed.getTime();
+      if (dateVal || timeRaw) {
+        let hm = { h: 0, m: 0 };
+        if (timeRaw) {
+          const parsed = parseFlexibleTime(timeRaw);
+          if (!parsed) {
+            showToast(isChineseUser ? "請輸入有效時間（例如 09:30 或 0930）" : "Please enter a valid time (e.g. 09:30 or 0930)");
+            return;
+          }
+          hm = parsed;
+        }
+        let base;
+        if (dateVal) {
+          const dm = dateVal.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+          if (!dm) {
+            showToast(isChineseUser ? "請選擇有效的日期" : "Please pick a valid date");
+            return;
+          }
+          base = new Date(+dm[1], +dm[2] - 1, +dm[3], hm.h, hm.m, 0, 0);
+        } else {
+          // Time only: assume today.
+          const now = new Date();
+          base = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hm.h, hm.m, 0, 0);
+        }
+        if (isNaN(base.getTime())) {
+          showToast(isChineseUser ? "日期或時間無效" : "Invalid date or time");
+          return;
+        }
+        due = base.getTime();
       }
 
       if (!settings.reminders) settings.reminders = [];
@@ -3229,7 +3292,8 @@ function initReminders() {
       await saveSettings();
 
       inputText.value = "";
-      if (inputDue) inputDue.value = "";
+      if (inputDate) inputDate.value = "";
+      if (inputTime) inputTime.value = "";
 
       renderDrawerReminders();
       renderRemindersWidget();
