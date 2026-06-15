@@ -10,11 +10,13 @@ Notable changes to this project. Format based on [Keep a Changelog](https://keep
 **繁中**
 - ⏰ 自訂提醒的到期時間改為「**原生日期選擇 + 可自由打字的時間欄**」，取代原本的 `datetime-local`（其逐段、需用上下鍵的操作較不直覺）。現在時間可直接輸入 `9`、`930`、`0930`、`9:30` 等，失焦時自動正規化為 `HH:MM`。
 - 🔒 仍做嚴格驗證：時間僅接受數字白名單且限定 0–23 時、0–59 分，無效輸入會被拒絕並提示；資料僅以數字 timestamp 儲存、以 `textContent` 顯示，無注入風險。
+- 🏷️ 精簡設定分頁標籤（金句小工具→金句、主題包管理→主題包、提醒與行事曆→提醒/行事曆），並微調字級，讓六個分頁在抽屜中單行不擁擠。
 - 未新增任何權限。
 
 **English**
 - ⏰ Reminder due time now uses a **native date picker + a free-typed time field** instead of `datetime-local` (whose segmented, arrow-key editing felt clunky). You can type `9`, `930`, `0930`, or `9:30`; it normalizes to `HH:MM` on blur.
 - 🔒 Still strictly validated: digits-only whitelist, hours 0–23 / minutes 0–59, invalid input is rejected with a toast. Values are stored as a numeric timestamp and rendered via `textContent`, so there is no injection surface.
+- 🏷️ Shortened the settings tab labels (Quotes/Themes; "Reminders & Calendar" → "Agenda"; "RSS Feed" → "RSS") and nudged the font size so all six tabs sit on one line without crowding.
 - No new permissions.
 
 ## [1.55] - 2026-06-15
