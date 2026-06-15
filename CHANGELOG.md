@@ -3,6 +3,20 @@
 本專案的版本更新紀錄。格式參考 [Keep a Changelog](https://keepachangelog.com/)。
 Notable changes to this project. Format based on [Keep a Changelog](https://keepachangelog.com/).
 
+## [1.55] - 2026-06-15
+
+### 放寬圖片上限 + 自動縮圖 / Higher image limit + auto-downscale
+
+**繁中**
+- 🖼️ 單張背景圖片上傳上限 **12MB → 25MB**；主題包 ZIP 內每張圖同步調為 25MB、ZIP 總大小 50MB → 100MB。
+- 新增「上傳時自動縮圖」選項（**預設開啟**）：超過 4K（長邊 3840px）的圖片會在存入前自動等比縮小以節省空間；PNG 維持 PNG、其餘輸出 JPEG；已夠小的圖片保持原檔不動。可於背景設定關閉以保留原圖。
+- 未新增任何權限。
+
+**English**
+- 🖼️ Single wallpaper upload limit raised **12MB → 25MB**; ZIP theme per-image limit matched to 25MB and total ZIP size 50MB → 100MB.
+- New "auto-downscale on upload" option (**on by default**): images larger than 4K (3840px long edge) are scaled down before storage to save space; PNG stays PNG, others become JPEG; already-small images are kept untouched. Can be turned off in wallpaper settings to keep originals.
+- No new permissions.
+
 ## [1.54] - 2026-06-15
 
 ### 從瀏覽器匯入常用網站 / Import Top Sites
@@ -47,5 +61,6 @@ Notable changes to this project. Format based on [Keep a Changelog](https://keep
 - Export all settings, shortcuts, custom quotes, RSS subscriptions, and wallpapers (IndexedDB) to a single JSON file.
 - Restore on another device or after a reinstall (with a confirm prompt); wallpaper references are remapped automatically. No sign-in, no cloud.
 
+[1.55]: https://github.com/ivanusto/just-new-tab/releases/tag/v1.55
 [1.54]: https://github.com/ivanusto/just-new-tab/releases/tag/v1.54
 [1.53]: https://github.com/ivanusto/just-new-tab/releases/tag/v1.53

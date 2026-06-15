@@ -59,6 +59,7 @@ let settings = {
   bgRotateInterval: 180,
   searchEngine: "google",
   searchInNewTab: false,
+  autoDownscaleUploads: true,
   cloudQuoteSource: "zenquotes",
   activeDefaults: [1, 2, 3, 4, 5],
   activeCustoms: [],
@@ -246,6 +247,7 @@ async function loadSettings() {
   if (settings.widgets.calendar === undefined) settings.widgets.calendar = defaultSettings.widgets.calendar;
 
   if (settings.searchInNewTab === undefined) settings.searchInNewTab = defaultSettings.searchInNewTab;
+  if (settings.autoDownscaleUploads === undefined) settings.autoDownscaleUploads = defaultSettings.autoDownscaleUploads;
   if (settings.cloudQuoteSource === undefined) {
     settings.cloudQuoteSource = isSimplifiedChinese ? "hitokoto" : "zenquotes";
   }
@@ -1929,10 +1931,24 @@ function revokeThumbnails() {
    File Upload & Drag & Drop
    ========================================================================== */
 
+// Largest single uploaded image accepted (raised from 12MB in v1.55).
+const MAX_UPLOAD_BYTES = 25 * 1024 * 1024;
+// Longest-edge cap used when "auto-downscale" is on, to keep stored images small.
+const DOWNSCALE_MAX_DIM = 3840;
+
 function initUpload() {
   const uploadBox = document.getElementById("upload-box");
   const fileInput = document.getElementById("file-input");
-  
+  const toggleAutoDownscale = document.getElementById("toggle-auto-downscale");
+
+  if (toggleAutoDownscale) {
+    toggleAutoDownscale.checked = settings.autoDownscaleUploads !== false;
+    toggleAutoDownscale.addEventListener("change", async () => {
+      settings.autoDownscaleUploads = toggleAutoDownscale.checked;
+      await saveSettings();
+    });
+  }
+
   uploadBox.addEventListener("click", () => {
     fileInput.click();
   });
@@ -1971,13 +1987,17 @@ async function handleUploadedFiles(files) {
       continue;
     }
     
-    if (file.size > 12 * 1024 * 1024) {
-      showToast(isChineseUser ? `${file.name} 檔案過大 (大於 12MB)，已略過` : `${file.name} exceeds 12MB limit`);
+    if (file.size > MAX_UPLOAD_BYTES) {
+      showToast(isChineseUser ? `${file.name} 檔案過大 (大於 25MB)，已略過` : `${file.name} exceeds 25MB limit`);
       continue;
     }
-    
+
     try {
-      const insertedId = await window.justDB.addWallpaper(file.name, file);
+      // Optionally downscale oversized images before storing to save space.
+      const toStore = settings.autoDownscaleUploads !== false
+        ? await downscaleImageBlob(file, DOWNSCALE_MAX_DIM, 0.9)
+        : file;
+      const insertedId = await window.justDB.addWallpaper(file.name, toStore);
       settings.activeCustoms.push(insertedId);
       successCount++;
     } catch (err) {
@@ -1989,10 +2009,60 @@ async function handleUploadedFiles(files) {
   if (successCount > 0) {
     await saveSettings();
     await renderDrawerWallpapers();
-    showToast(isChineseUser 
-      ? `成功上傳了 ${successCount} 張背景圖片！` 
+    showToast(isChineseUser
+      ? `成功上傳了 ${successCount} 張背景圖片！`
       : `Successfully uploaded ${successCount} wallpapers!`);
   }
+}
+
+// Downscale an image to `maxDim` on its longest edge (aspect-preserving) so very
+// large uploads don't bloat IndexedDB. Returns the original file unchanged when
+// it's already small enough, when decoding fails, or when re-encoding wouldn't
+// shrink it. PNG stays PNG (alpha preserved); everything else becomes JPEG.
+function downscaleImageBlob(file, maxDim, quality) {
+  return new Promise((resolve) => {
+    try {
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        const longest = Math.max(img.width, img.height);
+        if (!longest || longest <= maxDim) {
+          URL.revokeObjectURL(url);
+          resolve(file); // already within bounds — keep original bytes
+          return;
+        }
+        const scale = maxDim / longest;
+        const w = Math.round(img.width * scale);
+        const h = Math.round(img.height * scale);
+        const canvas = document.createElement("canvas");
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, w, h);
+        const outType = file.type === "image/png" ? "image/png" : "image/jpeg";
+        canvas.toBlob((blob) => {
+          URL.revokeObjectURL(url);
+          if (blob && blob.size < file.size) {
+            const newName = renameForType(file.name, outType);
+            resolve(new File([blob], newName, { type: outType }));
+          } else {
+            resolve(file); // re-encode didn't help — keep original
+          }
+        }, outType, quality);
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); resolve(file); };
+      img.src = url;
+    } catch (e) {
+      resolve(file);
+    }
+  });
+}
+
+// Keep the filename extension consistent with the (possibly converted) MIME type.
+function renameForType(name, type) {
+  const ext = type === "image/png" ? ".png" : ".jpg";
+  const base = name && name.includes(".") ? name.slice(0, name.lastIndexOf(".")) : (name || "wallpaper");
+  return base + ext;
 }
 
 /* ==========================================================================
@@ -2312,9 +2382,9 @@ async function handleZipFile(fileOrBlob, customName = null) {
     return;
   }
 
-  // Limit ZIP size to 50MB
-  if (fileOrBlob.size > 50 * 1024 * 1024) {
-    showToast(isChineseUser ? "ZIP 檔案過大 (大於 50MB)，已拒絕載入" : "ZIP file is too large (max 50MB)");
+  // Limit ZIP size to 100MB
+  if (fileOrBlob.size > 100 * 1024 * 1024) {
+    showToast(isChineseUser ? "ZIP 檔案過大 (大於 100MB)，已拒絕載入" : "ZIP file is too large (max 100MB)");
     return;
   }
 
@@ -2343,7 +2413,7 @@ async function handleZipFile(fileOrBlob, customName = null) {
         const mimeType = nameLower.endsWith(".png") ? "image/png" : "image/jpeg";
         
         const promise = zipEntry.async("blob").then(async (blob) => {
-          if (blob.size > 12 * 1024 * 1024) {
+          if (blob.size > 25 * 1024 * 1024) {
             console.warn(`Skipped ${zipEntry.name}: image too large`);
             return;
           }

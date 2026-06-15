@@ -30,6 +30,7 @@
 提醒與行事曆共用左上角的 `#agenda-widget` 卡片，兩者皆預設關閉。
 
 - **匯入常用網站**（`newtab.js` 的 `initTopSitesImport`）：透過瀏覽器 `topSites` API 讀取常用／釘選網站，預覽勾選後加入捷徑（與既有捷徑去重）。採選用權限 `topSites`，按下匯入才索取。Chrome 僅能取得「最常造訪」、Firefox 另含釘選 Top Sites。
+- **背景圖片上傳**（`handleUploadedFiles` / `downscaleImageBlob`）：單張上限 25MB；「上傳時自動縮圖」預設開啟，超過 4K（長邊 3840px）會等比縮小後存入 IndexedDB（PNG 維持 PNG、其餘輸出 JPEG），可於背景設定關閉以保留原圖。
 
 ## 本機開發 / 載入測試
 
@@ -71,4 +72,4 @@ python package_zip.py   # Windows 無 zip 時的替代方案（純 Python）
 
 ## 版本
 
-目前版本：1.54（定義於各自的 `manifest.json`）
+目前版本：1.55（定義於各自的 `manifest.json`）

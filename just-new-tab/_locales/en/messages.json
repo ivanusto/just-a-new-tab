@@ -60,7 +60,7 @@
     "message": "Drag & drop images here, or click to upload"
   },
   "uploadSubtext": {
-    "message": "Supports multiple files. Stored locally in browser DB."
+    "message": "Upload multiple images (max 25MB each); stored in your local database"
   },
   "customQuotes": {
     "message": "Custom Quotes Pool"
@@ -334,5 +334,8 @@
   },
   "importTopSitesAdd": {
     "message": "Add selected"
+  },
+  "autoDownscaleLabel": {
+    "message": "Auto-downscale on upload (recommended, caps at 4K to save space)"
   }
 }

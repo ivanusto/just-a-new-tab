@@ -60,7 +60,7 @@
     "message": "拖拽图片至此，或点击上传"
   },
   "uploadSubtext": {
-    "message": "支持多张上传，图片将存于本地数据库"
+    "message": "支持多张上传（单张上限 25MB），图片将存于本机数据库"
   },
   "customQuotes": {
     "message": "自定义金句库"
@@ -334,5 +334,8 @@
   },
   "importTopSitesAdd": {
     "message": "加入所选"
+  },
+  "autoDownscaleLabel": {
+    "message": "上传时自动缩图（建议，缩至 4K 以节省空间）"
   }
 }

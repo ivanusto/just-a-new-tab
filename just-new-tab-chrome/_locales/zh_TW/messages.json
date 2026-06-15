@@ -60,7 +60,7 @@
     "message": "拖曳圖片至此，或點擊上傳"
   },
   "uploadSubtext": {
-    "message": "支援多張上傳，圖片將存於本機資料庫"
+    "message": "支援多張上傳（單張上限 25MB），圖片將存於本機資料庫"
   },
   "customQuotes": {
     "message": "自訂金句庫"
@@ -334,5 +334,8 @@
   },
   "importTopSitesAdd": {
     "message": "加入所選"
+  },
+  "autoDownscaleLabel": {
+    "message": "上傳時自動縮圖（建議，縮至 4K 以節省空間）"
   }
 }
