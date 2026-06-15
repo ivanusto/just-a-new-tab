@@ -12,7 +12,7 @@ You can host this Privacy Policy on GitHub Pages, Google Sites, Notion, or your 
 
 #### 1. 我們不收集、不儲存、不傳輸您的個人資料
 我們極度重視您的隱私安全。本套件設計為**本機優先（Offline-First）**架構：
-*   **本機儲存**：您所上傳的自訂背景圖片、輸入的用戶名稱、以及您新增的自訂金句、自訂網頁捷徑，全部**僅儲存於您個人電腦瀏覽器的本機資料庫（IndexedDB 與 localStorage）中**。
+*   **本機儲存**：您所上傳的自訂背景圖片、輸入的用戶名稱、以及您新增的自訂金句、自訂網頁捷徑、提醒事項、行事曆的 iCal 私密網址，全部**僅儲存於您個人電腦瀏覽器的本機資料庫（IndexedDB 與 localStorage）中**。其中「提醒事項」為純本機功能，不會發出任何網路請求。
 *   **不對外傳輸**：本套件**不會**將上述任何資料傳送至我們或任何第三方的外部伺服器。我們不具備、亦無法存取您的任何個人資料或瀏覽歷史。
 
 #### 2. 第三方服務與網路請求
@@ -21,6 +21,7 @@ You can host this Privacy Policy on GitHub Pages, Google Sites, Notion, or your 
 *   **每日金句（啟用「從網路獲取金句」時）**：依您選擇的來源連線至 ZenQuotes API (`https://zenquotes.io/`，繁體中文／英文語系預設，英文語錄)、Hitokoto 一言 API (`https://v1.hitokoto.cn/`，簡體中文語系預設) 或 AnimeChan API (`https://api.animechan.io/`，動漫語錄)。
 *   **金句翻譯**：當金句來源為英文、且您使用繁體中文介面時，會將該句子送至 MyMemory 翻譯 API (`https://api.mymemory.translated.net/`) 以轉譯為繁體中文。
 *   **RSS 閱讀看板（啟用 RSS 時）**：本套件會向「您自行新增訂閱的 RSS 來源網址」發出請求，以讀取文章標題與連結。由於訂閱網址完全由您決定，此功能需要較廣的網路存取權限；因此該權限被設計為**選用權限（optional）**，僅在您開啟 RSS 功能時才會向您請求授權，預設為關閉。
+*   **行事曆訂閱（啟用「行事曆」時）**：本套件會向「您自行貼上的 iCal 私密網址」發出請求，以讀取近期行程的標題與時間。該網址完全由您提供、僅儲存於本機，並使用與 RSS 相同的**選用權限（optional）**機制：預設關閉，僅在您新增行事曆或開啟功能時，才會針對該網址的網域請求授權；刪除訂閱時會一併釋出該權限。
 *   **官方主題包下載（僅在您主動點擊下載時）**：自開發者網站 (`https://yblog.org/`) 下載內含背景圖與金句的主題壓縮包。
 *   **網站圖示（Favicon）**：請求 Google Favicon 服務 (`https://www.google.com/s2/favicons`) 以顯示您捷徑的網站圖示。
 
@@ -43,7 +44,7 @@ This Privacy Policy explains how 《Just a New Tab》 (referred to as "the exten
 
 #### 1. No Collection, Storage, or Transmission of Personal Data
 Your privacy is our highest priority. The extension is built with an **Offline-First** architecture:
-*   **Local Storage Only**: All your personalized data, including uploaded background images, custom username, custom quotes, and quick link shortcuts, are stored **exclusively in your browser's local storage (IndexedDB and localStorage)** on your own device.
+*   **Local Storage Only**: All your personalized data, including uploaded background images, custom username, custom quotes, quick link shortcuts, reminders, and your calendar's private iCal URL, are stored **exclusively in your browser's local storage (IndexedDB and localStorage)** on your own device. Reminders are a purely local feature and make no network requests.
 *   **No Data Transmission**: The extension **does not** collect, store, or transmit any of your personal data, search queries, or browsing history to our servers or any third parties. We have no access to your data.
 
 #### 2. Third-Party Services and Network Requests
@@ -52,6 +53,7 @@ The extension only makes anonymous network requests (Fetch) when you actually us
 *   **Daily Quotes (when "Fetch Quotes from Cloud" is enabled)**: Connects to your chosen source — ZenQuotes API (`https://zenquotes.io/`, default for English/Traditional Chinese locales, English quotes), Hitokoto API (`https://v1.hitokoto.cn/`, default for Simplified Chinese), or AnimeChan API (`https://api.animechan.io/`, anime quotes).
 *   **Quote Translation**: When an English quote is displayed in a Traditional Chinese interface, the quote text is sent to the MyMemory Translation API (`https://api.mymemory.translated.net/`) to be translated into Traditional Chinese.
 *   **RSS Reader (when RSS is enabled)**: The extension fetches article titles and links from the RSS feed URLs **you choose to subscribe to**. Because those URLs are entirely your choice, this feature needs broad network access; that access is declared as an **optional permission**, is off by default, and is requested only when you turn the RSS feature on.
+*   **Calendar Subscription (when the Calendar feature is enabled)**: The extension fetches event titles and times from the **private iCal URL you paste in**. That URL is entirely provided by you, stored locally only, and uses the same **optional permission** model as RSS: off by default, requested only for that URL's domain when you add a calendar or enable the feature, and released when you delete the subscription.
 *   **Official Theme Packs (only when you click to download)**: Downloads a theme archive (wallpapers and quotes) from the developer's site (`https://yblog.org/`).
 *   **Shortcut Icons (Favicons)**: Requests website favicons from the Google Favicon Service (`https://www.google.com/s2/favicons`) to display icons for your shortcuts.
 

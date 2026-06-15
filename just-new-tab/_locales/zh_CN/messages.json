@@ -271,5 +271,53 @@
   },
   "rssInputUrl": {
     "message": "RSS Feed 网址 (https://...)..."
+  },
+  "backupTitle": {
+    "message": "备份与还原"
+  },
+  "backupDesc": {
+    "message": "将所有设置（快捷方式、RSS、金句、背景图片等）导出成单一文件，即可在其他设备上还原，保持一致的使用体验。"
+  },
+  "backupExportBtn": {
+    "message": "导出备份文件"
+  },
+  "backupImportBtn": {
+    "message": "导入备份文件"
+  },
+  "tabAgenda": {
+    "message": "提醒与日历"
+  },
+  "remindersWidgetTitle": {
+    "message": "提醒事项"
+  },
+  "calendarWidgetTitle": {
+    "message": "近期日程"
+  },
+  "remindersTitle": {
+    "message": "提醒事项"
+  },
+  "toggleReminders": {
+    "message": "在新标签页显示提醒事项"
+  },
+  "remindersDesc": {
+    "message": "添加待办或提醒，仅保存在本机，不会上传任何数据。可选填到期时间。"
+  },
+  "reminderInputText": {
+    "message": "输入提醒内容..."
+  },
+  "calendarTitle": {
+    "message": "日历订阅 (ICS)"
+  },
+  "toggleCalendar": {
+    "message": "在新标签页显示近期日程"
+  },
+  "calendarDesc": {
+    "message": "粘贴日历的 iCal 私密网址（Google 日历设置 →「iCal 格式的密钥」），即可在新标签页看到近期日程。此网址为机密，仅保存在本机。"
+  },
+  "calendarInputName": {
+    "message": "日历名称 (例如: 工作)..."
+  },
+  "calendarInputUrl": {
+    "message": "iCal 私密网址 (https://...ics)..."
   }
 }

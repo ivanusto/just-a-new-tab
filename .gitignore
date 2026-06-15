@@ -27,3 +27,6 @@ tmp/
 
 # AI tool metadata files
 *.metadata.json
+
+# Claude Code local tooling (launch config, local settings)
+.claude/

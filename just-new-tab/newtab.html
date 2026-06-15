@@ -32,6 +32,32 @@
       </button>
     </div>
 
+    <!-- Agenda Widget: local reminders + ICS calendar (top-left card) -->
+    <div id="agenda-widget" class="agenda-widget widget-hidden">
+      <div id="reminders-block" class="agenda-block">
+        <div class="agenda-head">
+          <svg viewBox="0 0 24 24" width="15" height="15">
+            <path fill="currentColor" d="M19 3h-1V1h-2v2H8V1H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm0 16H5V9h14v10zm0-12H5V5h14v2z"/>
+          </svg>
+          <span class="agenda-title" data-i18n="remindersWidgetTitle">提醒事項</span>
+        </div>
+        <ul id="reminders-widget-list" class="agenda-list">
+          <!-- Populated by JS -->
+        </ul>
+      </div>
+      <div id="calendar-block" class="agenda-block">
+        <div class="agenda-head">
+          <svg viewBox="0 0 24 24" width="15" height="15">
+            <path fill="currentColor" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+          </svg>
+          <span class="agenda-title" data-i18n="calendarWidgetTitle">近期行程</span>
+        </div>
+        <ul id="calendar-widget-list" class="agenda-list">
+          <!-- Populated by JS -->
+        </ul>
+      </div>
+    </div>
+
     <main class="main-content">
       <!-- Widgets Section -->
       <div class="widgets-container">
@@ -140,6 +166,7 @@
       <button class="tab-btn" data-tab="tab-quotes" data-i18n="tabQuotes">金句小工具</button>
       <button class="tab-btn" data-tab="tab-themes" data-i18n="tabThemes">主題包管理</button>
       <button class="tab-btn" data-tab="tab-rss" data-i18n="tabRss">RSS訂閱</button>
+      <button class="tab-btn" data-tab="tab-agenda" data-i18n="tabAgenda">提醒與行事曆</button>
     </div>
     
     <div class="drawer-content">
@@ -259,6 +286,17 @@
               <span data-i18n="bgRotateIntervalLabel">輪播間隔時間 (秒)</span>
               <input type="number" id="input-bg-rotate-interval" min="15" max="86400" value="180">
             </div>
+          </div>
+        </div>
+
+        <!-- Section: Backup & Restore -->
+        <div class="drawer-section">
+          <h3 data-i18n="backupTitle">備份與還原</h3>
+          <p class="section-desc" data-i18n="backupDesc">將所有設定（捷徑、RSS、金句、背景圖片等）匯出成單一檔案，即可在其他裝置上還原，維持一致的使用體驗。</p>
+          <div class="backup-actions">
+            <button class="add-quote-btn" id="btn-export-backup" data-i18n="backupExportBtn">匯出備份檔</button>
+            <button class="add-quote-btn backup-btn-secondary" id="btn-import-backup" data-i18n="backupImportBtn">匯入備份檔</button>
+            <input type="file" id="backup-file-input" accept=".json,application/json" style="display: none;">
           </div>
         </div>
       </div>
@@ -416,6 +454,67 @@
 
           <!-- RSS feeds list -->
           <div class="custom-quotes-list" id="rss-feeds-list">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 6: Reminders & Calendar -->
+      <div class="tab-pane" id="tab-agenda">
+        <!-- Section: Local Reminders -->
+        <div class="drawer-section">
+          <h3 data-i18n="remindersTitle">提醒事項</h3>
+          <div class="toggle-group">
+            <label class="toggle-switch">
+              <input type="checkbox" id="toggle-reminders">
+              <span class="slider"></span>
+            </label>
+            <span data-i18n="toggleReminders">在新分頁顯示提醒事項</span>
+          </div>
+          <p class="section-desc" data-i18n="remindersDesc">新增待辦或提醒，僅儲存在本機，不會上傳任何資料。可選填到期時間。</p>
+
+          <!-- Add reminder form -->
+          <div class="quote-add-form">
+            <div class="form-group">
+              <input type="text" id="reminder-input-text" data-i18n="reminderInputText" placeholder="輸入提醒內容..." maxlength="120">
+            </div>
+            <div class="form-group-row">
+              <input type="datetime-local" id="reminder-input-due">
+              <button class="add-quote-btn" id="btn-add-reminder" data-i18n="addBtn">新增</button>
+            </div>
+          </div>
+
+          <!-- Reminders list -->
+          <div class="custom-quotes-list" id="reminders-list">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <!-- Section: ICS Calendar -->
+        <div class="drawer-section">
+          <h3 data-i18n="calendarTitle">行事曆訂閱 (ICS)</h3>
+          <div class="toggle-group">
+            <label class="toggle-switch">
+              <input type="checkbox" id="toggle-calendar">
+              <span class="slider"></span>
+            </label>
+            <span data-i18n="toggleCalendar">在新分頁顯示近期行程</span>
+          </div>
+          <p class="section-desc" data-i18n="calendarDesc">貼上行事曆的 iCal 私密網址（Google 行事曆設定 → 「iCal 格式的密鑰」），即可在新分頁看到近期行程。此網址為機密，僅儲存在本機。</p>
+
+          <!-- Add calendar form -->
+          <div class="quote-add-form">
+            <div class="form-group">
+              <input type="text" id="calendar-input-name" data-i18n="calendarInputName" placeholder="行事曆名稱 (例如: 工作)..." maxlength="30">
+            </div>
+            <div class="form-group-row">
+              <input type="url" id="calendar-input-url" data-i18n="calendarInputUrl" placeholder="iCal 私密網址 (https://...ics)...">
+              <button class="add-quote-btn" id="btn-add-calendar" data-i18n="addBtn">新增</button>
+            </div>
+          </div>
+
+          <!-- Calendar list -->
+          <div class="custom-quotes-list" id="calendars-list">
             <!-- Populated by JS -->
           </div>
         </div>
