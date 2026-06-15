@@ -271,5 +271,53 @@
   },
   "rssInputUrl": {
     "message": "RSS Feed 網址 (https://...)..."
+  },
+  "backupTitle": {
+    "message": "備份與還原"
+  },
+  "backupDesc": {
+    "message": "將所有設定（捷徑、RSS、金句、背景圖片等）匯出成單一檔案，即可在其他裝置上還原，維持一致的使用體驗。"
+  },
+  "backupExportBtn": {
+    "message": "匯出備份檔"
+  },
+  "backupImportBtn": {
+    "message": "匯入備份檔"
+  },
+  "tabAgenda": {
+    "message": "提醒與行事曆"
+  },
+  "remindersWidgetTitle": {
+    "message": "提醒事項"
+  },
+  "calendarWidgetTitle": {
+    "message": "近期行程"
+  },
+  "remindersTitle": {
+    "message": "提醒事項"
+  },
+  "toggleReminders": {
+    "message": "在新分頁顯示提醒事項"
+  },
+  "remindersDesc": {
+    "message": "新增待辦或提醒，僅儲存在本機，不會上傳任何資料。可選填到期時間。"
+  },
+  "reminderInputText": {
+    "message": "輸入提醒內容..."
+  },
+  "calendarTitle": {
+    "message": "行事曆訂閱 (ICS)"
+  },
+  "toggleCalendar": {
+    "message": "在新分頁顯示近期行程"
+  },
+  "calendarDesc": {
+    "message": "貼上行事曆的 iCal 私密網址（Google 行事曆設定 →「iCal 格式的密鑰」），即可在新分頁看到近期行程。此網址為機密，僅儲存在本機。"
+  },
+  "calendarInputName": {
+    "message": "行事曆名稱 (例如: 工作)..."
+  },
+  "calendarInputUrl": {
+    "message": "iCal 私密網址 (https://...ics)..."
   }
 }

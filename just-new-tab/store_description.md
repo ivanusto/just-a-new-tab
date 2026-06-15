@@ -8,7 +8,7 @@ Here are the optimized store listing descriptions in both **Traditional Chinese 
 
 ### 1. 簡短說明 (Short Description)
 *限制 132 字元以內*
-> 開啟新分頁，帶給您一整天的好心情。內建唯美背景輪播、質感時鐘、智慧搜尋框、自訂快捷網頁、每日金句（支援雲端抓取）與 RSS 閱讀看板，並可匯入主題包。
+> 開啟新分頁，帶給您一整天的好心情。內建唯美背景輪播、質感時鐘、智慧搜尋框、自訂捷徑、每日金句、RSS 看板、提醒事項與行事曆，並支援主題包匯入與設定備份匯出。
 
 ---
 
@@ -41,16 +41,21 @@ Here are the optimized store listing descriptions in both **Traditional Chinese 
     *   輕鬆新增、排列與刪除您的常用網頁，卡片會自動抓取網站 Favicon 圖示，兼具美觀與高實用性。可選擇以目前分頁、新分頁或新視窗開啟。
 *   **📰 RSS 閱讀看板（選用）**
     *   訂閱您喜愛的網站 RSS，標題會以跑馬燈方式在頁面頂端輪播，點擊即可閱讀。此功能預設關閉，開啟時才會請求必要的網路權限。
+*   **📝 提醒事項與行事曆（選用）**
+    *   **本地提醒**：在新分頁角落新增待辦與提醒，可選填到期時間，逾期會醒目標示。資料純存於本機，不發送任何網路請求。
+    *   **行事曆訂閱**：貼上 Google／Outlook／Apple 行事曆的 iCal 私密網址，即可在新分頁一覽近期 14 天的行程（唯讀）。此功能預設關閉，且僅在您新增訂閱時，才會針對該網址請求存取權限。
 *   **🎨 主題包匯入**
     *   一鍵匯入官方推薦主題包，或自行拖入 `.zip` 主題壓縮包（內含背景圖與金句文字檔），快速套用整組風格。
+*   **💾 設定備份與還原**
+    *   一鍵將所有設定（捷徑、金句、RSS、提醒、行事曆、背景圖片等）匯出成單一檔案，並可在其他裝置或重灌後一鍵還原，輕鬆維持一致的使用體驗。無需登入、不經雲端。
 *   **🎛️ 一鍵個性化開關**
-    *   不喜歡繁雜？右側設定抽屜讓您自由決定時鐘、問候語、搜尋框、快捷捷徑、金句、RSS 看板與背景縮放效果的顯示或隱藏。
+    *   不喜歡繁雜？右側設定抽屜讓您自由決定時鐘、問候語、搜尋框、快捷捷徑、金句、RSS 看板、提醒與行事曆，以及背景縮放效果的顯示或隱藏。
 
 ---
 
 ### 🔒 隱私安全與本地化承諾
 
-*   **本機儲存（Offline-First）**：您上傳的背景照片與自訂金句均儲存在您瀏覽器本機的 **IndexedDB** 安全資料庫中，**絕對不會上傳到任何第三方伺服器**。您的隱私 100% 掌握在自己手中。
+*   **本機儲存（Offline-First）**：您上傳的背景照片、自訂金句、提醒事項以及行事曆的 iCal 私密網址均儲存在您瀏覽器本機（**IndexedDB／localStorage**）中，**絕對不會上傳到任何第三方伺服器**。行事曆為唯讀抓取、提醒為純本機功能；您的隱私 100% 掌握在自己手中。
 *   **安全輕量**：代碼完全由原生 JavaScript 與 CSS 編寫，無任何廣告追蹤，不佔用系統多餘記憶體，讓新分頁開啟如閃電般迅速。
 
 ---
@@ -60,7 +65,7 @@ Here are the optimized store listing descriptions in both **Traditional Chinese 
 
 ### 1. Short Description
 *Within 132 characters*
-> A beautiful new tab: random wallpapers, elegant clock, smart search, quick links, daily quotes, and an optional RSS reader.
+> A beautiful new tab: wallpapers, clock, smart search, quick links, daily quotes, RSS, reminders, calendar, plus settings backup.
 
 ---
 
@@ -93,14 +98,19 @@ Whether you're starting your morning or working late at night, enjoy a clean des
     *   Add, edit, or delete your most visited websites. Cards automatically fetch website favicons, maintaining a clean and beautiful grid. Open links in the current tab, a new tab, or a new window.
 *   **📰 RSS Reader Board (optional)**
     *   Subscribe to your favorite sites' RSS feeds and see fresh headlines scroll across the top of the page, click to read. Off by default; the required network permission is requested only when you enable it.
+*   **📝 Reminders & Calendar (optional)**
+    *   **Local Reminders**: Add to-dos and reminders in the corner of your new tab, with an optional due time and overdue highlighting. Stored entirely on your device — no network requests.
+    *   **Calendar Subscription**: Paste the private iCal URL from Google / Outlook / Apple Calendar to see your next 14 days of events at a glance (read-only). Off by default; access is requested only for that URL when you add it.
 *   **🎨 Theme Pack Import**
     *   Install curated official theme packs in one click, or drag in your own `.zip` theme (bundling wallpapers and a quotes text file) to apply a whole look at once.
+*   **💾 Settings Backup & Restore**
+    *   Export everything (shortcuts, quotes, RSS, reminders, calendars, wallpapers, and more) to a single file, then restore it on another device or after a reinstall — keeping the same experience without any sign-in or cloud.
 *   **🎛️ Tailored UI Settings**
-    *   Open the side drawer to toggle individual widgets (clock, greeting, search, quotes, quick links, RSS board, and zoom effect) on or off according to your preference.
+    *   Open the side drawer to toggle individual widgets (clock, greeting, search, quotes, quick links, RSS board, reminders, calendar, and zoom effect) on or off according to your preference.
 
 ---
 
 ### 🔒 Privacy & Performance Commitment
 
-*   **100% Local Storage (Offline-First)**: Your uploaded background images and custom quotes are stored locally inside the browser's **IndexedDB** database. No data is sent or uploaded to external servers. Your privacy is fully secured.
+*   **100% Local Storage (Offline-First)**: Your uploaded background images, custom quotes, reminders, and your calendar's private iCal URL are stored locally in the browser (**IndexedDB / localStorage**). The calendar is read-only and reminders are purely local. No data is sent or uploaded to external servers. Your privacy is fully secured.
 *   **Lightweight & Fast**: Built entirely in vanilla HTML/CSS/JS without heavy frameworks. Opens instantly with zero impact on system memory.

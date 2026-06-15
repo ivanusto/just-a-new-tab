@@ -145,6 +145,28 @@ class JustDB {
       };
     });
   }
+
+  /**
+   * Removes every stored wallpaper. Used when restoring a backup so the
+   * imported set fully replaces the existing one.
+   * @returns {Promise<void>}
+   */
+  async clearAllWallpapers() {
+    await this.init();
+    return new Promise((resolve, reject) => {
+      const transaction = this.db.transaction([this.storeName], 'readwrite');
+      const store = transaction.objectStore(this.storeName);
+      const request = store.clear();
+
+      request.onsuccess = () => {
+        resolve();
+      };
+
+      request.onerror = (event) => {
+        reject(event.target.error);
+      };
+    });
+  }
 }
 
 // Export as a global class or instantiable object
