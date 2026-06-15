@@ -905,6 +905,74 @@ body {
   transform: scale(0.97);
 }
 
+/* Import Top Sites list */
+.topsites-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  max-height: 48vh;
+  overflow-y: auto;
+  margin: 0 -0.25rem;
+}
+
+.topsites-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.5rem;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.topsites-item:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.topsites-item input[type="checkbox"] {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent-color);
+}
+
+.topsites-item img {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.topsites-item .topsites-meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.topsites-item .topsites-name {
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.topsites-item .topsites-url {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.topsites-empty {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 1.5rem 0;
+}
+
 /* Visibility classes */
 .widget-hidden {
   display: none !important;

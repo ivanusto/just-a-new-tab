@@ -158,6 +158,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   initBackupRestore();
   initReminders();
   initCalendarSettings();
+  initTopSitesImport();
 
   // 6. Set background and execute cloud quotes fetching if enabled
   await setRandomBackground();
@@ -3770,4 +3771,160 @@ function expandRecurring(ev, winStart, winEnd) {
   }
 
   return out;
+}
+
+/* ==========================================================================
+   Import Top Sites — one-time helper to pull the browser's most-visited
+   (and, on Firefox, pinned) sites into Quick Links. Uses the optional
+   "topSites" permission, requested only when the user clicks Import.
+   ========================================================================== */
+
+function requestApiPermission(permissions) {
+  return new Promise((resolve) => {
+    try {
+      if (typeof browser !== "undefined" && browser.permissions && browser.permissions.request) {
+        browser.permissions.request({ permissions }).then(resolve).catch(() => resolve(false));
+      } else if (typeof chrome !== "undefined" && chrome.permissions && chrome.permissions.request) {
+        chrome.permissions.request({ permissions }, (granted) => resolve(!!granted));
+      } else {
+        resolve(false);
+      }
+    } catch (e) {
+      resolve(false);
+    }
+  });
+}
+
+function getTopSites() {
+  return new Promise((resolve) => {
+    try {
+      if (typeof browser !== "undefined" && browser.topSites && browser.topSites.get) {
+        // Firefox: include the user's pinned shortcuts, skip search shortcuts.
+        browser.topSites.get({ includePinned: true, includeSearchShortcuts: false, limit: 30 })
+          .then((sites) => resolve(sites || []))
+          .catch(() => resolve([]));
+      } else if (typeof chrome !== "undefined" && chrome.topSites && chrome.topSites.get) {
+        // Chrome: most-visited only (no access to manually pinned NTP tiles).
+        chrome.topSites.get((sites) => resolve(sites || []));
+      } else {
+        resolve(null); // API unavailable
+      }
+    } catch (e) {
+      resolve(null);
+    }
+  });
+}
+
+// Normalise a URL for dedupe: host + path, lower-cased, no trailing slash.
+function normalizeLinkUrl(u) {
+  try {
+    const url = new URL(u);
+    return (url.hostname + url.pathname).replace(/\/$/, "").toLowerCase();
+  } catch (e) {
+    return (u || "").trim().toLowerCase();
+  }
+}
+
+function initTopSitesImport() {
+  const importBtn = document.getElementById("btn-import-topsites");
+  const modal = document.getElementById("topsites-modal");
+  const listEl = document.getElementById("topsites-list");
+  const cancelBtn = document.getElementById("topsites-cancel");
+  const addBtn = document.getElementById("topsites-add");
+  if (!importBtn || !modal || !listEl) return;
+
+  const closeModal = () => modal.classList.remove("open");
+
+  importBtn.addEventListener("click", async () => {
+    const granted = await requestApiPermission(["topSites"]);
+    if (!granted) {
+      showToast(isChineseUser ? "需要存取常用網站的權限" : "Permission to read top sites is required");
+      return;
+    }
+
+    const sites = await getTopSites();
+    if (sites === null) {
+      showToast(isChineseUser ? "此瀏覽器不支援匯入常用網站" : "This browser does not support importing top sites");
+      return;
+    }
+
+    // Drop entries already present in Quick Links (and de-dupe the list itself).
+    const existing = new Set(quickLinks.map((l) => normalizeLinkUrl(l.url)));
+    const seen = new Set();
+    const candidates = [];
+    sites.forEach((s) => {
+      if (!s || !s.url) return;
+      const key = normalizeLinkUrl(s.url);
+      if (existing.has(key) || seen.has(key)) return;
+      seen.add(key);
+      let host = "";
+      try { host = new URL(s.url).hostname; } catch (e) {}
+      candidates.push({ name: (s.title && s.title.trim()) || host || s.url, url: s.url, host });
+    });
+
+    if (candidates.length === 0) {
+      showToast(isChineseUser ? "找不到可匯入的新網站" : "No new sites to import");
+      return;
+    }
+
+    listEl.innerHTML = "";
+    candidates.forEach((c, i) => {
+      const item = document.createElement("label");
+      item.className = "topsites-item";
+
+      const cb = document.createElement("input");
+      cb.type = "checkbox";
+      cb.checked = true;
+      cb.dataset.index = String(i);
+
+      const img = document.createElement("img");
+      img.alt = "";
+      if (c.host) {
+        img.src = `https://www.google.com/s2/favicons?sz=64&domain=${c.host}`;
+        img.onerror = () => { img.style.visibility = "hidden"; };
+      }
+
+      const meta = document.createElement("div");
+      meta.className = "topsites-meta";
+      const name = document.createElement("span");
+      name.className = "topsites-name";
+      name.textContent = c.name;
+      const url = document.createElement("span");
+      url.className = "topsites-url";
+      url.textContent = c.url;
+      meta.appendChild(name);
+      meta.appendChild(url);
+
+      item.appendChild(cb);
+      item.appendChild(img);
+      item.appendChild(meta);
+      listEl.appendChild(item);
+    });
+
+    // Stash candidates for the add handler.
+    modal._candidates = candidates;
+    modal.classList.add("open");
+  });
+
+  if (addBtn) {
+    addBtn.addEventListener("click", async () => {
+      const candidates = modal._candidates || [];
+      const checked = listEl.querySelectorAll('input[type="checkbox"]:checked');
+      if (checked.length === 0) {
+        showToast(isChineseUser ? "請至少勾選一個網站" : "Please select at least one site");
+        return;
+      }
+      checked.forEach((cb) => {
+        const c = candidates[parseInt(cb.dataset.index, 10)];
+        if (c) quickLinks.push({ name: c.name.slice(0, 30), url: c.url });
+      });
+      await saveSettings();
+      renderQuickLinks();
+      closeModal();
+      showToast(isChineseUser ? `已匯入 ${checked.length} 個網站` : `Imported ${checked.length} site(s)`);
+    });
+  }
+
+  if (cancelBtn) cancelBtn.addEventListener("click", closeModal);
+  modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
 }

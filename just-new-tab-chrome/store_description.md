@@ -38,7 +38,7 @@ Here are the optimized store listing descriptions in both **Traditional Chinese 
 *   **🔍 智慧搜尋框**
     *   直接在新分頁搜尋，內建 Google、Bing、DuckDuckGo、Yahoo、Baidu，以及 ChatGPT、Claude、Perplexity 等 AI 引擎，可選擇在目前分頁或新分頁開啟結果。
 *   **🔗 輕量化快捷連結 (Speed Dial)**
-    *   輕鬆新增、排列與刪除您的常用網頁，卡片會自動抓取網站 Favicon 圖示，兼具美觀與高實用性。可選擇以目前分頁、新分頁或新視窗開啟。
+    *   輕鬆新增、排列與刪除您的常用網頁，卡片會自動抓取網站 Favicon 圖示，兼具美觀與高實用性。可選擇以目前分頁、新分頁或新視窗開啟，並可一鍵從瀏覽器匯入常用網站（Top Sites）。
 *   **📰 RSS 閱讀看板（選用）**
     *   訂閱您喜愛的網站 RSS，標題會以跑馬燈方式在頁面頂端輪播，點擊即可閱讀。此功能預設關閉，開啟時才會請求必要的網路權限。
 *   **📝 提醒事項與行事曆（選用）**
@@ -95,7 +95,7 @@ Whether you're starting your morning or working late at night, enjoy a clean des
 *   **🔍 Smart Search Box**
     *   Search right from the new tab with built-in Google, Bing, DuckDuckGo, Yahoo, and Baidu, plus AI engines like ChatGPT, Claude, and Perplexity. Open results in the current or a new tab.
 *   **🔗 Quick Link Shortcuts (Speed Dial)**
-    *   Add, edit, or delete your most visited websites. Cards automatically fetch website favicons, maintaining a clean and beautiful grid. Open links in the current tab, a new tab, or a new window.
+    *   Add, edit, or delete your most visited websites. Cards automatically fetch website favicons, maintaining a clean and beautiful grid. Open links in the current tab, a new tab, or a new window, and import your browser's top sites in one click.
 *   **📰 RSS Reader Board (optional)**
     *   Subscribe to your favorite sites' RSS feeds and see fresh headlines scroll across the top of the page, click to read. Off by default; the required network permission is requested only when you enable it.
 *   **📝 Reminders & Calendar (optional)**

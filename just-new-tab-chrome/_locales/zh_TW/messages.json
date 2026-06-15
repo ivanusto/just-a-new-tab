@@ -319,5 +319,20 @@
   },
   "calendarInputUrl": {
     "message": "iCal 私密網址 (https://...ics)..."
+  },
+  "importTopSitesLabel": {
+    "message": "從瀏覽器匯入常用網站"
+  },
+  "importTopSitesBtn": {
+    "message": "匯入"
+  },
+  "importTopSitesTitle": {
+    "message": "匯入常用網站"
+  },
+  "importTopSitesDesc": {
+    "message": "勾選要加入捷徑的網站。提示：Chrome 僅能提供「最常造訪」的網站，無法讀取您在官方新分頁手動釘選的捷徑磚。"
+  },
+  "importTopSitesAdd": {
+    "message": "加入所選"
   }
 }
