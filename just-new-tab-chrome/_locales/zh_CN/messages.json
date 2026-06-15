@@ -337,5 +337,11 @@
   },
   "autoDownscaleLabel": {
     "message": "上传时自动缩图（建议，缩至 4K 以节省空间）"
+  },
+  "reminderTimePlaceholder": {
+    "message": "时间 例:0930"
+  },
+  "reminderDateTitle": {
+    "message": "日期（选填）"
   }
 }

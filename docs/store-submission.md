@@ -2,17 +2,17 @@
 
 可直接複製到 Chrome Web Store 與 Firefox AMO 後台的欄位文字。建議用英文填寫權限 justification（審核員主要看英文），下方另附中文對照。
 
-> **重點：v1.55 未新增任何權限**（僅放寬圖片上傳上限並加入自動縮圖，純前端處理）。v1.54 曾新增「一個選用權限」`topSites`（用於「匯入常用網站」，預設不索取、按下匯入才請求）；v1.52 / v1.53 未新增任何權限；行事曆沿用既有的 `optional_host_permissions`、提醒事項不需任何權限。全程未使用遠端程式碼，亦無任何資料外傳。
+> **重點：v1.56 未新增任何權限**（僅改善提醒時間輸入體驗，純前端處理）。v1.55 亦未新增任何權限（放寬圖片上傳上限並加入自動縮圖）。v1.54 曾新增「一個選用權限」`topSites`（用於「匯入常用網站」，預設不索取、按下匯入才請求）；v1.52 / v1.53 未新增任何權限；行事曆沿用既有的 `optional_host_permissions`、提醒事項不需任何權限。全程未使用遠端程式碼，亦無任何資料外傳。
 
 ---
 
 ## 此版本更新內容 / What's New（版本更新欄）
 
 **繁中**
-> v1.55：背景圖片單張上傳上限提高至 25MB，並新增「上傳時自動縮圖」（預設開啟，超過 4K 自動等比縮小以節省空間，可關閉）。未新增任何權限。
+> v1.56：改善自訂提醒的時間輸入 —— 改為原生日期選擇加上可自由打字的時間欄（可直接輸入 0930、9:30 等），並維持嚴格驗證。未新增任何權限。
 
 **English**
-> v1.55: Wallpaper upload limit raised to 25MB per image, plus a new "auto-downscale on upload" option (on by default; images over 4K are scaled down to save space, and it can be turned off). No new permissions.
+> v1.56: Improved the reminder time input — a native date picker plus a free-typed time field (type 0930, 9:30, etc.), with strict validation kept in place. No new permissions.
 
 完整更新紀錄見 [CHANGELOG.md](../CHANGELOG.md)。
 

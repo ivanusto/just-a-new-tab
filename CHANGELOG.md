@@ -3,6 +3,20 @@
 本專案的版本更新紀錄。格式參考 [Keep a Changelog](https://keepachangelog.com/)。
 Notable changes to this project. Format based on [Keep a Changelog](https://keepachangelog.com/).
 
+## [1.56] - 2026-06-15
+
+### 提醒時間輸入改善 / Easier reminder time input
+
+**繁中**
+- ⏰ 自訂提醒的到期時間改為「**原生日期選擇 + 可自由打字的時間欄**」，取代原本的 `datetime-local`（其逐段、需用上下鍵的操作較不直覺）。現在時間可直接輸入 `9`、`930`、`0930`、`9:30` 等，失焦時自動正規化為 `HH:MM`。
+- 🔒 仍做嚴格驗證：時間僅接受數字白名單且限定 0–23 時、0–59 分，無效輸入會被拒絕並提示；資料僅以數字 timestamp 儲存、以 `textContent` 顯示，無注入風險。
+- 未新增任何權限。
+
+**English**
+- ⏰ Reminder due time now uses a **native date picker + a free-typed time field** instead of `datetime-local` (whose segmented, arrow-key editing felt clunky). You can type `9`, `930`, `0930`, or `9:30`; it normalizes to `HH:MM` on blur.
+- 🔒 Still strictly validated: digits-only whitelist, hours 0–23 / minutes 0–59, invalid input is rejected with a toast. Values are stored as a numeric timestamp and rendered via `textContent`, so there is no injection surface.
+- No new permissions.
+
 ## [1.55] - 2026-06-15
 
 ### 放寬圖片上限 + 自動縮圖 / Higher image limit + auto-downscale
@@ -61,6 +75,7 @@ Notable changes to this project. Format based on [Keep a Changelog](https://keep
 - Export all settings, shortcuts, custom quotes, RSS subscriptions, and wallpapers (IndexedDB) to a single JSON file.
 - Restore on another device or after a reinstall (with a confirm prompt); wallpaper references are remapped automatically. No sign-in, no cloud.
 
+[1.56]: https://github.com/ivanusto/just-new-tab/releases/tag/v1.56
 [1.55]: https://github.com/ivanusto/just-new-tab/releases/tag/v1.55
 [1.54]: https://github.com/ivanusto/just-new-tab/releases/tag/v1.54
 [1.53]: https://github.com/ivanusto/just-new-tab/releases/tag/v1.53
