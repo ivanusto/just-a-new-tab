@@ -27,7 +27,7 @@ Here are the optimized store listing descriptions in both **Traditional Chinese 
 *   **🖼️ 自由揮灑的背景圖片庫**
     *   **隨機輪播效果**：每次打開新分頁，都會從您的圖片庫中隨機挑選一張背景，伴隨優雅的淡入淡出及 Ken Burns 鏡頭微動縮放效果，讓桌布躍然紙上。
     *   **預設精美桌布**：內建 6 張精心挑選的高質感桌布。
-    *   **無限制自訂上傳**：支援多張圖片點擊或拖曳上傳，圖片可隨時在設定中勾選是否加入輪播池，或點選垃圾桶永久刪除。
+    *   **自訂上傳**：支援多張圖片點擊或拖曳上傳（單張上限 25MB，並可在上傳時自動縮圖至 4K 以節省空間），圖片可隨時在設定中勾選是否加入輪播池，或點選垃圾桶永久刪除。
 *   **✍️ 點亮心靈的每日金句**
     *   **雲端隨機獲取**：開啟網路金句開關，系統將從雲端隨機抓取精美語錄。可選來源包含 ZenQuotes（英文語錄，繁中介面會自動轉譯）、Hitokoto 一言（簡中）與 AnimeChan（動漫語錄）。
     *   **自訂擴充金句庫**：您可以自由輸入任何喜愛的句子與作者，創造專屬於您的正能量資料庫。
@@ -84,7 +84,7 @@ Whether you're starting your morning or working late at night, enjoy a clean des
 *   **🖼️ Dynamic Wallpaper Gallery**
     *   **Random Rotation**: Cycles through your enabled wallpapers on every new tab, using a smooth cross-fade transition and a subtle Ken Burns zoom effect to make the page feel alive.
     *   **Premium Default Wallpapers**: Comes with 6 aesthetic, pre-bundled illustrations.
-    *   **Custom Uploads**: Drag & drop or click to upload your favorite photos. Select which ones to include in the rotation pool, or delete them instantly with a single click.
+    *   **Custom Uploads**: Drag & drop or click to upload your favorite photos (up to 25MB each, with optional auto-downscaling to 4K to save space). Select which ones to include in the rotation pool, or delete them instantly with a single click.
 *   **✍️ Inspiring Quotes Widget**
     *   **Cloud Fetching**: Enable cloud quotes to pull inspiring thoughts dynamically. Choose your source: ZenQuotes (English, auto-translated for Traditional Chinese UI), Hitokoto (Simplified Chinese), or AnimeChan (anime quotes).
     *   **Custom Quotes Library**: Add your own favorite quotes and authors. They will rotate randomly along with the default pool.
