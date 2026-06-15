@@ -22,6 +22,7 @@ You can host this Privacy Policy on GitHub Pages, Google Sites, Notion, or your 
 *   **金句翻譯**：當金句來源為英文、且您使用繁體中文介面時，會將該句子送至 MyMemory 翻譯 API (`https://api.mymemory.translated.net/`) 以轉譯為繁體中文。
 *   **RSS 閱讀看板（啟用 RSS 時）**：本套件會向「您自行新增訂閱的 RSS 來源網址」發出請求，以讀取文章標題與連結。由於訂閱網址完全由您決定，此功能需要較廣的網路存取權限；因此該權限被設計為**選用權限（optional）**，僅在您開啟 RSS 功能時才會向您請求授權，預設為關閉。
 *   **行事曆訂閱（啟用「行事曆」時）**：本套件會向「您自行貼上的 iCal 私密網址」發出請求，以讀取近期行程的標題與時間。該網址完全由您提供、僅儲存於本機，並使用與 RSS 相同的**選用權限（optional）**機制：預設關閉，僅在您新增行事曆或開啟功能時，才會針對該網址的網域請求授權；刪除訂閱時會一併釋出該權限。
+*   **匯入常用網站（按下「從瀏覽器匯入常用網站」時）**：本套件會透過瀏覽器的 `topSites` API 讀取您的常用／釘選網站清單，僅供您勾選加入捷徑之用。此為**選用權限（optional）**，預設不索取，僅在您按下匯入按鈕的當下才請求；取得的清單僅於本機顯示、**不會傳送至任何伺服器**。
 *   **官方主題包下載（僅在您主動點擊下載時）**：自開發者網站 (`https://yblog.org/`) 下載內含背景圖與金句的主題壓縮包。
 *   **網站圖示（Favicon）**：請求 Google Favicon 服務 (`https://www.google.com/s2/favicons`) 以顯示您捷徑的網站圖示。
 
@@ -54,6 +55,7 @@ The extension only makes anonymous network requests (Fetch) when you actually us
 *   **Quote Translation**: When an English quote is displayed in a Traditional Chinese interface, the quote text is sent to the MyMemory Translation API (`https://api.mymemory.translated.net/`) to be translated into Traditional Chinese.
 *   **RSS Reader (when RSS is enabled)**: The extension fetches article titles and links from the RSS feed URLs **you choose to subscribe to**. Because those URLs are entirely your choice, this feature needs broad network access; that access is declared as an **optional permission**, is off by default, and is requested only when you turn the RSS feature on.
 *   **Calendar Subscription (when the Calendar feature is enabled)**: The extension fetches event titles and times from the **private iCal URL you paste in**. That URL is entirely provided by you, stored locally only, and uses the same **optional permission** model as RSS: off by default, requested only for that URL's domain when you add a calendar or enable the feature, and released when you delete the subscription.
+*   **Import Top Sites (when you click "Import top sites from browser")**: The extension reads your most-visited / pinned sites via the browser's `topSites` API, solely so you can pick which ones to add as shortcuts. This is an **optional permission**, never requested at install — only at the moment you click Import. The list is shown locally and **never sent to any server**.
 *   **Official Theme Packs (only when you click to download)**: Downloads a theme archive (wallpapers and quotes) from the developer's site (`https://yblog.org/`).
 *   **Shortcut Icons (Favicons)**: Requests website favicons from the Google Favicon Service (`https://www.google.com/s2/favicons`) to display icons for your shortcuts.
 

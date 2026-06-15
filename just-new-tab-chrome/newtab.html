@@ -248,6 +248,10 @@
                 <option value="newwindow" data-i18n="linkOpenNewWindow">新視窗</option>
               </select>
             </div>
+            <div class="form-group-inline">
+              <span data-i18n="importTopSitesLabel">從瀏覽器匯入常用網站</span>
+              <button class="text-action-btn" id="btn-import-topsites" data-i18n="importTopSitesBtn">匯入</button>
+            </div>
           </div>
           <div class="toggle-group">
             <label class="toggle-switch">
@@ -549,6 +553,21 @@
       <div class="modal-actions">
         <button class="modal-btn secondary" id="modal-cancel" data-i18n="modalCancel">取消</button>
         <button class="modal-btn primary" id="modal-save" data-i18n="modalSave">儲存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Import Top Sites Dialog -->
+  <div class="modal-overlay" id="topsites-modal">
+    <div class="modal-box">
+      <h3 data-i18n="importTopSitesTitle">匯入常用網站</h3>
+      <p class="section-desc" data-i18n="importTopSitesDesc">勾選要加入捷徑的網站。提示：Chrome 僅能提供「最常造訪」的網站，無法讀取您在官方新分頁手動釘選的捷徑磚。</p>
+      <div class="topsites-list" id="topsites-list">
+        <!-- Populated by JS -->
+      </div>
+      <div class="modal-actions">
+        <button class="modal-btn secondary" id="topsites-cancel" data-i18n="modalCancel">取消</button>
+        <button class="modal-btn primary" id="topsites-add" data-i18n="importTopSitesAdd">加入所選</button>
       </div>
     </div>
   </div>

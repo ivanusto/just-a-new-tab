@@ -3,6 +3,20 @@
 本專案的版本更新紀錄。格式參考 [Keep a Changelog](https://keepachangelog.com/)。
 Notable changes to this project. Format based on [Keep a Changelog](https://keepachangelog.com/).
 
+## [1.54] - 2026-06-15
+
+### 從瀏覽器匯入常用網站 / Import Top Sites
+
+**繁中**
+- 🔗 捷徑設定新增「從瀏覽器匯入常用網站」：透過瀏覽器 `topSites` API 讀取常用／釘選網站，於對話框勾選後一鍵加入捷徑（自動與既有捷徑去重）。
+- 採**選用權限（`optional_permissions: ["topSites"]`）**，預設不索取，僅在按下匯入的當下才請求；清單僅於本機顯示、不外傳。
+- 限制：Chrome 僅能提供「最常造訪」網站，無法讀取官方新分頁手動釘選的捷徑磚；Firefox 另含使用者釘選的 Top Sites。
+
+**English**
+- 🔗 Quick Links can now "Import top sites from browser": reads most-visited / pinned sites via the browser `topSites` API and adds the selected ones in one click (de-duplicated against existing links).
+- Uses an **optional permission** (`optional_permissions: ["topSites"]`), never requested at install — only when you click Import. The list is shown locally and never uploaded.
+- Limitation: Chrome only exposes most-visited sites (not the tiles you manually pinned on the official new tab); Firefox additionally includes your pinned Top Sites.
+
 ## [1.53] - 2026-06-15
 
 ### 提醒事項與行事曆 / Reminders & Calendar
@@ -33,4 +47,5 @@ Notable changes to this project. Format based on [Keep a Changelog](https://keep
 - Export all settings, shortcuts, custom quotes, RSS subscriptions, and wallpapers (IndexedDB) to a single JSON file.
 - Restore on another device or after a reinstall (with a confirm prompt); wallpaper references are remapped automatically. No sign-in, no cloud.
 
+[1.54]: https://github.com/ivanusto/just-new-tab/releases/tag/v1.54
 [1.53]: https://github.com/ivanusto/just-new-tab/releases/tag/v1.53

@@ -29,6 +29,8 @@
 
 提醒與行事曆共用左上角的 `#agenda-widget` 卡片，兩者皆預設關閉。
 
+- **匯入常用網站**（`newtab.js` 的 `initTopSitesImport`）：透過瀏覽器 `topSites` API 讀取常用／釘選網站，預覽勾選後加入捷徑（與既有捷徑去重）。採選用權限 `topSites`，按下匯入才索取。Chrome 僅能取得「最常造訪」、Firefox 另含釘選 Top Sites。
+
 ## 本機開發 / 載入測試
 
 - Chrome：`chrome://extensions` → 開啟開發者模式 → 載入未封裝項目 → 選 `just-new-tab-chrome/`
@@ -64,8 +66,9 @@ python package_zip.py   # Windows 無 zip 時的替代方案（純 Python）
 
 - `host_permissions`：僅列出金句／翻譯／官方主題等固定 API 網域（窄範圍，利於商店審核）。
 - `optional_host_permissions`：`http://*/*`、`https://*/*`，**僅在使用者於設定中開啟 RSS，或新增行事曆（ICS）訂閱時才動態索取**（用於抓取任意訂閱來源／行事曆網址；行事曆會針對該網址的網域請求，刪除時釋出）。
+- `optional_permissions`：`topSites`，**僅在使用者按下「從瀏覽器匯入常用網站」時才動態索取**；清單僅於本機顯示、不外傳。
 - 預設行為：RSS 看板、提醒事項、行事曆皆預設關閉；捷徑預設以「新分頁」開啟，使用者可自行調整。
 
 ## 版本
 
-目前版本：1.53（定義於各自的 `manifest.json`）
+目前版本：1.54（定義於各自的 `manifest.json`）

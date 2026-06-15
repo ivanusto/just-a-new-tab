@@ -319,5 +319,20 @@
   },
   "calendarInputUrl": {
     "message": "Private iCal URL (https://...ics)..."
+  },
+  "importTopSitesLabel": {
+    "message": "Import top sites from browser"
+  },
+  "importTopSitesBtn": {
+    "message": "Import"
+  },
+  "importTopSitesTitle": {
+    "message": "Import Top Sites"
+  },
+  "importTopSitesDesc": {
+    "message": "Pick the sites to add as shortcuts. Note: Chrome can only provide your most-visited sites, not the tiles you manually pinned on the official new tab page."
+  },
+  "importTopSitesAdd": {
+    "message": "Add selected"
   }
 }
