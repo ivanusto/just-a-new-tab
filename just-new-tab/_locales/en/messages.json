@@ -337,5 +337,11 @@
   },
   "autoDownscaleLabel": {
     "message": "Auto-downscale on upload (recommended, caps at 4K to save space)"
+  },
+  "reminderTimePlaceholder": {
+    "message": "Time e.g. 0930"
+  },
+  "reminderDateTitle": {
+    "message": "Date (optional)"
   }
 }

@@ -490,7 +490,8 @@
               <input type="text" id="reminder-input-text" data-i18n="reminderInputText" placeholder="輸入提醒內容..." maxlength="120">
             </div>
             <div class="form-group-row">
-              <input type="datetime-local" id="reminder-input-due">
+              <input type="date" id="reminder-input-date" data-i18n-title="reminderDateTitle" title="日期（選填）">
+              <input type="text" id="reminder-input-time" inputmode="numeric" maxlength="5" autocomplete="off" data-i18n="reminderTimePlaceholder" placeholder="時間 例:0930" style="max-width: 7rem;">
               <button class="add-quote-btn" id="btn-add-reminder" data-i18n="addBtn">新增</button>
             </div>
           </div>
