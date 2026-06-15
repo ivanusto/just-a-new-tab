@@ -1,12 +1,15 @@
 {
   "manifest_version": 3,
   "name": "__MSG_extName__",
-  "version": "1.53",
+  "version": "1.54",
   "description": "__MSG_extDesc__",
   "default_locale": "zh_TW",
   "permissions": [
     "storage",
     "unlimitedStorage"
+  ],
+  "optional_permissions": [
+    "topSites"
   ],
   "host_permissions": [
     "https://zenquotes.io/",

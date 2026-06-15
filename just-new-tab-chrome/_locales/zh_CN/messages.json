@@ -319,5 +319,20 @@
   },
   "calendarInputUrl": {
     "message": "iCal 私密网址 (https://...ics)..."
+  },
+  "importTopSitesLabel": {
+    "message": "从浏览器导入常用网站"
+  },
+  "importTopSitesBtn": {
+    "message": "导入"
+  },
+  "importTopSitesTitle": {
+    "message": "导入常用网站"
+  },
+  "importTopSitesDesc": {
+    "message": "勾选要加入快捷方式的网站。提示：Chrome 仅能提供「最常访问」的网站，无法读取您在官方新标签页手动固定的快捷磁贴。"
+  },
+  "importTopSitesAdd": {
+    "message": "加入所选"
   }
 }
