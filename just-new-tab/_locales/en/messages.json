@@ -271,5 +271,53 @@
   },
   "rssInputUrl": {
     "message": "RSS feed URL (https://...)..."
+  },
+  "backupTitle": {
+    "message": "Backup & Restore"
+  },
+  "backupDesc": {
+    "message": "Export all your settings (shortcuts, RSS, quotes, wallpapers and more) into a single file, then restore it on another device to keep the same experience."
+  },
+  "backupExportBtn": {
+    "message": "Export Backup"
+  },
+  "backupImportBtn": {
+    "message": "Import Backup"
+  },
+  "tabAgenda": {
+    "message": "Reminders & Calendar"
+  },
+  "remindersWidgetTitle": {
+    "message": "Reminders"
+  },
+  "calendarWidgetTitle": {
+    "message": "Upcoming"
+  },
+  "remindersTitle": {
+    "message": "Reminders"
+  },
+  "toggleReminders": {
+    "message": "Show reminders on the new tab"
+  },
+  "remindersDesc": {
+    "message": "Add to-dos or reminders. Stored locally only, nothing is uploaded. Due time is optional."
+  },
+  "reminderInputText": {
+    "message": "Enter a reminder..."
+  },
+  "calendarTitle": {
+    "message": "Calendar Subscription (ICS)"
+  },
+  "toggleCalendar": {
+    "message": "Show upcoming events on the new tab"
+  },
+  "calendarDesc": {
+    "message": "Paste your calendar's private iCal URL (Google Calendar settings -> 'Secret address in iCal format') to see upcoming events on the new tab. This URL is secret and stored locally only."
+  },
+  "calendarInputName": {
+    "message": "Calendar name (e.g. Work)..."
+  },
+  "calendarInputUrl": {
+    "message": "Private iCal URL (https://...ics)..."
   }
 }
