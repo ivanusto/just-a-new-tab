@@ -231,7 +231,7 @@
     "message": "Pre-made theme packages from official sources. Click download to fetch and automatically import wallpapers and quotes."
   },
   "tabRss": {
-    "message": "RSS Feed"
+    "message": "RSS"
   },
   "rssToggleTitle": {
     "message": "RSS Dashboard"
@@ -285,7 +285,7 @@
     "message": "Import Backup"
   },
   "tabAgenda": {
-    "message": "Reminders & Calendar"
+    "message": "Agenda"
   },
   "remindersWidgetTitle": {
     "message": "Reminders"

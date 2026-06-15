@@ -180,10 +180,10 @@
     "message": "背景图片"
   },
   "tabQuotes": {
-    "message": "金句工具"
+    "message": "金句"
   },
   "tabThemes": {
-    "message": "主题包管理"
+    "message": "主题包"
   },
   "importedThemesTitle": {
     "message": "已导入主题包清单"
@@ -285,7 +285,7 @@
     "message": "导入备份文件"
   },
   "tabAgenda": {
-    "message": "提醒与日历"
+    "message": "提醒/日历"
   },
   "remindersWidgetTitle": {
     "message": "提醒事项"
