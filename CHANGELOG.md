@@ -91,6 +91,7 @@ Notable changes to this project. Format based on [Keep a Changelog](https://keep
 - Export all settings, shortcuts, custom quotes, RSS subscriptions, and wallpapers (IndexedDB) to a single JSON file.
 - Restore on another device or after a reinstall (with a confirm prompt); wallpaper references are remapped automatically. No sign-in, no cloud.
 
+[1.57]: https://github.com/ivanusto/just-new-tab/releases/tag/v1.57
 [1.56]: https://github.com/ivanusto/just-new-tab/releases/tag/v1.56
 [1.55]: https://github.com/ivanusto/just-new-tab/releases/tag/v1.55
 [1.54]: https://github.com/ivanusto/just-new-tab/releases/tag/v1.54
