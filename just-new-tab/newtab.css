@@ -237,12 +237,12 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
+  width: 54px;
+  height: 54px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.08);
-  margin-bottom: 0.6rem;
-  font-size: 1.25rem;
+  margin-bottom: 0.55rem;
+  font-size: 1.5rem;
   font-weight: bold;
   overflow: hidden;
   color: var(--text-primary);
@@ -250,8 +250,8 @@ body {
 }
 
 .link-icon-img {
-  width: 24px;
-  height: 24px;
+  width: 32px;
+  height: 32px;
   object-fit: contain;
 }
 
