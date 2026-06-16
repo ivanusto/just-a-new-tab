@@ -1070,7 +1070,7 @@ function updateModalIconPreview() {
 
   if (domain) {
     const img = document.createElement("img");
-    img.src = `https://www.google.com/s2/favicons?sz=64&domain=${domain}`;
+    img.src = `https://www.google.com/s2/favicons?sz=128&domain=${domain}`;
     img.alt = "";
     img.onerror = () => { img.remove(); preview.textContent = name ? name.charAt(0).toUpperCase() : "?"; };
     preview.appendChild(img);
@@ -1225,7 +1225,7 @@ function renderQuickLinks() {
       if (domain) {
         const img = document.createElement("img");
         img.className = "link-icon-img";
-        img.src = `https://www.google.com/s2/favicons?sz=64&domain=${domain}`;
+        img.src = `https://www.google.com/s2/favicons?sz=128&domain=${domain}`;
         img.alt = link.name;
 
         // Fallback in case Google favicon API fails or offline
@@ -4014,7 +4014,7 @@ function initTopSitesImport() {
       const img = document.createElement("img");
       img.alt = "";
       if (c.host) {
-        img.src = `https://www.google.com/s2/favicons?sz=64&domain=${c.host}`;
+        img.src = `https://www.google.com/s2/favicons?sz=128&domain=${c.host}`;
         img.onerror = () => { img.style.visibility = "hidden"; };
       }
 

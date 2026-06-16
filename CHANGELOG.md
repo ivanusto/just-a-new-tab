@@ -3,6 +3,20 @@
 本專案的版本更新紀錄。格式參考 [Keep a Changelog](https://keepachangelog.com/)。
 Notable changes to this project. Format based on [Keep a Changelog](https://keepachangelog.com/).
 
+## [1.57] - 2026-06-16
+
+### 捷徑圖示放大 / Larger shortcut icons
+
+**繁中**
+- 🔼 參考 Firefox 原生新分頁，將捷徑圖示放大，減少框內留白：玻璃圓圈 `44px → 54px`、圖示 `24px → 32px`，首字母 fallback 字級 `1.25rem → 1.5rem`。
+- 🔍 favicon 抓取解析度 `sz=64 → sz=128`，放大後仍維持銳利不模糊。
+- 未新增任何權限。
+
+**English**
+- 🔼 Enlarged the quick-link icons to match Firefox's native new tab and reduce empty space: glass circle `44px → 54px`, icon `24px → 32px`, first-letter fallback `1.25rem → 1.5rem`.
+- 🔍 Favicon fetch resolution bumped `sz=64 → sz=128` so icons stay crisp at the larger size.
+- No new permissions.
+
 ## [1.56] - 2026-06-15
 
 ### 提醒時間輸入改善 / Easier reminder time input
