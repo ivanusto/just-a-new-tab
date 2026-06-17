@@ -123,7 +123,22 @@
     "message": "指针时钟"
   },
   "clockPositionLabel": {
-    "message": "时钟位置"
+    "message": "本地时钟位置"
+  },
+  "clockPositionLabel2": {
+    "message": "位置"
+  },
+  "clockCityLabel": {
+    "message": "城市"
+  },
+  "clockCustomCityLabel": {
+    "message": "自定义城市"
+  },
+  "clockCustomCityPlaceholder": {
+    "message": "例如：巴黎 / Paris"
+  },
+  "toggleThirdClock": {
+    "message": "显示第三时钟（世界时钟）"
   },
   "clockPosLeft": {
     "message": "靠左"
@@ -202,6 +217,39 @@
   },
   "bgRotateIntervalLabel": {
     "message": "轮播间隔时间 (秒)"
+  },
+  "toggleBgRotateSyncQuote": {
+    "message": "轮播时同步换一则金句"
+  },
+  "toggleSecondClock": {
+    "message": "显示第二时钟（世界时钟）"
+  },
+  "secondClockCityLabel": {
+    "message": "第二时钟城市"
+  },
+  "toggleWeather": {
+    "message": "显示天气"
+  },
+  "weatherModeLabel": {
+    "message": "天气地点来源"
+  },
+  "weatherModeFollowClock": {
+    "message": "跟随第二时钟城市"
+  },
+  "weatherModeManual": {
+    "message": "手动输入城市"
+  },
+  "weatherCityLabel": {
+    "message": "本地天气城市"
+  },
+  "weatherRemoteHint": {
+    "message": "本地天气需手动输入城市；开启第二／第三时钟后，会自动在各时钟下方显示该城市的天气。"
+  },
+  "weatherCityPlaceholder": {
+    "message": "例如：台北 / Tokyo"
+  },
+  "weatherUnitLabel": {
+    "message": "温度单位"
   },
   "searchPlaceholder": {
     "message": "搜索网页或输入问题..."

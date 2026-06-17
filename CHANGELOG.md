@@ -3,6 +3,24 @@
 本專案的版本更新紀錄。格式參考 [Keep a Changelog](https://keepachangelog.com/)。
 Notable changes to this project. Format based on [Keep a Changelog](https://keepachangelog.com/).
 
+## [1.58] - 2026-06-17
+
+### 世界時鐘 + 天氣 + 輪播同步金句 / World clock, weather & rotation-synced quotes
+
+**繁中**
+- 🕑 **世界時鐘（最多三個）**：本地時鐘外，可再加開第二、第三時鐘。畫面固定為**左／中／右**三個位置，每個位置最多一個時鐘；指定某個時鐘到已被佔用的位置時會自動與對方對調，因此三個時鐘一定分散在三欄、不會擠成一列。城市可從內建 20 個常用城市挑選，或**自訂輸入任意城市**（自動解析時區與經緯度）。數字／指針兩種樣式皆支援。並重新設計時鐘「小／標準／大」三段大小，修正「小反而比標準大」的問題。
+- 🌤️ **天氣小工具**：以免費的 Open-Meteo 顯示目前氣溫與天氣，**完全不需要瀏覽器定位權限**。天氣顯示在各自時鐘下方：本地天氣需「手動輸入城市」；第二／第三時鐘則自動顯示該城市天氣。可切換 °C／°F，結果在本機快取 30 分鐘。
+- 🔁 **輪播時同步換金句**：開啟「自動輪播背景圖片」後，多了一個子選項，可在每次換背景時一併重新隨機一則金句。
+- 🎨 修正深色模式下，下拉式選單選項反白不易閱讀的問題。
+- 🔐 新增權限：`api.open-meteo.com`、`geocoding-api.open-meteo.com`（僅天氣功能會用到，預設關閉）。
+
+**English**
+- 🕑 **World clocks (up to three)**: besides the local clock you can add a second and third clock. The screen has three fixed **left / center / right** slots and each slot holds at most one clock — assigning a clock to an occupied slot swaps it with the clock already there, so the clocks always spread across the three columns and never pile up in one. Pick from 20 built-in cities or **enter any custom city** (timezone and coordinates are resolved automatically). Works with both digital and analog styles. The small/standard/large size tiers were also redesigned to fix "small was bigger than standard".
+- 🌤️ **Weather widget**: shows the current temperature and condition via the free Open-Meteo API with **no browser geolocation permission required**. Weather appears under each clock: local weather uses a **manually entered city**; the second/third clocks show their own city's weather automatically. Toggle °C/°F; cached locally for 30 minutes.
+- 🔁 **Rotation-synced quotes**: when "Timed wallpaper rotation" is on, a new sub-option re-randomizes the quote together with each background change.
+- 🎨 Fixed hard-to-read (washed-out) dropdown options under dark mode.
+- 🔐 New permissions: `api.open-meteo.com`, `geocoding-api.open-meteo.com` (only used by the weather feature, which is off by default).
+
 ## [1.57] - 2026-06-16
 
 ### 捷徑圖示放大 / Larger shortcut icons
@@ -91,6 +109,7 @@ Notable changes to this project. Format based on [Keep a Changelog](https://keep
 - Export all settings, shortcuts, custom quotes, RSS subscriptions, and wallpapers (IndexedDB) to a single JSON file.
 - Restore on another device or after a reinstall (with a confirm prompt); wallpaper references are remapped automatically. No sign-in, no cloud.
 
+[1.58]: https://github.com/ivanusto/just-new-tab/releases/tag/v1.58
 [1.57]: https://github.com/ivanusto/just-new-tab/releases/tag/v1.57
 [1.56]: https://github.com/ivanusto/just-new-tab/releases/tag/v1.56
 [1.55]: https://github.com/ivanusto/just-new-tab/releases/tag/v1.55

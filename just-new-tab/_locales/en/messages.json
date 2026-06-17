@@ -123,7 +123,22 @@
     "message": "Analog"
   },
   "clockPositionLabel": {
-    "message": "Clock Position"
+    "message": "Local clock position"
+  },
+  "clockPositionLabel2": {
+    "message": "Position"
+  },
+  "clockCityLabel": {
+    "message": "City"
+  },
+  "clockCustomCityLabel": {
+    "message": "Custom city"
+  },
+  "clockCustomCityPlaceholder": {
+    "message": "e.g. Paris / London"
+  },
+  "toggleThirdClock": {
+    "message": "Show a third (world) clock"
   },
   "clockPosLeft": {
     "message": "Left"
@@ -202,6 +217,39 @@
   },
   "bgRotateIntervalLabel": {
     "message": "Rotation Interval (seconds)"
+  },
+  "toggleBgRotateSyncQuote": {
+    "message": "Pick a new quote with each rotation"
+  },
+  "toggleSecondClock": {
+    "message": "Show a second (world) clock"
+  },
+  "secondClockCityLabel": {
+    "message": "Second clock city"
+  },
+  "toggleWeather": {
+    "message": "Show weather"
+  },
+  "weatherModeLabel": {
+    "message": "Weather location"
+  },
+  "weatherModeFollowClock": {
+    "message": "Follow second-clock city"
+  },
+  "weatherModeManual": {
+    "message": "Enter city manually"
+  },
+  "weatherCityLabel": {
+    "message": "Local weather city"
+  },
+  "weatherRemoteHint": {
+    "message": "Local weather needs a city entered manually; turn on the second/third clock to show each city's weather under its clock."
+  },
+  "weatherCityPlaceholder": {
+    "message": "e.g. Taipei / Tokyo"
+  },
+  "weatherUnitLabel": {
+    "message": "Temperature unit"
   },
   "searchPlaceholder": {
     "message": "Search the web or ask a question..."

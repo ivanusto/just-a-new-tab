@@ -61,22 +61,83 @@
     <main class="main-content">
       <!-- Widgets Section -->
       <div class="widgets-container">
-        <!-- Clock & Date -->
-        <div id="clock-widget" class="widget-item clock-wrapper">
-          <!-- Digital Clock -->
-          <h1 id="clock-time">00:00</h1>
-          
-          <!-- Analog Clock -->
-          <div id="analog-clock" class="analog-clock-container" style="display: none;">
-            <div class="clock-face" id="clock-face">
-              <div class="hand hour-hand" id="analog-hour"></div>
-              <div class="hand minute-hand" id="analog-minute"></div>
-              <div class="hand second-hand" id="analog-second"></div>
-              <div class="clock-center"></div>
+        <!-- Clock & Date (wrapped in a row so an optional second/world clock can sit beside it) -->
+        <div id="clock-row" class="clock-row">
+          <div id="clock-widget" class="widget-item clock-wrapper">
+            <span id="local-city-label" class="clock-city-label"></span>
+
+            <!-- Digital Clock -->
+            <h1 id="clock-time">00:00</h1>
+
+            <!-- Analog Clock -->
+            <div id="analog-clock" class="analog-clock-container" style="display: none;">
+              <div class="clock-face" id="clock-face">
+                <div class="hand hour-hand" id="analog-hour"></div>
+                <div class="hand minute-hand" id="analog-minute"></div>
+                <div class="hand second-hand" id="analog-second"></div>
+                <div class="clock-center"></div>
+              </div>
+            </div>
+
+            <p id="clock-date">2026年6月5日 星期五</p>
+
+            <!-- Local weather (manual city) -->
+            <div id="local-weather" class="clock-weather widget-hidden">
+              <span id="local-weather-icon" class="weather-icon">☀️</span>
+              <span id="local-weather-temp" class="weather-temp">--°</span>
+              <span id="local-weather-desc" class="weather-desc"></span>
             </div>
           </div>
-          
-          <p id="clock-date">2026年6月5日 星期五</p>
+
+          <!-- Second (world) clock -->
+          <div id="clock-widget-remote" class="widget-item clock-wrapper clock-remote widget-hidden">
+            <span id="remote-city-label" class="clock-city-label"></span>
+
+            <h1 id="remote-clock-time">00:00</h1>
+
+            <div id="remote-analog-clock" class="analog-clock-container" style="display: none;">
+              <div class="clock-face" id="remote-clock-face">
+                <div class="hand hour-hand" id="remote-analog-hour"></div>
+                <div class="hand minute-hand" id="remote-analog-minute"></div>
+                <div class="hand second-hand" id="remote-analog-second"></div>
+                <div class="clock-center"></div>
+              </div>
+            </div>
+
+            <p id="remote-clock-date"></p>
+
+            <!-- Remote weather (follows the second-clock city) -->
+            <div id="remote-weather" class="clock-weather widget-hidden">
+              <span id="remote-weather-icon" class="weather-icon">☀️</span>
+              <span id="remote-weather-temp" class="weather-temp">--°</span>
+              <span id="remote-weather-desc" class="weather-desc"></span>
+            </div>
+          </div>
+
+          <!-- Third (world) clock -->
+          <div id="clock-widget-third" class="widget-item clock-wrapper clock-remote widget-hidden">
+            <span id="third-city-label" class="clock-city-label"></span>
+
+            <h1 id="third-clock-time">00:00</h1>
+
+            <div id="third-analog-clock" class="analog-clock-container" style="display: none;">
+              <div class="clock-face" id="third-clock-face">
+                <div class="hand hour-hand" id="third-analog-hour"></div>
+                <div class="hand minute-hand" id="third-analog-minute"></div>
+                <div class="hand second-hand" id="third-analog-second"></div>
+                <div class="clock-center"></div>
+              </div>
+            </div>
+
+            <p id="third-clock-date"></p>
+
+            <!-- Third weather (follows the third-clock city) -->
+            <div id="third-weather" class="clock-weather widget-hidden">
+              <span id="third-weather-icon" class="weather-icon">☀️</span>
+              <span id="third-weather-temp" class="weather-temp">--°</span>
+              <span id="third-weather-desc" class="weather-desc"></span>
+            </div>
+          </div>
         </div>
 
         <!-- Greeting -->
@@ -201,7 +262,7 @@
               </select>
             </div>
             <div class="form-group-inline">
-              <span data-i18n="clockPositionLabel">時鐘位置</span>
+              <span data-i18n="clockPositionLabel">本地時鐘位置</span>
               <select id="clock-position-select">
                 <option value="left" data-i18n="clockPosLeft">靠左</option>
                 <option value="center" data-i18n="clockPosCenter">置中</option>
@@ -222,6 +283,59 @@
                 <span class="slider"></span>
               </label>
               <span data-i18n="toggleSeconds">顯示秒數</span>
+            </div>
+            <!-- Second (world) clock -->
+            <div class="toggle-group sub-toggle">
+              <label class="toggle-switch">
+                <input type="checkbox" id="toggle-second-clock">
+                <span class="slider"></span>
+              </label>
+              <span data-i18n="toggleSecondClock">顯示第二時鐘（世界時鐘）</span>
+            </div>
+            <div id="second-clock-sub-options" class="sub-options-group" style="display: none;">
+              <div class="form-group-inline">
+                <span data-i18n="clockCityLabel">城市</span>
+                <select id="second-clock-city-select"></select>
+              </div>
+              <div id="second-clock-custom-row" class="form-group-inline" style="display: none;">
+                <span data-i18n="clockCustomCityLabel">自訂城市</span>
+                <input type="text" id="second-clock-custom-input" data-i18n="clockCustomCityPlaceholder" placeholder="例如：巴黎 / Paris">
+              </div>
+              <div class="form-group-inline">
+                <span data-i18n="clockPositionLabel2">位置</span>
+                <select id="second-clock-position-select">
+                  <option value="left" data-i18n="clockPosLeft">靠左</option>
+                  <option value="center" data-i18n="clockPosCenter">置中</option>
+                  <option value="right" data-i18n="clockPosRight">靠右</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Third (world) clock -->
+            <div class="toggle-group sub-toggle">
+              <label class="toggle-switch">
+                <input type="checkbox" id="toggle-third-clock">
+                <span class="slider"></span>
+              </label>
+              <span data-i18n="toggleThirdClock">顯示第三時鐘（世界時鐘）</span>
+            </div>
+            <div id="third-clock-sub-options" class="sub-options-group" style="display: none;">
+              <div class="form-group-inline">
+                <span data-i18n="clockCityLabel">城市</span>
+                <select id="third-clock-city-select"></select>
+              </div>
+              <div id="third-clock-custom-row" class="form-group-inline" style="display: none;">
+                <span data-i18n="clockCustomCityLabel">自訂城市</span>
+                <input type="text" id="third-clock-custom-input" data-i18n="clockCustomCityPlaceholder" placeholder="例如：巴黎 / Paris">
+              </div>
+              <div class="form-group-inline">
+                <span data-i18n="clockPositionLabel2">位置</span>
+                <select id="third-clock-position-select">
+                  <option value="left" data-i18n="clockPosLeft">靠左</option>
+                  <option value="center" data-i18n="clockPosCenter">置中</option>
+                  <option value="right" data-i18n="clockPosRight">靠右</option>
+                </select>
+              </div>
             </div>
           </div>
           <div class="toggle-group">
@@ -290,6 +404,36 @@
               <span data-i18n="bgRotateIntervalLabel">輪播間隔時間 (秒)</span>
               <input type="number" id="input-bg-rotate-interval" min="15" max="86400" value="180">
             </div>
+            <div class="toggle-group sub-toggle">
+              <label class="toggle-switch">
+                <input type="checkbox" id="toggle-bg-rotate-sync-quote">
+                <span class="slider"></span>
+              </label>
+              <span data-i18n="toggleBgRotateSyncQuote">輪播時同步換一則金句</span>
+            </div>
+          </div>
+
+          <!-- Weather -->
+          <div class="toggle-group">
+            <label class="toggle-switch">
+              <input type="checkbox" id="toggle-weather">
+              <span class="slider"></span>
+            </label>
+            <span data-i18n="toggleWeather">顯示天氣</span>
+          </div>
+          <div id="weather-sub-options" class="sub-options-group" style="display: none;">
+            <div class="form-group-inline">
+              <span data-i18n="weatherCityLabel">本地天氣城市</span>
+              <input type="text" id="weather-city-input" data-i18n="weatherCityPlaceholder" placeholder="例如：台北 / Tokyo">
+            </div>
+            <div class="form-group-inline">
+              <span data-i18n="weatherUnitLabel">溫度單位</span>
+              <select id="weather-unit-select">
+                <option value="c">°C</option>
+                <option value="f">°F</option>
+              </select>
+            </div>
+            <p class="section-desc" data-i18n="weatherRemoteHint">本地天氣需手動輸入城市；開啟第二時鐘後，會自動在遠端時鐘下方顯示該城市的天氣。</p>
           </div>
         </div>
 
