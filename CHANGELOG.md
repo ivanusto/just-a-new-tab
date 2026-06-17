@@ -8,15 +8,17 @@ Notable changes to this project. Format based on [Keep a Changelog](https://keep
 ### 世界時鐘 + 天氣 + 輪播同步金句 / World clock, weather & rotation-synced quotes
 
 **繁中**
-- 🕑 **第二時鐘（世界時鐘）**：可在本地時鐘旁加開一個遠端時區時鐘，左右分置，方便對照紐約、倫敦、東京等地時間。內建 20 個常用城市，數字／指針兩種樣式皆支援。並重新設計時鐘「小／標準／大」三段大小，修正「小反而比標準大」的問題，小尺寸現在真的更小。
-- 🌤️ **天氣小工具**：以免費的 Open-Meteo 顯示目前氣溫與天氣，**完全不需要瀏覽器定位權限**。天氣顯示在各自時鐘下方：本地天氣需「手動輸入城市」；開啟第二時鐘後，會自動在遠端時鐘下方顯示該城市的天氣。可切換 °C／°F，結果在本機快取 30 分鐘以減少請求。
+- 🕑 **世界時鐘（最多三個）**：本地時鐘外，可再加開第二、第三時鐘。每個時鐘各自指定**靠左／置中／靠右**位置，三個並列時就由位置決定排版，UI 直覺。城市可從內建 20 個常用城市挑選，或**自訂輸入任意城市**（自動解析時區與經緯度）。數字／指針兩種樣式皆支援。並重新設計時鐘「小／標準／大」三段大小，修正「小反而比標準大」的問題。
+- 🌤️ **天氣小工具**：以免費的 Open-Meteo 顯示目前氣溫與天氣，**完全不需要瀏覽器定位權限**。天氣顯示在各自時鐘下方：本地天氣需「手動輸入城市」；第二／第三時鐘則自動顯示該城市天氣。可切換 °C／°F，結果在本機快取 30 分鐘。
 - 🔁 **輪播時同步換金句**：開啟「自動輪播背景圖片」後，多了一個子選項，可在每次換背景時一併重新隨機一則金句。
+- 🎨 修正深色模式下，下拉式選單選項反白不易閱讀的問題。
 - 🔐 新增權限：`api.open-meteo.com`、`geocoding-api.open-meteo.com`（僅天氣功能會用到，預設關閉）。
 
 **English**
-- 🕑 **Second (world) clock**: add a remote-timezone clock beside the local one, split left/right, handy for checking New York / London / Tokyo time at a glance. 20 built-in cities; works with both digital and analog styles. The small/standard/large size tiers were also redesigned to fix "small was bigger than standard" — small is now genuinely smaller.
-- 🌤️ **Weather widget**: shows the current temperature and condition via the free Open-Meteo API with **no browser geolocation permission required**. Weather appears under each clock: local weather uses a **manually entered city**; when the second clock is on, that city's weather is shown automatically under the remote clock. Toggle °C/°F; results are cached locally for 30 minutes to keep requests low.
+- 🕑 **World clocks (up to three)**: besides the local clock you can add a second and third clock. Each clock is given its own **left / center / right** position, so when several are shown the layout simply follows those positions. Pick from 20 built-in cities or **enter any custom city** (timezone and coordinates are resolved automatically). Works with both digital and analog styles. The small/standard/large size tiers were also redesigned to fix "small was bigger than standard".
+- 🌤️ **Weather widget**: shows the current temperature and condition via the free Open-Meteo API with **no browser geolocation permission required**. Weather appears under each clock: local weather uses a **manually entered city**; the second/third clocks show their own city's weather automatically. Toggle °C/°F; cached locally for 30 minutes.
 - 🔁 **Rotation-synced quotes**: when "Timed wallpaper rotation" is on, a new sub-option re-randomizes the quote together with each background change.
+- 🎨 Fixed hard-to-read (washed-out) dropdown options under dark mode.
 - 🔐 New permissions: `api.open-meteo.com`, `geocoding-api.open-meteo.com` (only used by the weather feature, which is off by default).
 
 ## [1.57] - 2026-06-16

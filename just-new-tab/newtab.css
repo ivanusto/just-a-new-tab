@@ -158,7 +158,7 @@ body {
 
 /* ---------------------------------------------------------------------------
    Clock sizing — driven by CSS variables so the small/standard/large tiers
-   stay correctly ordered and compose cleanly with the dual-clock and
+   stay correctly ordered and compose cleanly with the multi-clock and
    responsive scale multipliers (single source of truth, no specificity wars).
    --------------------------------------------------------------------------- */
 .clock-wrapper {
@@ -166,7 +166,7 @@ body {
   --clock-time-size: 6rem;
   --clock-date-size: 1.2rem;
   --analog-size: 210px;
-  /* Multipliers applied on top of the tier (dual-clock + responsive) */
+  /* Multipliers applied on top of the tier (multi-clock + responsive) */
   --dual-scale: 1;
   --resp-scale: 1;
 }
@@ -180,11 +180,13 @@ body.clock-size-large .clock-wrapper {
   --clock-date-size: 1.45rem;
   --analog-size: 285px;
 }
-/* In dual-clock mode both clocks shrink together to fit side-by-side */
-body.dual-clock .clock-wrapper { --dual-scale: 0.6; }
+/* When more than one clock is shown they shrink together; tighter for three. */
+body.clock-count-2 .clock-wrapper { --dual-scale: 0.62; }
+body.clock-count-3 .clock-wrapper { --dual-scale: 0.5; }
 
 #clock-time,
-#remote-clock-time {
+#remote-clock-time,
+#third-clock-time {
   font-size: calc(var(--clock-time-size) * var(--dual-scale) * var(--resp-scale));
   font-weight: 700;
   line-height: 1;
@@ -195,14 +197,15 @@ body.dual-clock .clock-wrapper { --dual-scale: 0.6; }
 }
 
 #clock-date,
-#remote-clock-date {
+#remote-clock-date,
+#third-clock-date {
   font-size: calc(var(--clock-date-size) * var(--dual-scale) * var(--resp-scale));
   font-weight: 500;
   color: rgba(255, 255, 255, 0.85);
   letter-spacing: 2px;
 }
 
-/* City label above each clock — only visible in dual-clock mode */
+/* City label above each clock — only visible in multi-clock mode */
 .clock-city-label {
   display: none;
   font-size: 0.95rem;
@@ -213,26 +216,25 @@ body.dual-clock .clock-wrapper { --dual-scale: 0.6; }
   margin-bottom: 0.4rem;
 }
 
-/* Clock row: transparent wrapper normally, flex split when dual-clock is on */
+/* Clock row: a transparent wrapper normally; a 3-column position grid when more
+   than one clock is shown, so each clock sits in its left/center/right slot. */
 .clock-row { display: contents; }
 
-body.dual-clock .clock-row {
-  display: flex;
+body.multi-clock .clock-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
   width: 100%;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 1.5rem;
+  align-items: start;
+  gap: 1rem;
 }
-body.dual-clock #clock-widget,
-body.dual-clock #clock-widget-remote {
-  align-self: auto;
-  flex: 0 1 auto;
-}
-body.dual-clock #clock-widget { text-align: left; }
-body.dual-clock #clock-widget-remote { text-align: right; }
-body.dual-clock #clock-widget .analog-clock-container { margin-left: 0; margin-right: auto; }
-body.dual-clock #clock-widget-remote .analog-clock-container { margin-left: auto; margin-right: 0; }
-body.dual-clock .clock-city-label { display: block; }
+body.multi-clock .clock-wrapper { align-self: start; }
+body.multi-clock .clock-pos-left   { grid-column: 1; text-align: left;   justify-self: start; }
+body.multi-clock .clock-pos-center { grid-column: 2; text-align: center; justify-self: center; }
+body.multi-clock .clock-pos-right  { grid-column: 3; text-align: right;  justify-self: end; }
+body.multi-clock .clock-pos-left   .analog-clock-container { margin-left: 0;    margin-right: auto; }
+body.multi-clock .clock-pos-center .analog-clock-container { margin-left: auto; margin-right: auto; }
+body.multi-clock .clock-pos-right  .analog-clock-container { margin-left: auto; margin-right: 0; }
+body.multi-clock .clock-city-label { display: block; }
 
 /* Per-clock weather — sits under each clock's date line */
 .clock-weather {
@@ -254,7 +256,8 @@ body.dual-clock .clock-city-label { display: block; }
 .clock-weather .weather-icon { font-size: 1.35rem; line-height: 1; }
 .clock-weather .weather-temp { font-weight: 700; font-variant-numeric: tabular-nums; }
 .clock-weather .weather-desc { opacity: 0.92; }
-body.dual-clock .clock-weather { font-size: 1rem; padding: 0.35rem 0.85rem; }
+body.multi-clock .clock-weather { font-size: 1rem; padding: 0.35rem 0.85rem; gap: 0.4rem; }
+body.clock-count-3 .clock-weather { font-size: 0.9rem; }
 
 /* Greeting Widget */
 .greeting-wrapper {
@@ -1320,7 +1323,8 @@ body.dual-clock .clock-weather { font-size: 1rem; padding: 0.35rem 0.85rem; }
   background-color: rgba(255, 255, 255, 0.25);
   left: 50%;
   margin-left: -1px;
-  transform-origin: 50% 110px;
+  /* Pivot at the face's centre so ticks scale with the (variable) clock size */
+  transform-origin: 50% calc(var(--analog-size, 210px) * var(--dual-scale, 1) * var(--resp-scale, 1) / 2);
 }
 
 .clock-mark.quarter {
@@ -1372,6 +1376,16 @@ body.dual-clock .clock-weather { font-size: 1rem; padding: 0.35rem 0.85rem; }
 .form-group-inline select:focus {
   border-color: var(--accent-color);
   background-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Native dropdown popups: force a dark, readable palette regardless of the OS
+   light/dark theme (otherwise dark-mode users get white-on-white options). */
+select {
+  color-scheme: dark;
+}
+select option {
+  background-color: #1c1c22;
+  color: #fff;
 }
 
 .toggle-group.sub-toggle {
@@ -1678,26 +1692,29 @@ body.dual-clock .clock-weather { font-size: 1rem; padding: 0.35rem 0.85rem; }
   .greeting-wrapper {
     font-size: 1.6rem;
   }
-  /* Stack the dual clocks vertically when there isn't room side-by-side */
-  body.dual-clock .clock-row {
-    flex-direction: column;
-    align-items: center;
+  /* Stack the clocks vertically when there isn't room side-by-side */
+  body.multi-clock .clock-row {
+    grid-template-columns: 1fr;
     gap: 1rem;
   }
   /* Stacked vertically there's room, so don't shrink as aggressively */
-  body.dual-clock .clock-wrapper {
+  body.multi-clock .clock-wrapper {
     --dual-scale: 0.9;
   }
-  body.dual-clock #clock-widget,
-  body.dual-clock #clock-widget-remote {
+  body.multi-clock .clock-pos-left,
+  body.multi-clock .clock-pos-center,
+  body.multi-clock .clock-pos-right {
+    grid-column: 1;
     text-align: center;
+    justify-self: center;
   }
-  body.dual-clock #clock-widget .analog-clock-container,
-  body.dual-clock #clock-widget-remote .analog-clock-container {
+  body.multi-clock .clock-pos-left .analog-clock-container,
+  body.multi-clock .clock-pos-center .analog-clock-container,
+  body.multi-clock .clock-pos-right .analog-clock-container {
     margin-left: auto;
     margin-right: auto;
   }
-  body.dual-clock .clock-weather {
+  body.multi-clock .clock-weather {
     margin-left: auto;
     margin-right: auto;
   }

@@ -67,9 +67,20 @@ function getCityByKey(key) {
 
 function cityDisplayName(city) {
   if (!city) return "";
+  if (city.custom) return city.name; // manually geocoded city
   if (isSimplifiedChinese) return city.zhCN;
   if (isChineseUser) return city.zh;
   return city.en;
+}
+
+// Resolve the city object for a remote clock slot ("second" | "third").
+// Returns a preset WORLD_CITIES entry, a resolved custom city {name,tz,lat,lon},
+// or null when a manual city hasn't been geocoded yet.
+function getClockCity(prefix) {
+  if (settings[prefix + "ClockCity"] === "custom") {
+    return settings[prefix + "ClockCustom"] || null;
+  }
+  return getCityByKey(settings[prefix + "ClockCity"]);
 }
 
 // State variables
@@ -91,9 +102,17 @@ let settings = {
   clockShowSeconds: false,
   clockPosition: "center", // "left" | "center" | "right"
   clockSize: "standard", // "small" | "standard" | "large"
-  // Second (world) clock — shown side-by-side with the local clock
+  // Second & third (world) clocks. Each can use a preset city or a manually
+  // geocoded one, and is placed by its own left/center/right position so the
+  // local + remote clocks share the same simple left/center/right layout.
   secondClock: false,
-  secondClockCity: "new_york", // key into WORLD_CITIES
+  secondClockCity: "new_york",  // a WORLD_CITIES key, or "custom"
+  secondClockCustom: null,      // {name, tz, lat, lon} when city === "custom"
+  secondClockPosition: "right", // "left" | "center" | "right"
+  thirdClock: false,
+  thirdClockCity: "tokyo",
+  thirdClockCustom: null,
+  thirdClockPosition: "left",
   // Weather widget (Open-Meteo, no API key, no geolocation permission).
   // Local weather = manually entered city; remote weather follows the second clock.
   weather: false,
@@ -297,6 +316,12 @@ async function loadSettings() {
   if (settings.autoDownscaleUploads === undefined) settings.autoDownscaleUploads = defaultSettings.autoDownscaleUploads;
   if (settings.secondClock === undefined) settings.secondClock = defaultSettings.secondClock;
   if (settings.secondClockCity === undefined) settings.secondClockCity = defaultSettings.secondClockCity;
+  if (settings.secondClockCustom === undefined) settings.secondClockCustom = defaultSettings.secondClockCustom;
+  if (settings.secondClockPosition === undefined) settings.secondClockPosition = defaultSettings.secondClockPosition;
+  if (settings.thirdClock === undefined) settings.thirdClock = defaultSettings.thirdClock;
+  if (settings.thirdClockCity === undefined) settings.thirdClockCity = defaultSettings.thirdClockCity;
+  if (settings.thirdClockCustom === undefined) settings.thirdClockCustom = defaultSettings.thirdClockCustom;
+  if (settings.thirdClockPosition === undefined) settings.thirdClockPosition = defaultSettings.thirdClockPosition;
   if (settings.weather === undefined) settings.weather = defaultSettings.weather;
   if (settings.weatherCity === undefined) settings.weatherCity = defaultSettings.weatherCity;
   if (settings.weatherUnit === undefined) settings.weatherUnit = defaultSettings.weatherUnit;
@@ -395,32 +420,13 @@ function applyWidgetVisibility() {
   // Per-clock weather: hide when disabled; when enabled the slots are shown by
   // initWeather() once data has loaded (avoids flashing an empty box).
   if (!settings.weather) {
-    const lw = document.getElementById("local-weather");
-    const rw = document.getElementById("remote-weather");
-    if (lw) lw.classList.add("widget-hidden");
-    if (rw) rw.classList.add("widget-hidden");
+    ["local-weather", "remote-weather", "third-weather"].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.add("widget-hidden");
+    });
   }
 
-  applyClockLayout();
-  applySecondClock();
-}
-
-// Apply the clock's horizontal position and size via classes on the widget,
-// so users can shift/shrink it to avoid covering the background subject.
-function applyClockLayout() {
-  const clockWidget = document.getElementById("clock-widget");
-  if (!clockWidget) return;
-
-  const pos = settings.clockPosition || "center";
-  const size = settings.clockSize || "standard";
-
-  clockWidget.classList.remove("clock-pos-left", "clock-pos-center", "clock-pos-right");
-  clockWidget.classList.add(`clock-pos-${pos}`);
-
-  // Size tier lives on <body> so both the local and remote clocks share it
-  // (the CSS-variable scale system reads it from any .clock-wrapper ancestor).
-  document.body.classList.remove("clock-size-small", "clock-size-standard", "clock-size-large");
-  document.body.classList.add(`clock-size-${size}`);
+  applyClockConfig();
 }
 
 /* ==========================================================================
@@ -510,26 +516,35 @@ function buildClockMarks(faceId) {
   }
 }
 
+// The two optional remote clocks. `el` is the DOM id prefix, `cfg` the settings
+// prefix (e.g. cfg "second" → settings.secondClock*, els "remote-*").
+const REMOTE_CLOCKS = [
+  { el: "remote", cfg: "second" },
+  { el: "third", cfg: "third" }
+];
+
+function clockEls(prefix) {
+  // prefix "" → local clock; otherwise "remote"/"third"
+  const p = prefix ? prefix + "-" : "";
+  const analogId = prefix ? `${prefix}-analog-clock` : "analog-clock";
+  const handId = h => prefix ? `${prefix}-analog-${h}` : `analog-${h}`;
+  return {
+    digital: document.getElementById(prefix ? `${prefix}-clock-time` : "clock-time"),
+    analog: document.getElementById(analogId),
+    hour: document.getElementById(handId("hour")),
+    minute: document.getElementById(handId("minute")),
+    second: document.getElementById(handId("second")),
+    date: document.getElementById(prefix ? `${prefix}-clock-date` : "clock-date")
+  };
+}
+
 function initClock() {
-  const localEls = {
-    digital: document.getElementById("clock-time"),
-    analog: document.getElementById("analog-clock"),
-    hour: document.getElementById("analog-hour"),
-    minute: document.getElementById("analog-minute"),
-    second: document.getElementById("analog-second"),
-    date: document.getElementById("clock-date")
-  };
-  const remoteEls = {
-    digital: document.getElementById("remote-clock-time"),
-    analog: document.getElementById("remote-analog-clock"),
-    hour: document.getElementById("remote-analog-hour"),
-    minute: document.getElementById("remote-analog-minute"),
-    second: document.getElementById("remote-analog-second"),
-    date: document.getElementById("remote-clock-date")
-  };
+  const localEls = clockEls("");
+  const remoteSets = REMOTE_CLOCKS.map(rc => ({ ...rc, els: clockEls(rc.el) }));
 
   buildClockMarks("clock-face");
   buildClockMarks("remote-clock-face");
+  buildClockMarks("third-clock-face");
 
   function updateClock() {
     const now = new Date();
@@ -544,12 +559,14 @@ function initClock() {
     renderClockFace(localEls, localParts, showSeconds, isAnalog);
     localEls.date.textContent = formatClockDate(localParts, null);
 
-    if (settings.secondClock && remoteEls.digital) {
-      const city = getCityByKey(settings.secondClockCity);
+    remoteSets.forEach(({ cfg, els }) => {
+      if (!settings[cfg + "Clock"] || !els.digital) return;
+      const city = getClockCity(cfg);
+      if (!city || !city.tz) return;
       const rParts = getZonedParts(city.tz);
-      renderClockFace(remoteEls, rParts, showSeconds, isAnalog);
-      remoteEls.date.textContent = formatClockDate(rParts, city.tz);
-    }
+      renderClockFace(els, rParts, showSeconds, isAnalog);
+      els.date.textContent = formatClockDate(rParts, city.tz);
+    });
   }
 
   updateClock();
@@ -560,21 +577,50 @@ function initClock() {
   window.clockInterval = setInterval(updateClock, 1000);
 }
 
-// Toggle the dual-clock layout and refresh the city labels.
-function applySecondClock() {
+// Apply position, size, visibility and labels for the local + remote clocks,
+// then (re)start the ticking. Positions drive a simple left/center/right grid.
+function applyClockConfig() {
+  const clockOn = !!settings.widgets.clock;
+  const secondOn = clockOn && !!settings.secondClock;
+  const thirdOn = clockOn && !!settings.thirdClock;
+  const count = 1 + (secondOn ? 1 : 0) + (thirdOn ? 1 : 0);
+
+  // Body classes: multi-clock grid + clock count (for shared scaling) + size tier
+  document.body.classList.toggle("multi-clock", count > 1);
+  document.body.classList.remove("clock-count-1", "clock-count-2", "clock-count-3");
+  document.body.classList.add(`clock-count-${count}`);
+
+  const size = settings.clockSize || "standard";
+  document.body.classList.remove("clock-size-small", "clock-size-standard", "clock-size-large");
+  document.body.classList.add(`clock-size-${size}`);
+
+  // Position each clock widget (left/center/right)
+  const setPos = (id, pos) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.remove("clock-pos-left", "clock-pos-center", "clock-pos-right");
+    el.classList.add(`clock-pos-${pos || "center"}`);
+  };
+  setPos("clock-widget", settings.clockPosition);
+  setPos("clock-widget-remote", settings.secondClockPosition);
+  setPos("clock-widget-third", settings.thirdClockPosition);
+
+  // Visibility + city labels
   const remoteWidget = document.getElementById("clock-widget-remote");
+  const thirdWidget = document.getElementById("clock-widget-third");
+  if (remoteWidget) remoteWidget.classList.toggle("widget-hidden", !secondOn);
+  if (thirdWidget) thirdWidget.classList.toggle("widget-hidden", !thirdOn);
+
   const localLabel = document.getElementById("local-city-label");
-  const remoteLabel = document.getElementById("remote-city-label");
-  const enabled = !!settings.secondClock && !!settings.widgets.clock;
+  if (localLabel) localLabel.textContent = isChineseUser ? "本地" : "Local";
+  REMOTE_CLOCKS.forEach(({ el, cfg }) => {
+    const label = document.getElementById(`${el}-city-label`);
+    if (label && settings[cfg + "Clock"]) {
+      const city = getClockCity(cfg);
+      label.textContent = city ? cityDisplayName(city) : (isChineseUser ? "（請設定城市）" : "(set a city)");
+    }
+  });
 
-  document.body.classList.toggle("dual-clock", enabled);
-  if (remoteWidget) remoteWidget.classList.toggle("widget-hidden", !enabled);
-
-  if (enabled) {
-    const city = getCityByKey(settings.secondClockCity);
-    if (remoteLabel) remoteLabel.textContent = cityDisplayName(city);
-    if (localLabel) localLabel.textContent = isChineseUser ? "本地" : "Local";
-  }
   initClock();
 }
 
@@ -655,7 +701,8 @@ async function geocodeCity(name) {
       const d = await res.json();
       if (d.results && d.results.length) {
         const r = d.results[0];
-        const loc = { lat: r.latitude, lon: r.longitude, name: r.name };
+        // tz lets a manually entered city also drive a world clock
+        const loc = { lat: r.latitude, lon: r.longitude, name: r.name, tz: r.timezone || null, custom: true };
         localStorage.setItem(cacheKey, JSON.stringify(loc));
         return loc;
       }
@@ -721,12 +768,19 @@ async function renderWeatherSlot(slot, loc) {
   widget.classList.remove("widget-hidden");
 }
 
+// Coordinates for a remote clock slot's weather ("second" | "third").
+function remoteWeatherLoc(prefix) {
+  const city = getClockCity(prefix);
+  if (!city || city.lat == null || city.lon == null) return null;
+  return { lat: city.lat, lon: city.lon };
+}
+
 async function initWeather() {
   if (!settings.weather) {
-    const lw = document.getElementById("local-weather");
-    const rw = document.getElementById("remote-weather");
-    if (lw) lw.classList.add("widget-hidden");
-    if (rw) rw.classList.add("widget-hidden");
+    ["local-weather", "remote-weather", "third-weather"].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.add("widget-hidden");
+    });
     return;
   }
 
@@ -737,13 +791,9 @@ async function initWeather() {
   }
   await renderWeatherSlot("local", localLoc);
 
-  // Remote weather — automatically follows the second-clock city (when shown).
-  let remoteLoc = null;
-  if (settings.secondClock) {
-    const city = getCityByKey(settings.secondClockCity);
-    remoteLoc = { lat: city.lat, lon: city.lon, name: cityDisplayName(city) };
-  }
-  await renderWeatherSlot("remote", remoteLoc);
+  // Remote weather — each remote clock's city, shown under that clock.
+  await renderWeatherSlot("remote", settings.secondClock ? remoteWeatherLoc("second") : null);
+  await renderWeatherSlot("third", settings.thirdClock ? remoteWeatherLoc("third") : null);
 
   // Refresh periodically (cache layer keeps network calls infrequent).
   if (!window.weatherInterval) {
@@ -1128,9 +1178,8 @@ function initQuoteSearch() {
   }
 }
 
-// Populate the second-clock city dropdown with localized city names.
-function initSecondClockCitySelect() {
-  const select = document.getElementById("second-clock-city-select");
+// Populate a world-clock city dropdown with localized city names + a "custom" entry.
+function buildCitySelect(select) {
   if (!select) return;
   select.innerHTML = "";
   WORLD_CITIES.forEach(city => {
@@ -1138,6 +1187,96 @@ function initSecondClockCitySelect() {
     opt.value = city.key;
     opt.textContent = cityDisplayName(city);
     select.appendChild(opt);
+  });
+  const custom = document.createElement("option");
+  custom.value = "custom";
+  custom.textContent = isChineseUser ? "自訂城市…" : "Custom city…";
+  select.appendChild(custom);
+}
+
+// Grab the drawer controls for a remote clock slot ("second" | "third").
+function remoteClockControls(prefix) {
+  return {
+    toggle: document.getElementById(`toggle-${prefix}-clock`),
+    sub: document.getElementById(`${prefix}-clock-sub-options`),
+    citySelect: document.getElementById(`${prefix}-clock-city-select`),
+    customRow: document.getElementById(`${prefix}-clock-custom-row`),
+    customInput: document.getElementById(`${prefix}-clock-custom-input`),
+    posSelect: document.getElementById(`${prefix}-clock-position-select`)
+  };
+}
+
+// Reflect current settings into a remote clock's drawer controls (on drawer open).
+function populateRemoteClock(prefix) {
+  const c = remoteClockControls(prefix);
+  if (!c.toggle) return;
+  buildCitySelect(c.citySelect);
+  const defCity = prefix === "second" ? "new_york" : "tokyo";
+  const defPos = prefix === "second" ? "right" : "left";
+  c.toggle.checked = !!settings[prefix + "Clock"];
+  c.citySelect.value = settings[prefix + "ClockCity"] || defCity;
+  c.customInput.value = (settings[prefix + "ClockCustom"] && settings[prefix + "ClockCustom"].query) || "";
+  c.posSelect.value = settings[prefix + "ClockPosition"] || defPos;
+  c.sub.style.display = settings[prefix + "Clock"] ? "flex" : "none";
+  c.customRow.style.display = settings[prefix + "ClockCity"] === "custom" ? "flex" : "none";
+}
+
+// Geocode a manually entered city for a remote clock and store the result.
+async function resolveCustomCity(prefix, query) {
+  if (!query) {
+    settings[prefix + "ClockCustom"] = null;
+    await saveSettings();
+    return;
+  }
+  const loc = await geocodeCity(query);
+  if (loc) {
+    settings[prefix + "ClockCustom"] = {
+      query, name: loc.name || query, tz: loc.tz || null,
+      lat: loc.lat != null ? loc.lat : null, lon: loc.lon != null ? loc.lon : null, custom: true
+    };
+  } else {
+    settings[prefix + "ClockCustom"] = { query, name: query, tz: null, lat: null, lon: null, custom: true };
+  }
+  await saveSettings();
+}
+
+// Attach listeners for a remote clock's drawer controls (once).
+function wireRemoteClock(prefix) {
+  const c = remoteClockControls(prefix);
+  if (!c.toggle || c.toggle.dataset.bound) return;
+  c.toggle.dataset.bound = "true";
+
+  c.toggle.addEventListener("change", async () => {
+    settings[prefix + "Clock"] = c.toggle.checked;
+    c.sub.style.display = c.toggle.checked ? "flex" : "none";
+    await saveSettings();
+    applyClockConfig();
+    if (settings.weather) initWeather();
+  });
+
+  c.citySelect.addEventListener("change", async () => {
+    settings[prefix + "ClockCity"] = c.citySelect.value;
+    c.customRow.style.display = c.citySelect.value === "custom" ? "flex" : "none";
+    await saveSettings();
+    if (c.citySelect.value === "custom") {
+      await resolveCustomCity(prefix, c.customInput.value.trim());
+    }
+    applyClockConfig();
+    if (settings.weather) initWeather();
+  });
+
+  const handleCustom = async () => {
+    await resolveCustomCity(prefix, c.customInput.value.trim());
+    applyClockConfig();
+    if (settings.weather) initWeather();
+  };
+  c.customInput.addEventListener("change", handleCustom);
+  c.customInput.addEventListener("blur", handleCustom);
+
+  c.posSelect.addEventListener("change", async () => {
+    settings[prefix + "ClockPosition"] = c.posSelect.value;
+    await saveSettings();
+    applyClockConfig();
   });
 }
 
@@ -1681,9 +1820,6 @@ function initDrawer() {
   const clockPositionSelect = document.getElementById("clock-position-select");
   const clockSizeSelect = document.getElementById("clock-size-select");
   const clockSubOptions = document.getElementById("clock-sub-options");
-  const toggleSecondClock = document.getElementById("toggle-second-clock");
-  const secondClockCitySelect = document.getElementById("second-clock-city-select");
-  const secondClockSubOptions = document.getElementById("second-clock-sub-options");
 
   const toggleBgRotateSyncQuote = document.getElementById("toggle-bg-rotate-sync-quote");
 
@@ -1752,10 +1888,8 @@ function initDrawer() {
     clockTypeSelect.value = settings.clockType || "digital";
     clockPositionSelect.value = settings.clockPosition || "center";
     clockSizeSelect.value = settings.clockSize || "standard";
-    initSecondClockCitySelect();
-    toggleSecondClock.checked = settings.secondClock || false;
-    secondClockCitySelect.value = settings.secondClockCity || "new_york";
-    secondClockSubOptions.style.display = settings.secondClock ? "flex" : "none";
+    populateRemoteClock("second");
+    populateRemoteClock("third");
     if (settings.widgets.clock) {
       clockSubOptions.classList.remove("disabled");
     } else {
@@ -1963,30 +2097,18 @@ function initDrawer() {
   clockPositionSelect.addEventListener("change", async () => {
     settings.clockPosition = clockPositionSelect.value;
     await saveSettings();
-    applyClockLayout();
+    applyClockConfig();
   });
 
   clockSizeSelect.addEventListener("change", async () => {
     settings.clockSize = clockSizeSelect.value;
     await saveSettings();
-    applyClockLayout();
+    applyClockConfig();
   });
 
-  // Second (world) clock listeners
-  toggleSecondClock.addEventListener("change", async () => {
-    settings.secondClock = toggleSecondClock.checked;
-    secondClockSubOptions.style.display = settings.secondClock ? "flex" : "none";
-    await saveSettings();
-    applySecondClock();
-    if (settings.weather) initWeather(); // remote weather follows the second clock
-  });
-
-  secondClockCitySelect.addEventListener("change", async () => {
-    settings.secondClockCity = secondClockCitySelect.value;
-    await saveSettings();
-    applySecondClock();
-    if (settings.weather) initWeather(); // remote weather follows the second clock
-  });
+  // Second & third (world) clock listeners
+  wireRemoteClock("second");
+  wireRemoteClock("third");
 
   // Weather listeners
   toggleWeather.addEventListener("change", async () => {
@@ -1996,10 +2118,10 @@ function initDrawer() {
     if (settings.weather) {
       initWeather();
     } else {
-      const lw = document.getElementById("local-weather");
-      const rw = document.getElementById("remote-weather");
-      if (lw) lw.classList.add("widget-hidden");
-      if (rw) rw.classList.add("widget-hidden");
+      ["local-weather", "remote-weather", "third-weather"].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add("widget-hidden");
+      });
     }
   });
 

@@ -113,6 +113,31 @@
               <span id="remote-weather-desc" class="weather-desc"></span>
             </div>
           </div>
+
+          <!-- Third (world) clock -->
+          <div id="clock-widget-third" class="widget-item clock-wrapper clock-remote widget-hidden">
+            <span id="third-city-label" class="clock-city-label"></span>
+
+            <h1 id="third-clock-time">00:00</h1>
+
+            <div id="third-analog-clock" class="analog-clock-container" style="display: none;">
+              <div class="clock-face" id="third-clock-face">
+                <div class="hand hour-hand" id="third-analog-hour"></div>
+                <div class="hand minute-hand" id="third-analog-minute"></div>
+                <div class="hand second-hand" id="third-analog-second"></div>
+                <div class="clock-center"></div>
+              </div>
+            </div>
+
+            <p id="third-clock-date"></p>
+
+            <!-- Third weather (follows the third-clock city) -->
+            <div id="third-weather" class="clock-weather widget-hidden">
+              <span id="third-weather-icon" class="weather-icon">☀️</span>
+              <span id="third-weather-temp" class="weather-temp">--°</span>
+              <span id="third-weather-desc" class="weather-desc"></span>
+            </div>
+          </div>
         </div>
 
         <!-- Greeting -->
@@ -237,7 +262,7 @@
               </select>
             </div>
             <div class="form-group-inline">
-              <span data-i18n="clockPositionLabel">時鐘位置</span>
+              <span data-i18n="clockPositionLabel">本地時鐘位置</span>
               <select id="clock-position-select">
                 <option value="left" data-i18n="clockPosLeft">靠左</option>
                 <option value="center" data-i18n="clockPosCenter">置中</option>
@@ -259,6 +284,7 @@
               </label>
               <span data-i18n="toggleSeconds">顯示秒數</span>
             </div>
+            <!-- Second (world) clock -->
             <div class="toggle-group sub-toggle">
               <label class="toggle-switch">
                 <input type="checkbox" id="toggle-second-clock">
@@ -266,9 +292,50 @@
               </label>
               <span data-i18n="toggleSecondClock">顯示第二時鐘（世界時鐘）</span>
             </div>
-            <div id="second-clock-sub-options" class="form-group-inline" style="display: none;">
-              <span data-i18n="secondClockCityLabel">第二時鐘城市</span>
-              <select id="second-clock-city-select"></select>
+            <div id="second-clock-sub-options" class="sub-options-group" style="display: none;">
+              <div class="form-group-inline">
+                <span data-i18n="clockCityLabel">城市</span>
+                <select id="second-clock-city-select"></select>
+              </div>
+              <div id="second-clock-custom-row" class="form-group-inline" style="display: none;">
+                <span data-i18n="clockCustomCityLabel">自訂城市</span>
+                <input type="text" id="second-clock-custom-input" data-i18n="clockCustomCityPlaceholder" placeholder="例如：巴黎 / Paris">
+              </div>
+              <div class="form-group-inline">
+                <span data-i18n="clockPositionLabel2">位置</span>
+                <select id="second-clock-position-select">
+                  <option value="left" data-i18n="clockPosLeft">靠左</option>
+                  <option value="center" data-i18n="clockPosCenter">置中</option>
+                  <option value="right" data-i18n="clockPosRight">靠右</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Third (world) clock -->
+            <div class="toggle-group sub-toggle">
+              <label class="toggle-switch">
+                <input type="checkbox" id="toggle-third-clock">
+                <span class="slider"></span>
+              </label>
+              <span data-i18n="toggleThirdClock">顯示第三時鐘（世界時鐘）</span>
+            </div>
+            <div id="third-clock-sub-options" class="sub-options-group" style="display: none;">
+              <div class="form-group-inline">
+                <span data-i18n="clockCityLabel">城市</span>
+                <select id="third-clock-city-select"></select>
+              </div>
+              <div id="third-clock-custom-row" class="form-group-inline" style="display: none;">
+                <span data-i18n="clockCustomCityLabel">自訂城市</span>
+                <input type="text" id="third-clock-custom-input" data-i18n="clockCustomCityPlaceholder" placeholder="例如：巴黎 / Paris">
+              </div>
+              <div class="form-group-inline">
+                <span data-i18n="clockPositionLabel2">位置</span>
+                <select id="third-clock-position-select">
+                  <option value="left" data-i18n="clockPosLeft">靠左</option>
+                  <option value="center" data-i18n="clockPosCenter">置中</option>
+                  <option value="right" data-i18n="clockPosRight">靠右</option>
+                </select>
+              </div>
             </div>
           </div>
           <div class="toggle-group">

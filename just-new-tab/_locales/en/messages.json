@@ -123,7 +123,22 @@
     "message": "Analog"
   },
   "clockPositionLabel": {
-    "message": "Clock Position"
+    "message": "Local clock position"
+  },
+  "clockPositionLabel2": {
+    "message": "Position"
+  },
+  "clockCityLabel": {
+    "message": "City"
+  },
+  "clockCustomCityLabel": {
+    "message": "Custom city"
+  },
+  "clockCustomCityPlaceholder": {
+    "message": "e.g. Paris / London"
+  },
+  "toggleThirdClock": {
+    "message": "Show a third (world) clock"
   },
   "clockPosLeft": {
     "message": "Left"
@@ -228,7 +243,7 @@
     "message": "Local weather city"
   },
   "weatherRemoteHint": {
-    "message": "Local weather needs a city entered manually; turn on the second clock to also show that city's weather under the remote clock."
+    "message": "Local weather needs a city entered manually; turn on the second/third clock to show each city's weather under its clock."
   },
   "weatherCityPlaceholder": {
     "message": "e.g. Taipei / Tokyo"

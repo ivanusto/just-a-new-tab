@@ -123,7 +123,22 @@
     "message": "指針時鐘"
   },
   "clockPositionLabel": {
-    "message": "時鐘位置"
+    "message": "本地時鐘位置"
+  },
+  "clockPositionLabel2": {
+    "message": "位置"
+  },
+  "clockCityLabel": {
+    "message": "城市"
+  },
+  "clockCustomCityLabel": {
+    "message": "自訂城市"
+  },
+  "clockCustomCityPlaceholder": {
+    "message": "例如：巴黎 / Paris"
+  },
+  "toggleThirdClock": {
+    "message": "顯示第三時鐘（世界時鐘）"
   },
   "clockPosLeft": {
     "message": "靠左"
@@ -228,7 +243,7 @@
     "message": "本地天氣城市"
   },
   "weatherRemoteHint": {
-    "message": "本地天氣需手動輸入城市；開啟第二時鐘後，會自動在遠端時鐘下方顯示該城市的天氣。"
+    "message": "本地天氣需手動輸入城市；開啟第二／第三時鐘後，會自動在各時鐘下方顯示該城市的天氣。"
   },
   "weatherCityPlaceholder": {
     "message": "例如：台北 / Tokyo"
