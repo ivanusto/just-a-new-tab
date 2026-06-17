@@ -35,6 +35,43 @@ const EN_QUOTES = [
 // Default wallpapers count (1 to 6)
 const DEFAULT_BG_COUNT = 5;
 
+// World cities for the second clock & weather. Each entry carries an IANA
+// timezone (for the clock) and lat/lon (so weather can follow the same city
+// with no geolocation permission). Names are localized per UI language.
+const WORLD_CITIES = [
+  { key: "new_york",     tz: "America/New_York",     lat: 40.7128,  lon: -74.0060, zh: "紐約",     zhCN: "纽约",     en: "New York" },
+  { key: "los_angeles",  tz: "America/Los_Angeles",  lat: 34.0522,  lon: -118.2437, zh: "洛杉磯",  zhCN: "洛杉矶",  en: "Los Angeles" },
+  { key: "chicago",      tz: "America/Chicago",      lat: 41.8781,  lon: -87.6298, zh: "芝加哥",   zhCN: "芝加哥",   en: "Chicago" },
+  { key: "toronto",      tz: "America/Toronto",      lat: 43.6532,  lon: -79.3832, zh: "多倫多",   zhCN: "多伦多",   en: "Toronto" },
+  { key: "sao_paulo",    tz: "America/Sao_Paulo",    lat: -23.5505, lon: -46.6333, zh: "聖保羅",   zhCN: "圣保罗",   en: "São Paulo" },
+  { key: "london",       tz: "Europe/London",        lat: 51.5074,  lon: -0.1278,  zh: "倫敦",     zhCN: "伦敦",     en: "London" },
+  { key: "paris",        tz: "Europe/Paris",         lat: 48.8566,  lon: 2.3522,   zh: "巴黎",     zhCN: "巴黎",     en: "Paris" },
+  { key: "berlin",       tz: "Europe/Berlin",        lat: 52.5200,  lon: 13.4050,  zh: "柏林",     zhCN: "柏林",     en: "Berlin" },
+  { key: "moscow",       tz: "Europe/Moscow",        lat: 55.7558,  lon: 37.6173,  zh: "莫斯科",   zhCN: "莫斯科",   en: "Moscow" },
+  { key: "dubai",        tz: "Asia/Dubai",           lat: 25.2048,  lon: 55.2708,  zh: "杜拜",     zhCN: "迪拜",     en: "Dubai" },
+  { key: "mumbai",       tz: "Asia/Kolkata",         lat: 19.0760,  lon: 72.8777,  zh: "孟買",     zhCN: "孟买",     en: "Mumbai" },
+  { key: "bangkok",      tz: "Asia/Bangkok",         lat: 13.7563,  lon: 100.5018, zh: "曼谷",     zhCN: "曼谷",     en: "Bangkok" },
+  { key: "singapore",    tz: "Asia/Singapore",       lat: 1.3521,   lon: 103.8198, zh: "新加坡",   zhCN: "新加坡",   en: "Singapore" },
+  { key: "hong_kong",    tz: "Asia/Hong_Kong",       lat: 22.3193,  lon: 114.1694, zh: "香港",     zhCN: "香港",     en: "Hong Kong" },
+  { key: "taipei",       tz: "Asia/Taipei",          lat: 25.0330,  lon: 121.5654, zh: "台北",     zhCN: "台北",     en: "Taipei" },
+  { key: "shanghai",     tz: "Asia/Shanghai",        lat: 31.2304,  lon: 121.4737, zh: "上海",     zhCN: "上海",     en: "Shanghai" },
+  { key: "tokyo",        tz: "Asia/Tokyo",           lat: 35.6762,  lon: 139.6503, zh: "東京",     zhCN: "东京",     en: "Tokyo" },
+  { key: "seoul",        tz: "Asia/Seoul",           lat: 37.5665,  lon: 126.9780, zh: "首爾",     zhCN: "首尔",     en: "Seoul" },
+  { key: "sydney",       tz: "Australia/Sydney",     lat: -33.8688, lon: 151.2093, zh: "雪梨",     zhCN: "悉尼",     en: "Sydney" },
+  { key: "auckland",     tz: "Pacific/Auckland",     lat: -36.8485, lon: 174.7633, zh: "奧克蘭",   zhCN: "奥克兰",   en: "Auckland" }
+];
+
+function getCityByKey(key) {
+  return WORLD_CITIES.find(c => c.key === key) || WORLD_CITIES.find(c => c.key === "new_york");
+}
+
+function cityDisplayName(city) {
+  if (!city) return "";
+  if (isSimplifiedChinese) return city.zhCN;
+  if (isChineseUser) return city.zh;
+  return city.en;
+}
+
 // State variables
 let settings = {
   username: "",
@@ -54,9 +91,18 @@ let settings = {
   clockShowSeconds: false,
   clockPosition: "center", // "left" | "center" | "right"
   clockSize: "standard", // "small" | "standard" | "large"
+  // Second (world) clock — shown side-by-side with the local clock
+  secondClock: false,
+  secondClockCity: "new_york", // key into WORLD_CITIES
+  // Weather widget (Open-Meteo, no API key, no geolocation permission).
+  // Local weather = manually entered city; remote weather follows the second clock.
+  weather: false,
+  weatherCity: "", // manual free-text city for the local weather
+  weatherUnit: "c", // "c" | "f"
   linkOpenMode: "newtab", // "current" | "newtab" | "newwindow"
   bgAutoRotate: false,
   bgRotateInterval: 180,
+  bgRotateSyncQuote: false, // when auto-rotating background, also re-randomize the quote
   searchEngine: "google",
   searchInNewTab: false,
   autoDownscaleUploads: true,
@@ -167,6 +213,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   initRssWidget();
   renderRemindersWidget();
   initCalendarWidget();
+  initWeather();
   
   if (settings.widgets.cloudQuotes) {
     await loadCloudQuote();
@@ -248,6 +295,12 @@ async function loadSettings() {
 
   if (settings.searchInNewTab === undefined) settings.searchInNewTab = defaultSettings.searchInNewTab;
   if (settings.autoDownscaleUploads === undefined) settings.autoDownscaleUploads = defaultSettings.autoDownscaleUploads;
+  if (settings.secondClock === undefined) settings.secondClock = defaultSettings.secondClock;
+  if (settings.secondClockCity === undefined) settings.secondClockCity = defaultSettings.secondClockCity;
+  if (settings.weather === undefined) settings.weather = defaultSettings.weather;
+  if (settings.weatherCity === undefined) settings.weatherCity = defaultSettings.weatherCity;
+  if (settings.weatherUnit === undefined) settings.weatherUnit = defaultSettings.weatherUnit;
+  if (settings.bgRotateSyncQuote === undefined) settings.bgRotateSyncQuote = defaultSettings.bgRotateSyncQuote;
   if (settings.cloudQuoteSource === undefined) {
     settings.cloudQuoteSource = isSimplifiedChinese ? "hitokoto" : "zenquotes";
   }
@@ -339,7 +392,17 @@ function applyWidgetVisibility() {
     }
   }
 
+  // Per-clock weather: hide when disabled; when enabled the slots are shown by
+  // initWeather() once data has loaded (avoids flashing an empty box).
+  if (!settings.weather) {
+    const lw = document.getElementById("local-weather");
+    const rw = document.getElementById("remote-weather");
+    if (lw) lw.classList.add("widget-hidden");
+    if (rw) rw.classList.add("widget-hidden");
+  }
+
   applyClockLayout();
+  applySecondClock();
 }
 
 // Apply the clock's horizontal position and size via classes on the widget,
@@ -354,95 +417,165 @@ function applyClockLayout() {
   clockWidget.classList.remove("clock-pos-left", "clock-pos-center", "clock-pos-right");
   clockWidget.classList.add(`clock-pos-${pos}`);
 
-  clockWidget.classList.remove("clock-size-small", "clock-size-standard", "clock-size-large");
-  clockWidget.classList.add(`clock-size-${size}`);
+  // Size tier lives on <body> so both the local and remote clocks share it
+  // (the CSS-variable scale system reads it from any .clock-wrapper ancestor).
+  document.body.classList.remove("clock-size-small", "clock-size-standard", "clock-size-large");
+  document.body.classList.add(`clock-size-${size}`);
 }
 
 /* ==========================================================================
    Clock & Greeting Widget
    ========================================================================== */
 
-function initClock() {
-  const timeEl = document.getElementById("clock-time");
-  const dateEl = document.getElementById("clock-date");
-  const digitalClock = timeEl;
-  const analogClock = document.getElementById("analog-clock");
-  const hourHand = document.getElementById("analog-hour");
-  const minuteHand = document.getElementById("analog-minute");
-  const secondHand = document.getElementById("analog-second");
-  
-  // Generate clock tick marks dynamically for Analog Clock
-  const clockFace = document.getElementById("clock-face");
-  if (clockFace && clockFace.querySelectorAll(".clock-mark").length === 0) {
+const WEEKDAY_INDEX = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+
+// Extract clock-relevant parts for a given IANA timezone (used by the remote clock).
+function getZonedParts(tz) {
+  const now = new Date();
+  const fmt = new Intl.DateTimeFormat("en-US", {
+    timeZone: tz, hour12: false, weekday: "short",
+    year: "numeric", month: "numeric", day: "numeric",
+    hour: "2-digit", minute: "2-digit", second: "2-digit"
+  });
+  const parts = {};
+  for (const p of fmt.formatToParts(now)) {
+    if (p.type !== "literal") parts[p.type] = p.value;
+  }
+  return {
+    hours: parseInt(parts.hour, 10) % 24,
+    minutes: parseInt(parts.minute, 10),
+    seconds: parseInt(parts.second, 10),
+    year: parseInt(parts.year, 10),
+    month: parseInt(parts.month, 10),
+    day: parseInt(parts.day, 10),
+    weekdayIndex: WEEKDAY_INDEX[parts.weekday] != null ? WEEKDAY_INDEX[parts.weekday] : now.getDay()
+  };
+}
+
+// Format the date line using the app's house style. Pass tz for a remote zone, null for local.
+function formatClockDate(parts, tz) {
+  if (isChineseUser) {
+    const weekDays = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
+    return `${parts.year}年${parts.month}月${parts.day}日 ${weekDays[parts.weekdayIndex]}`;
+  }
+  const options = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
+  if (tz) options.timeZone = tz;
+  return new Date().toLocaleDateString(undefined, options);
+}
+
+// Render a single clock (digital or analog) into the supplied element set.
+function renderClockFace(els, parts, showSeconds, isAnalog) {
+  if (isAnalog) {
+    els.digital.style.display = "none";
+    els.analog.style.display = "flex";
+
+    const hrDegrees = ((parts.hours % 12) * 30) + (parts.minutes * 0.5);
+    const minDegrees = (parts.minutes * 6) + (parts.seconds * 0.1);
+    const secDegrees = parts.seconds * 6;
+
+    els.hour.style.transform = `rotate(${hrDegrees}deg)`;
+    els.minute.style.transform = `rotate(${minDegrees}deg)`;
+
+    if (showSeconds) {
+      els.second.style.display = "block";
+      els.second.style.transform = `rotate(${secDegrees}deg)`;
+    } else {
+      els.second.style.display = "none";
+    }
+  } else {
+    els.analog.style.display = "none";
+    els.digital.style.display = "block";
+
+    const hours = parts.hours.toString().padStart(2, "0");
+    const minutes = parts.minutes.toString().padStart(2, "0");
+    if (showSeconds) {
+      const seconds = parts.seconds.toString().padStart(2, "0");
+      els.digital.textContent = `${hours}:${minutes}:${seconds}`;
+    } else {
+      els.digital.textContent = `${hours}:${minutes}`;
+    }
+  }
+}
+
+// Populate the tick marks of an analog clock face once.
+function buildClockMarks(faceId) {
+  const face = document.getElementById(faceId);
+  if (face && face.querySelectorAll(".clock-mark").length === 0) {
     for (let i = 0; i < 12; i++) {
       const mark = document.createElement("div");
       mark.className = "clock-mark" + (i % 3 === 0 ? " quarter" : "");
       mark.style.transform = `rotate(${i * 30}deg)`;
-      clockFace.appendChild(mark);
+      face.appendChild(mark);
     }
   }
-  
+}
+
+function initClock() {
+  const localEls = {
+    digital: document.getElementById("clock-time"),
+    analog: document.getElementById("analog-clock"),
+    hour: document.getElementById("analog-hour"),
+    minute: document.getElementById("analog-minute"),
+    second: document.getElementById("analog-second"),
+    date: document.getElementById("clock-date")
+  };
+  const remoteEls = {
+    digital: document.getElementById("remote-clock-time"),
+    analog: document.getElementById("remote-analog-clock"),
+    hour: document.getElementById("remote-analog-hour"),
+    minute: document.getElementById("remote-analog-minute"),
+    second: document.getElementById("remote-analog-second"),
+    date: document.getElementById("remote-clock-date")
+  };
+
+  buildClockMarks("clock-face");
+  buildClockMarks("remote-clock-face");
+
   function updateClock() {
     const now = new Date();
     const showSeconds = settings.clockShowSeconds !== false;
     const isAnalog = settings.clockType === "analog";
-    
-    if (isAnalog) {
-      digitalClock.style.display = "none";
-      analogClock.style.display = "flex";
-      
-      const hours = now.getHours();
-      const minutes = now.getMinutes();
-      const seconds = now.getSeconds();
-      
-      const hrDegrees = ((hours % 12) * 30) + (minutes * 0.5);
-      const minDegrees = (minutes * 6) + (seconds * 0.1);
-      const secDegrees = seconds * 6;
-      
-      hourHand.style.transform = `rotate(${hrDegrees}deg)`;
-      minuteHand.style.transform = `rotate(${minDegrees}deg)`;
-      
-      if (showSeconds) {
-        secondHand.style.display = "block";
-        secondHand.style.transform = `rotate(${secDegrees}deg)`;
-      } else {
-        secondHand.style.display = "none";
-      }
-    } else {
-      analogClock.style.display = "none";
-      digitalClock.style.display = "block";
-      
-      let hours = now.getHours().toString().padStart(2, '0');
-      let minutes = now.getMinutes().toString().padStart(2, '0');
-      if (showSeconds) {
-        let seconds = now.getSeconds().toString().padStart(2, '0');
-        digitalClock.textContent = `${hours}:${minutes}:${seconds}`;
-      } else {
-        digitalClock.textContent = `${hours}:${minutes}`;
-      }
-    }
-    
-    // Format Date based on system UI locale
-    const years = now.getFullYear();
-    const months = now.getMonth() + 1;
-    const days = now.getDate();
-    
-    if (isChineseUser) {
-      const weekDays = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
-      const weekDayStr = weekDays[now.getDay()];
-      dateEl.textContent = `${years}年${months}月${days}日 ${weekDayStr}`;
-    } else {
-      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-      dateEl.textContent = now.toLocaleDateString(undefined, options);
+
+    const localParts = {
+      hours: now.getHours(), minutes: now.getMinutes(), seconds: now.getSeconds(),
+      year: now.getFullYear(), month: now.getMonth() + 1, day: now.getDate(),
+      weekdayIndex: now.getDay()
+    };
+    renderClockFace(localEls, localParts, showSeconds, isAnalog);
+    localEls.date.textContent = formatClockDate(localParts, null);
+
+    if (settings.secondClock && remoteEls.digital) {
+      const city = getCityByKey(settings.secondClockCity);
+      const rParts = getZonedParts(city.tz);
+      renderClockFace(remoteEls, rParts, showSeconds, isAnalog);
+      remoteEls.date.textContent = formatClockDate(rParts, city.tz);
     }
   }
-  
+
   updateClock();
-  
+
   if (window.clockInterval) {
     clearInterval(window.clockInterval);
   }
   window.clockInterval = setInterval(updateClock, 1000);
+}
+
+// Toggle the dual-clock layout and refresh the city labels.
+function applySecondClock() {
+  const remoteWidget = document.getElementById("clock-widget-remote");
+  const localLabel = document.getElementById("local-city-label");
+  const remoteLabel = document.getElementById("remote-city-label");
+  const enabled = !!settings.secondClock && !!settings.widgets.clock;
+
+  document.body.classList.toggle("dual-clock", enabled);
+  if (remoteWidget) remoteWidget.classList.toggle("widget-hidden", !enabled);
+
+  if (enabled) {
+    const city = getCityByKey(settings.secondClockCity);
+    if (remoteLabel) remoteLabel.textContent = cityDisplayName(city);
+    if (localLabel) localLabel.textContent = isChineseUser ? "本地" : "Local";
+  }
+  initClock();
 }
 
 function initGreeting() {
@@ -483,6 +616,141 @@ function initGreeting() {
   
   updateGreeting();
   setInterval(updateGreeting, 60000);
+}
+
+/* ==========================================================================
+   Weather Widget (Open-Meteo — no API key, no geolocation permission)
+   ========================================================================== */
+
+// Map WMO weather codes to an emoji + localized description.
+function wmoInfo(code) {
+  const T = (emoji, zh, zhCN, en) => ({ emoji, zh, zhCN, en });
+  if (code === 0) return T("☀️", "晴朗", "晴朗", "Clear");
+  if (code === 1) return T("🌤️", "大致晴朗", "大致晴朗", "Mainly clear");
+  if (code === 2) return T("⛅", "局部多雲", "局部多云", "Partly cloudy");
+  if (code === 3) return T("☁️", "陰天", "阴天", "Overcast");
+  if (code === 45 || code === 48) return T("🌫️", "有霧", "有雾", "Fog");
+  if (code >= 51 && code <= 57) return T("🌦️", "毛毛雨", "毛毛雨", "Drizzle");
+  if (code >= 61 && code <= 67) return T("🌧️", "下雨", "下雨", "Rain");
+  if (code >= 71 && code <= 77) return T("🌨️", "下雪", "下雪", "Snow");
+  if (code >= 80 && code <= 82) return T("🌧️", "陣雨", "阵雨", "Rain showers");
+  if (code >= 85 && code <= 86) return T("🌨️", "陣雪", "阵雪", "Snow showers");
+  if (code >= 95) return T("⛈️", "雷雨", "雷雨", "Thunderstorm");
+  return T("🌡️", "天氣", "天气", "Weather");
+}
+
+// Resolve a free-text city name to coordinates via Open-Meteo geocoding (cached).
+async function geocodeCity(name) {
+  const cacheKey = "jnt_geo_" + name.trim().toLowerCase();
+  try {
+    const cached = JSON.parse(localStorage.getItem(cacheKey) || "null");
+    if (cached) return cached;
+  } catch (e) {}
+
+  try {
+    const lang = isChineseUser ? "zh" : "en";
+    const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(name)}&count=1&language=${lang}&format=json`;
+    const res = await fetch(url);
+    if (res.ok) {
+      const d = await res.json();
+      if (d.results && d.results.length) {
+        const r = d.results[0];
+        const loc = { lat: r.latitude, lon: r.longitude, name: r.name };
+        localStorage.setItem(cacheKey, JSON.stringify(loc));
+        return loc;
+      }
+    }
+  } catch (e) {
+    console.log("Geocoding failed:", e.message || e);
+  }
+  return null;
+}
+
+// Fetch current weather for coordinates (cached for 30 minutes).
+async function fetchWeather(lat, lon, unit) {
+  const tempUnit = unit === "f" ? "fahrenheit" : "celsius";
+  const cacheKey = `jnt_wx_${lat.toFixed(2)}_${lon.toFixed(2)}_${tempUnit}`;
+  try {
+    const c = JSON.parse(localStorage.getItem(cacheKey) || "null");
+    if (c && Date.now() - c.t < 30 * 60 * 1000) return c.d;
+  } catch (e) {}
+
+  try {
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&temperature_unit=${tempUnit}`;
+    const res = await fetch(url);
+    if (res.ok) {
+      const j = await res.json();
+      if (j.current) {
+        const d = { temp: Math.round(j.current.temperature_2m), code: j.current.weather_code };
+        localStorage.setItem(cacheKey, JSON.stringify({ t: Date.now(), d }));
+        return d;
+      }
+    }
+  } catch (e) {
+    console.log("Weather fetch failed:", e.message || e);
+  }
+  return null;
+}
+
+// Render weather into one clock's slot ("local" or "remote"). Hides the slot
+// when disabled or when no data/location is available.
+async function renderWeatherSlot(slot, loc) {
+  const widget = document.getElementById(`${slot}-weather`);
+  if (!widget) return;
+
+  if (!settings.weather || !loc) {
+    widget.classList.add("widget-hidden");
+    return;
+  }
+
+  const data = await fetchWeather(loc.lat, loc.lon, settings.weatherUnit);
+  if (!data) {
+    widget.classList.add("widget-hidden");
+    return;
+  }
+
+  const iconEl = document.getElementById(`${slot}-weather-icon`);
+  const tempEl = document.getElementById(`${slot}-weather-temp`);
+  const descEl = document.getElementById(`${slot}-weather-desc`);
+  const info = wmoInfo(data.code);
+
+  if (iconEl) iconEl.textContent = info.emoji;
+  if (tempEl) tempEl.textContent = `${data.temp}°${settings.weatherUnit === "f" ? "F" : "C"}`;
+  if (descEl) descEl.textContent = isSimplifiedChinese ? info.zhCN : (isChineseUser ? info.zh : info.en);
+
+  widget.classList.remove("widget-hidden");
+}
+
+async function initWeather() {
+  if (!settings.weather) {
+    const lw = document.getElementById("local-weather");
+    const rw = document.getElementById("remote-weather");
+    if (lw) lw.classList.add("widget-hidden");
+    if (rw) rw.classList.add("widget-hidden");
+    return;
+  }
+
+  // Local weather — always from the manually entered city (no geolocation).
+  let localLoc = null;
+  if ((settings.weatherCity || "").trim()) {
+    localLoc = await geocodeCity(settings.weatherCity.trim());
+  }
+  await renderWeatherSlot("local", localLoc);
+
+  // Remote weather — automatically follows the second-clock city (when shown).
+  let remoteLoc = null;
+  if (settings.secondClock) {
+    const city = getCityByKey(settings.secondClockCity);
+    remoteLoc = { lat: city.lat, lon: city.lon, name: cityDisplayName(city) };
+  }
+  await renderWeatherSlot("remote", remoteLoc);
+
+  // Refresh periodically (cache layer keeps network calls infrequent).
+  if (!window.weatherInterval) {
+    window.weatherInterval = setInterval(() => {
+      if (settings.weather) initWeather();
+    }, 30 * 60 * 1000);
+  }
 }
 
 /* ==========================================================================
@@ -821,6 +1089,10 @@ function startBgAutoRotate() {
     
     window.bgRotateIntervalId = setInterval(() => {
       setRandomBackground();
+      // Optionally re-randomize the quote in sync with the background
+      if (settings.bgRotateSyncQuote && settings.widgets.quote) {
+        initQuote();
+      }
     }, interval * 1000);
   }
 }
@@ -854,6 +1126,19 @@ function initQuoteSearch() {
     });
     quoteWidget.dataset.listenerBound = "true";
   }
+}
+
+// Populate the second-clock city dropdown with localized city names.
+function initSecondClockCitySelect() {
+  const select = document.getElementById("second-clock-city-select");
+  if (!select) return;
+  select.innerHTML = "";
+  WORLD_CITIES.forEach(city => {
+    const opt = document.createElement("option");
+    opt.value = city.key;
+    opt.textContent = cityDisplayName(city);
+    select.appendChild(opt);
+  });
 }
 
 function initQuoteSourceSelect() {
@@ -1396,6 +1681,16 @@ function initDrawer() {
   const clockPositionSelect = document.getElementById("clock-position-select");
   const clockSizeSelect = document.getElementById("clock-size-select");
   const clockSubOptions = document.getElementById("clock-sub-options");
+  const toggleSecondClock = document.getElementById("toggle-second-clock");
+  const secondClockCitySelect = document.getElementById("second-clock-city-select");
+  const secondClockSubOptions = document.getElementById("second-clock-sub-options");
+
+  const toggleBgRotateSyncQuote = document.getElementById("toggle-bg-rotate-sync-quote");
+
+  const toggleWeather = document.getElementById("toggle-weather");
+  const weatherSubOptions = document.getElementById("weather-sub-options");
+  const weatherCityInput = document.getElementById("weather-city-input");
+  const weatherUnitSelect = document.getElementById("weather-unit-select");
 
   const linkOpenModeSelect = document.getElementById("link-open-mode-select");
   const linksSubOptions = document.getElementById("links-sub-options");
@@ -1451,16 +1746,27 @@ function initDrawer() {
     toggleBgRotate.checked = settings.bgAutoRotate || false;
     bgRotateSubOptions.style.display = settings.bgAutoRotate ? "block" : "none";
     inputBgRotateInterval.value = settings.bgRotateInterval || 180;
-    
+    toggleBgRotateSyncQuote.checked = settings.bgRotateSyncQuote || false;
+
     toggleSeconds.checked = settings.clockShowSeconds !== false;
     clockTypeSelect.value = settings.clockType || "digital";
     clockPositionSelect.value = settings.clockPosition || "center";
     clockSizeSelect.value = settings.clockSize || "standard";
+    initSecondClockCitySelect();
+    toggleSecondClock.checked = settings.secondClock || false;
+    secondClockCitySelect.value = settings.secondClockCity || "new_york";
+    secondClockSubOptions.style.display = settings.secondClock ? "flex" : "none";
     if (settings.widgets.clock) {
       clockSubOptions.classList.remove("disabled");
     } else {
       clockSubOptions.classList.add("disabled");
     }
+
+    // Weather controls
+    toggleWeather.checked = settings.weather || false;
+    weatherCityInput.value = settings.weatherCity || "";
+    weatherUnitSelect.value = settings.weatherUnit || "c";
+    weatherSubOptions.style.display = settings.weather ? "block" : "none";
 
     linkOpenModeSelect.value = settings.linkOpenMode || "newtab";
     if (settings.widgets.links) {
@@ -1634,7 +1940,13 @@ function initDrawer() {
   
   inputBgRotateInterval.addEventListener("change", handleIntervalChange);
   inputBgRotateInterval.addEventListener("blur", handleIntervalChange);
-  
+
+  // Re-randomize the quote in sync with each background rotation
+  toggleBgRotateSyncQuote.addEventListener("change", async () => {
+    settings.bgRotateSyncQuote = toggleBgRotateSyncQuote.checked;
+    await saveSettings();
+  });
+
   // Clock Style & Seconds listeners
   clockTypeSelect.addEventListener("change", async () => {
     settings.clockType = clockTypeSelect.value;
@@ -1658,6 +1970,51 @@ function initDrawer() {
     settings.clockSize = clockSizeSelect.value;
     await saveSettings();
     applyClockLayout();
+  });
+
+  // Second (world) clock listeners
+  toggleSecondClock.addEventListener("change", async () => {
+    settings.secondClock = toggleSecondClock.checked;
+    secondClockSubOptions.style.display = settings.secondClock ? "flex" : "none";
+    await saveSettings();
+    applySecondClock();
+    if (settings.weather) initWeather(); // remote weather follows the second clock
+  });
+
+  secondClockCitySelect.addEventListener("change", async () => {
+    settings.secondClockCity = secondClockCitySelect.value;
+    await saveSettings();
+    applySecondClock();
+    if (settings.weather) initWeather(); // remote weather follows the second clock
+  });
+
+  // Weather listeners
+  toggleWeather.addEventListener("change", async () => {
+    settings.weather = toggleWeather.checked;
+    weatherSubOptions.style.display = settings.weather ? "block" : "none";
+    await saveSettings();
+    if (settings.weather) {
+      initWeather();
+    } else {
+      const lw = document.getElementById("local-weather");
+      const rw = document.getElementById("remote-weather");
+      if (lw) lw.classList.add("widget-hidden");
+      if (rw) rw.classList.add("widget-hidden");
+    }
+  });
+
+  const handleWeatherCityChange = async () => {
+    settings.weatherCity = weatherCityInput.value.trim();
+    await saveSettings();
+    if (settings.weather) initWeather();
+  };
+  weatherCityInput.addEventListener("change", handleWeatherCityChange);
+  weatherCityInput.addEventListener("blur", handleWeatherCityChange);
+
+  weatherUnitSelect.addEventListener("change", async () => {
+    settings.weatherUnit = weatherUnitSelect.value;
+    await saveSettings();
+    if (settings.weather) initWeather();
   });
 
   // Quick Link Open Mode listener

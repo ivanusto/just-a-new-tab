@@ -203,6 +203,39 @@
   "bgRotateIntervalLabel": {
     "message": "轮播间隔时间 (秒)"
   },
+  "toggleBgRotateSyncQuote": {
+    "message": "轮播时同步换一则金句"
+  },
+  "toggleSecondClock": {
+    "message": "显示第二时钟（世界时钟）"
+  },
+  "secondClockCityLabel": {
+    "message": "第二时钟城市"
+  },
+  "toggleWeather": {
+    "message": "显示天气"
+  },
+  "weatherModeLabel": {
+    "message": "天气地点来源"
+  },
+  "weatherModeFollowClock": {
+    "message": "跟随第二时钟城市"
+  },
+  "weatherModeManual": {
+    "message": "手动输入城市"
+  },
+  "weatherCityLabel": {
+    "message": "本地天气城市"
+  },
+  "weatherRemoteHint": {
+    "message": "本地天气需手动输入城市；开启第二时钟后，会自动在远端时钟下方显示该城市的天气。"
+  },
+  "weatherCityPlaceholder": {
+    "message": "例如：台北 / Tokyo"
+  },
+  "weatherUnitLabel": {
+    "message": "温度单位"
+  },
   "searchPlaceholder": {
     "message": "搜索网页或输入问题..."
   },

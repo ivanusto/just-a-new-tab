@@ -156,17 +156,36 @@ body {
 #clock-widget.clock-pos-left .analog-clock-container { margin-left: 0; margin-right: auto; }
 #clock-widget.clock-pos-right .analog-clock-container { margin-left: auto; margin-right: 0; }
 
-/* Clock size */
-#clock-widget.clock-size-small #clock-time { font-size: 4.2rem; }
-#clock-widget.clock-size-small #clock-date { font-size: 1rem; }
-#clock-widget.clock-size-small .analog-clock-container { width: 150px; height: 150px; }
+/* ---------------------------------------------------------------------------
+   Clock sizing — driven by CSS variables so the small/standard/large tiers
+   stay correctly ordered and compose cleanly with the dual-clock and
+   responsive scale multipliers (single source of truth, no specificity wars).
+   --------------------------------------------------------------------------- */
+.clock-wrapper {
+  /* Standard tier (default) */
+  --clock-time-size: 6rem;
+  --clock-date-size: 1.2rem;
+  --analog-size: 210px;
+  /* Multipliers applied on top of the tier (dual-clock + responsive) */
+  --dual-scale: 1;
+  --resp-scale: 1;
+}
+body.clock-size-small .clock-wrapper {
+  --clock-time-size: 3.2rem;
+  --clock-date-size: 0.9rem;
+  --analog-size: 120px;
+}
+body.clock-size-large .clock-wrapper {
+  --clock-time-size: 8.2rem;
+  --clock-date-size: 1.45rem;
+  --analog-size: 285px;
+}
+/* In dual-clock mode both clocks shrink together to fit side-by-side */
+body.dual-clock .clock-wrapper { --dual-scale: 0.6; }
 
-#clock-widget.clock-size-large #clock-time { font-size: 8.5rem; }
-#clock-widget.clock-size-large #clock-date { font-size: 1.5rem; }
-#clock-widget.clock-size-large .analog-clock-container { width: 290px; height: 290px; }
-
-#clock-time {
-  font-size: 6.5rem;
+#clock-time,
+#remote-clock-time {
+  font-size: calc(var(--clock-time-size) * var(--dual-scale) * var(--resp-scale));
   font-weight: 700;
   line-height: 1;
   letter-spacing: -3px;
@@ -175,12 +194,67 @@ body {
   margin-bottom: 0.5rem;
 }
 
-#clock-date {
-  font-size: 1.25rem;
+#clock-date,
+#remote-clock-date {
+  font-size: calc(var(--clock-date-size) * var(--dual-scale) * var(--resp-scale));
   font-weight: 500;
   color: rgba(255, 255, 255, 0.85);
   letter-spacing: 2px;
 }
+
+/* City label above each clock — only visible in dual-clock mode */
+.clock-city-label {
+  display: none;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.78);
+  margin-bottom: 0.4rem;
+}
+
+/* Clock row: transparent wrapper normally, flex split when dual-clock is on */
+.clock-row { display: contents; }
+
+body.dual-clock .clock-row {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1.5rem;
+}
+body.dual-clock #clock-widget,
+body.dual-clock #clock-widget-remote {
+  align-self: auto;
+  flex: 0 1 auto;
+}
+body.dual-clock #clock-widget { text-align: left; }
+body.dual-clock #clock-widget-remote { text-align: right; }
+body.dual-clock #clock-widget .analog-clock-container { margin-left: 0; margin-right: auto; }
+body.dual-clock #clock-widget-remote .analog-clock-container { margin-left: auto; margin-right: 0; }
+body.dual-clock .clock-city-label { display: block; }
+
+/* Per-clock weather — sits under each clock's date line */
+.clock-weather {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-top: 0.6rem;
+  font-size: 1.15rem;
+  font-weight: 500;
+  color: #fff;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border-radius: 999px;
+  padding: 0.4rem 1rem;
+}
+.clock-weather .weather-icon { font-size: 1.35rem; line-height: 1; }
+.clock-weather .weather-temp { font-weight: 700; font-variant-numeric: tabular-nums; }
+.clock-weather .weather-desc { opacity: 0.92; }
+body.dual-clock .clock-weather { font-size: 1rem; padding: 0.35rem 0.85rem; }
 
 /* Greeting Widget */
 .greeting-wrapper {
@@ -1156,8 +1230,8 @@ body {
 /* Analog Clock Widget */
 .analog-clock-container {
   position: relative;
-  width: 220px;
-  height: 220px;
+  width: calc(var(--analog-size, 210px) * var(--dual-scale, 1) * var(--resp-scale, 1));
+  height: calc(var(--analog-size, 210px) * var(--dual-scale, 1) * var(--resp-scale, 1));
   margin: 0.5rem auto 1.5rem;
   background: rgba(10, 10, 15, 0.25);
   border: 2px solid rgba(255, 255, 255, 0.08);
@@ -1556,16 +1630,14 @@ body {
   .widgets-container {
     gap: 1.5rem;
   }
-  #clock-time {
-    font-size: 5.5rem;
+  .clock-wrapper {
+    --resp-scale: 0.85;
   }
   .greeting-wrapper {
     font-size: 1.8rem;
     margin-bottom: 0.5rem;
   }
   .analog-clock-container {
-    width: 180px;
-    height: 180px;
     margin: 0.25rem auto 1rem;
   }
 }
@@ -1577,11 +1649,8 @@ body {
   .widgets-container {
     gap: 0.75rem;
   }
-  #clock-time {
-    font-size: 4rem;
-  }
-  #clock-date {
-    font-size: 1.1rem;
+  .clock-wrapper {
+    --resp-scale: 0.68;
   }
   .greeting-wrapper {
     font-size: 1.5rem;
@@ -1598,18 +1667,39 @@ body {
     margin-bottom: 0.2rem;
   }
   .analog-clock-container {
-    width: 140px;
-    height: 140px;
     margin: 0.25rem auto 0.75rem;
   }
 }
 
 @media (max-width: 600px) {
-  #clock-time {
-    font-size: 4.5rem;
+  .clock-wrapper {
+    --resp-scale: 0.78;
   }
   .greeting-wrapper {
     font-size: 1.6rem;
+  }
+  /* Stack the dual clocks vertically when there isn't room side-by-side */
+  body.dual-clock .clock-row {
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+  /* Stacked vertically there's room, so don't shrink as aggressively */
+  body.dual-clock .clock-wrapper {
+    --dual-scale: 0.9;
+  }
+  body.dual-clock #clock-widget,
+  body.dual-clock #clock-widget-remote {
+    text-align: center;
+  }
+  body.dual-clock #clock-widget .analog-clock-container,
+  body.dual-clock #clock-widget-remote .analog-clock-container {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  body.dual-clock .clock-weather {
+    margin-left: auto;
+    margin-right: auto;
   }
 }
 

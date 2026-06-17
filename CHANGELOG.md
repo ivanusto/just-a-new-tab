@@ -3,6 +3,22 @@
 本專案的版本更新紀錄。格式參考 [Keep a Changelog](https://keepachangelog.com/)。
 Notable changes to this project. Format based on [Keep a Changelog](https://keepachangelog.com/).
 
+## [1.58] - 2026-06-17
+
+### 世界時鐘 + 天氣 + 輪播同步金句 / World clock, weather & rotation-synced quotes
+
+**繁中**
+- 🕑 **第二時鐘（世界時鐘）**：可在本地時鐘旁加開一個遠端時區時鐘，左右分置，方便對照紐約、倫敦、東京等地時間。內建 20 個常用城市，數字／指針兩種樣式皆支援。並重新設計時鐘「小／標準／大」三段大小，修正「小反而比標準大」的問題，小尺寸現在真的更小。
+- 🌤️ **天氣小工具**：以免費的 Open-Meteo 顯示目前氣溫與天氣，**完全不需要瀏覽器定位權限**。天氣顯示在各自時鐘下方：本地天氣需「手動輸入城市」；開啟第二時鐘後，會自動在遠端時鐘下方顯示該城市的天氣。可切換 °C／°F，結果在本機快取 30 分鐘以減少請求。
+- 🔁 **輪播時同步換金句**：開啟「自動輪播背景圖片」後，多了一個子選項，可在每次換背景時一併重新隨機一則金句。
+- 🔐 新增權限：`api.open-meteo.com`、`geocoding-api.open-meteo.com`（僅天氣功能會用到，預設關閉）。
+
+**English**
+- 🕑 **Second (world) clock**: add a remote-timezone clock beside the local one, split left/right, handy for checking New York / London / Tokyo time at a glance. 20 built-in cities; works with both digital and analog styles. The small/standard/large size tiers were also redesigned to fix "small was bigger than standard" — small is now genuinely smaller.
+- 🌤️ **Weather widget**: shows the current temperature and condition via the free Open-Meteo API with **no browser geolocation permission required**. Weather appears under each clock: local weather uses a **manually entered city**; when the second clock is on, that city's weather is shown automatically under the remote clock. Toggle °C/°F; results are cached locally for 30 minutes to keep requests low.
+- 🔁 **Rotation-synced quotes**: when "Timed wallpaper rotation" is on, a new sub-option re-randomizes the quote together with each background change.
+- 🔐 New permissions: `api.open-meteo.com`, `geocoding-api.open-meteo.com` (only used by the weather feature, which is off by default).
+
 ## [1.57] - 2026-06-16
 
 ### 捷徑圖示放大 / Larger shortcut icons
@@ -91,6 +107,7 @@ Notable changes to this project. Format based on [Keep a Changelog](https://keep
 - Export all settings, shortcuts, custom quotes, RSS subscriptions, and wallpapers (IndexedDB) to a single JSON file.
 - Restore on another device or after a reinstall (with a confirm prompt); wallpaper references are remapped automatically. No sign-in, no cloud.
 
+[1.58]: https://github.com/ivanusto/just-new-tab/releases/tag/v1.58
 [1.57]: https://github.com/ivanusto/just-new-tab/releases/tag/v1.57
 [1.56]: https://github.com/ivanusto/just-new-tab/releases/tag/v1.56
 [1.55]: https://github.com/ivanusto/just-new-tab/releases/tag/v1.55
