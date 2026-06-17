@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "__MSG_extName__",
-  "version": "1.57",
+  "version": "1.58",
   "description": "__MSG_extDesc__",
   "default_locale": "zh_TW",
   "permissions": [
@@ -16,6 +16,8 @@
     "https://v1.hitokoto.cn/",
     "https://api.mymemory.translated.net/",
     "https://api.animechan.io/",
+    "https://api.open-meteo.com/",
+    "https://geocoding-api.open-meteo.com/",
     "https://yblog.org/"
   ],
   "optional_host_permissions": [
