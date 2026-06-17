@@ -228,9 +228,12 @@ body.multi-clock .clock-row {
   gap: 1rem;
 }
 body.multi-clock .clock-wrapper { align-self: start; }
-body.multi-clock .clock-pos-left   { grid-column: 1; text-align: left;   justify-self: start; }
-body.multi-clock .clock-pos-center { grid-column: 2; text-align: center; justify-self: center; }
-body.multi-clock .clock-pos-right  { grid-column: 3; text-align: right;  justify-self: end; }
+/* grid-row: 1 keeps all clocks on the same top row regardless of DOM order —
+   without it, a clock whose column sits "behind" the auto-placement cursor
+   (e.g. the 3rd clock placed in column 1) gets bumped to a second row. */
+body.multi-clock .clock-pos-left   { grid-column: 1; grid-row: 1; text-align: left;   justify-self: start; }
+body.multi-clock .clock-pos-center { grid-column: 2; grid-row: 1; text-align: center; justify-self: center; }
+body.multi-clock .clock-pos-right  { grid-column: 3; grid-row: 1; text-align: right;  justify-self: end; }
 body.multi-clock .clock-pos-left   .analog-clock-container { margin-left: 0;    margin-right: auto; }
 body.multi-clock .clock-pos-center .analog-clock-container { margin-left: auto; margin-right: auto; }
 body.multi-clock .clock-pos-right  .analog-clock-container { margin-left: auto; margin-right: 0; }
