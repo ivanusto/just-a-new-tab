@@ -577,6 +577,60 @@ function initClock() {
   window.clockInterval = setInterval(updateClock, 1000);
 }
 
+/* The three clocks occupy three fixed slots (left/center/right) and a slot can
+   hold at most one clock, so they never collapse into a single column. */
+const CLOCK_POSITIONS = ["left", "center", "right"];
+
+function clockPosKey(which) {
+  return which === "local" ? "clockPosition" : which + "ClockPosition";
+}
+function getClockPos(which) {
+  const def = which === "local" ? "center" : which === "second" ? "right" : "left";
+  return settings[clockPosKey(which)] || def;
+}
+function setClockPos(which, pos) {
+  settings[clockPosKey(which)] = pos;
+}
+
+// Clocks currently on screen, in slot-priority order (local keeps its slot first).
+function enabledClocks() {
+  const list = ["local"];
+  if (settings.secondClock) list.push("second");
+  if (settings.thirdClock) list.push("third");
+  return list;
+}
+
+// Ensure every visible clock sits in a distinct slot (safety net for saved data
+// or newly enabled clocks). Earlier clocks keep their slot; later ones get bumped.
+function normalizeClockPositions() {
+  const used = new Set();
+  enabledClocks().forEach(which => {
+    let pos = getClockPos(which);
+    if (used.has(pos)) {
+      const free = CLOCK_POSITIONS.find(p => !used.has(p));
+      if (free) { setClockPos(which, free); pos = free; }
+    }
+    used.add(pos);
+  });
+}
+
+// User picked a slot for one clock — give it that slot and swap with whoever held it.
+function setClockPosition(which, newPos) {
+  const old = getClockPos(which);
+  if (old === newPos) return;
+  const conflict = enabledClocks().find(c => c !== which && getClockPos(c) === newPos);
+  setClockPos(which, newPos);
+  if (conflict) setClockPos(conflict, old);
+}
+
+// Reflect current clock positions back into the drawer's three position selects.
+function refreshClockPositionSelects() {
+  const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
+  setVal("clock-position-select", getClockPos("local"));
+  setVal("second-clock-position-select", getClockPos("second"));
+  setVal("third-clock-position-select", getClockPos("third"));
+}
+
 // Apply position, size, visibility and labels for the local + remote clocks,
 // then (re)start the ticking. Positions drive a simple left/center/right grid.
 function applyClockConfig() {
@@ -584,6 +638,8 @@ function applyClockConfig() {
   const secondOn = clockOn && !!settings.secondClock;
   const thirdOn = clockOn && !!settings.thirdClock;
   const count = 1 + (secondOn ? 1 : 0) + (thirdOn ? 1 : 0);
+
+  normalizeClockPositions();
 
   // Body classes: multi-clock grid + clock count (for shared scaling) + size tier
   document.body.classList.toggle("multi-clock", count > 1);
@@ -601,9 +657,9 @@ function applyClockConfig() {
     el.classList.remove("clock-pos-left", "clock-pos-center", "clock-pos-right");
     el.classList.add(`clock-pos-${pos || "center"}`);
   };
-  setPos("clock-widget", settings.clockPosition);
-  setPos("clock-widget-remote", settings.secondClockPosition);
-  setPos("clock-widget-third", settings.thirdClockPosition);
+  setPos("clock-widget", getClockPos("local"));
+  setPos("clock-widget-remote", getClockPos("second"));
+  setPos("clock-widget-third", getClockPos("third"));
 
   // Visibility + city labels
   const remoteWidget = document.getElementById("clock-widget-remote");
@@ -1249,6 +1305,8 @@ function wireRemoteClock(prefix) {
   c.toggle.addEventListener("change", async () => {
     settings[prefix + "Clock"] = c.toggle.checked;
     c.sub.style.display = c.toggle.checked ? "flex" : "none";
+    if (c.toggle.checked) normalizeClockPositions(); // give the new clock a free slot
+    refreshClockPositionSelects();
     await saveSettings();
     applyClockConfig();
     if (settings.weather) initWeather();
@@ -1274,7 +1332,8 @@ function wireRemoteClock(prefix) {
   c.customInput.addEventListener("blur", handleCustom);
 
   c.posSelect.addEventListener("change", async () => {
-    settings[prefix + "ClockPosition"] = c.posSelect.value;
+    setClockPosition(prefix, c.posSelect.value);
+    refreshClockPositionSelects();
     await saveSettings();
     applyClockConfig();
   });
@@ -2095,7 +2154,8 @@ function initDrawer() {
   });
 
   clockPositionSelect.addEventListener("change", async () => {
-    settings.clockPosition = clockPositionSelect.value;
+    setClockPosition("local", clockPositionSelect.value);
+    refreshClockPositionSelects();
     await saveSettings();
     applyClockConfig();
   });
