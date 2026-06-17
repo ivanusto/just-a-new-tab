@@ -1,0 +1,92 @@
+name: Publish extension
+
+# Publishes the extension to the Chrome Web Store and Firefox AMO.
+#
+# Trigger: push a version tag (e.g. v1.59) or run it manually from the Actions
+# tab. The version is read from just-new-tab/manifest.json, so bump the two
+# manifests (and tag to match) before releasing.
+#
+# Credentials live in repository secrets - never in this file:
+#   Settings -> Secrets and variables -> Actions -> New repository secret.
+# Each store's step auto-skips until BOTH of its secrets exist, so it is safe to
+# merge this workflow before any credentials are set up.
+#
+# Firefox AMO  (generate at https://addons.mozilla.org/developers/addon/api/key/):
+#   AMO_JWT_ISSUER     - API key (JWT issuer, e.g. "user:12345:67")
+#   AMO_JWT_SECRET     - API secret (shown only once)
+#
+# Chrome Web Store (Google Cloud Console: enable "Chrome Web Store API",
+# create an OAuth client, then mint a refresh token once):
+#   CWS_EXTENSION_ID   - the store item id (public)
+#   CWS_CLIENT_ID      - OAuth client id
+#   CWS_CLIENT_SECRET  - OAuth client secret
+#   CWS_REFRESH_TOKEN  - OAuth refresh token
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      AMO_JWT_ISSUER: ${{ secrets.AMO_JWT_ISSUER }}
+      AMO_JWT_SECRET: ${{ secrets.AMO_JWT_SECRET }}
+      CWS_EXTENSION_ID: ${{ secrets.CWS_EXTENSION_ID }}
+      CWS_CLIENT_ID: ${{ secrets.CWS_CLIENT_ID }}
+      CWS_CLIENT_SECRET: ${{ secrets.CWS_CLIENT_SECRET }}
+      CWS_REFRESH_TOKEN: ${{ secrets.CWS_REFRESH_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      # Builds dist/just-a-new-tab-chrome-vX.zip and ...-firefox-vX.xpi
+      - name: Build packages
+        id: build
+        run: |
+          python package_zip.py
+          VERSION=$(python -c "import json;print(json.load(open('just-new-tab/manifest.json'))['version'])")
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "chrome_zip=dist/just-a-new-tab-chrome-v$VERSION.zip" >> "$GITHUB_OUTPUT"
+
+      # Keep the built packages on the run (handy even before stores are wired up)
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: packages-v${{ steps.build.outputs.version }}
+          path: dist/*
+
+      # --- Firefox AMO -------------------------------------------------------
+      # web-ext signs + submits the listed version straight from source.
+      - name: Publish to Firefox AMO
+        if: ${{ env.AMO_JWT_ISSUER != '' && env.AMO_JWT_SECRET != '' }}
+        run: |
+          npx --yes web-ext sign \
+            --source-dir just-new-tab \
+            --channel listed \
+            --api-key "$AMO_JWT_ISSUER" \
+            --api-secret "$AMO_JWT_SECRET"
+
+      # --- Chrome Web Store --------------------------------------------------
+      - name: Publish to Chrome Web Store
+        if: ${{ env.CWS_EXTENSION_ID != '' && env.CWS_CLIENT_ID != '' }}
+        uses: mnao305/chrome-extension-upload@v5
+        with:
+          file-path: ${{ steps.build.outputs.chrome_zip }}
+          extension-id: ${{ env.CWS_EXTENSION_ID }}
+          client-id: ${{ env.CWS_CLIENT_ID }}
+          client-secret: ${{ env.CWS_CLIENT_SECRET }}
+          refresh-token: ${{ env.CWS_REFRESH_TOKEN }}
+          publish: true
