@@ -30,3 +30,6 @@ tmp/
 
 # Claude Code local tooling (launch config, local settings)
 .claude/
+
+# Claude Code memory (synced between machines via QNAP QSync, not git)
+claude-memory/
