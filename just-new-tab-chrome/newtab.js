@@ -2911,6 +2911,45 @@ function initZipImport() {
   });
 }
 
+// Current UI language as a lowercase BCP-47 code (e.g. "en", "zh-tw").
+function getUiLangCode() {
+  const raw = (typeof chrome !== "undefined" && chrome.i18n)
+    ? chrome.i18n.getUILanguage()
+    : (navigator.language || "en");
+  return (raw || "en").toLowerCase();
+}
+
+// Choose the best quote file for the given UI language from a theme package.
+// Convention: `quotes.txt`/`quotes.json` is the default language; translations
+// use a language suffix, e.g. `quotes_en.txt`, `quotes_zh-tw.txt`, `quotes_ja.txt`.
+// Falls back to the default file, then to any quote file present.
+function pickQuoteFileForLang(bases, langCode) {
+  if (!bases || !bases.length) return null;
+  const lang = (langCode || "en").toLowerCase();
+  const primary = lang.split("-")[0];
+  const has = (name) => bases.find(b => b === name);
+
+  // 1. Exact language match (e.g. quotes_zh-tw.txt)
+  let hit = has(`quotes_${lang}.txt`) || has(`quotes_${lang}.json`) ||
+            has(`金句_${lang}.txt`) || has(`金句_${lang}.json`);
+  // 2. Primary subtag match (e.g. quotes_en.txt for "en-US")
+  if (!hit) {
+    hit = has(`quotes_${primary}.txt`) || has(`quotes_${primary}.json`) ||
+          has(`金句_${primary}.txt`) || has(`金句_${primary}.json`);
+  }
+  // 3. Any file starting with that primary subtag (e.g. quotes_zh-cn for "zh")
+  if (!hit) {
+    hit = bases.find(b => b.startsWith(`quotes_${primary}`) || b.startsWith(`金句_${primary}`));
+  }
+  // 4. Default (unsuffixed) file
+  if (!hit) {
+    hit = has("quotes.txt") || has("quotes.json") || has("金句.txt") || has("金句.json");
+  }
+  // 5. Anything quote-like
+  if (!hit) hit = bases[0];
+  return hit;
+}
+
 async function handleZipFile(fileOrBlob, customName = null) {
   if (!fileOrBlob) return;
 
@@ -2942,21 +2981,28 @@ async function handleZipFile(fileOrBlob, customName = null) {
 
     const filePromises = [];
 
+    // Collect quote files so we can pick the one matching the UI language.
+    // Multi-language theme packs ship the default language as `quotes.txt`
+    // (or `quotes.json`) plus per-language translations such as
+    // `quotes_en.txt`, `quotes_zh-TW.txt`. We import only the best match.
+    const quoteEntries = [];
+
     zip.forEach((relativePath, zipEntry) => {
       if (zipEntry.dir) return;
 
       const nameLower = zipEntry.name.toLowerCase();
+      const baseLower = nameLower.split("/").pop();
 
       // Only allow JPG, JPEG, PNG
       if (nameLower.endsWith(".jpg") || nameLower.endsWith(".jpeg") || nameLower.endsWith(".png")) {
         const mimeType = nameLower.endsWith(".png") ? "image/png" : "image/jpeg";
-        
+
         const promise = zipEntry.async("blob").then(async (blob) => {
           if (blob.size > 25 * 1024 * 1024) {
             console.warn(`Skipped ${zipEntry.name}: image too large`);
             return;
           }
-          
+
           const fileBlob = new Blob([blob], { type: mimeType });
           try {
             const fileName = zipEntry.name.split("/").pop();
@@ -2969,49 +3015,25 @@ async function handleZipFile(fileOrBlob, customName = null) {
         });
         filePromises.push(promise);
       }
-      
-      // Quotes from txt or json
-      else if (nameLower.endsWith("quotes.txt") || nameLower.endsWith("金句.txt")) {
-        const promise = zipEntry.async("string").then((text) => {
-          const lines = text.split(/\r?\n/);
-          lines.forEach(line => {
-            const trimmed = line.trim();
-            if (!trimmed) return;
 
-            let quoteText = trimmed;
-            let quoteAuthor = isChineseUser ? "主題包匯入" : "Theme Package";
-
-            if (trimmed.includes("|")) {
-              const parts = trimmed.split("|");
-              quoteText = parts[0].trim();
-              quoteAuthor = parts[1].trim() || quoteAuthor;
-            } else if (trimmed.includes(" — ")) {
-              const parts = trimmed.split(" — ");
-              quoteText = parts[0].trim();
-              quoteAuthor = parts[1].trim() || quoteAuthor;
-            } else if (trimmed.includes(" - ")) {
-              const parts = trimmed.split(" - ");
-              quoteText = parts[0].trim();
-              quoteAuthor = parts[1].trim() || quoteAuthor;
-            }
-
-            if (quoteText) {
-              customQuotesList.push({
-                id: Date.now() + Math.random(),
-                text: quoteText,
-                author: quoteAuthor,
-                packageId: packageId,
-                packageName: packageName
-              });
-              quotesImported++;
-            }
-          });
-        });
-        filePromises.push(promise);
+      // Quote files: quotes*.txt / quotes*.json / 金句*.txt / 金句*.json
+      else if (
+        (baseLower.endsWith(".txt") || baseLower.endsWith(".json")) &&
+        (baseLower.startsWith("quotes") || baseLower.startsWith("金句"))
+      ) {
+        quoteEntries.push({ base: baseLower, entry: zipEntry });
       }
-      
-      else if (nameLower.endsWith("quotes.json") || nameLower.endsWith("金句.json")) {
-        const promise = zipEntry.async("string").then((text) => {
+    });
+
+    // Pick the quote file whose language best matches the UI, falling back to
+    // the default (`quotes.txt`/`quotes.json`) and finally to any quote file.
+    const chosenQuote = pickQuoteFileForLang(quoteEntries.map(q => q.base), getUiLangCode());
+    const chosenEntry = chosenQuote && quoteEntries.find(q => q.base === chosenQuote);
+
+    if (chosenEntry) {
+      const isJson = chosenEntry.base.endsWith(".json");
+      const promise = chosenEntry.entry.async("string").then((text) => {
+        if (isJson) {
           try {
             const data = JSON.parse(text);
             if (Array.isArray(data)) {
@@ -3029,12 +3051,47 @@ async function handleZipFile(fileOrBlob, customName = null) {
               });
             }
           } catch (jsonErr) {
-            console.error("Failed to parse quotes.json:", jsonErr);
+            console.error("Failed to parse quotes JSON:", jsonErr);
+          }
+          return;
+        }
+
+        const lines = text.split(/\r?\n/);
+        lines.forEach(line => {
+          const trimmed = line.trim();
+          if (!trimmed) return;
+
+          let quoteText = trimmed;
+          let quoteAuthor = isChineseUser ? "主題包匯入" : "Theme Package";
+
+          if (trimmed.includes("|")) {
+            const parts = trimmed.split("|");
+            quoteText = parts[0].trim();
+            quoteAuthor = parts[1].trim() || quoteAuthor;
+          } else if (trimmed.includes(" — ")) {
+            const parts = trimmed.split(" — ");
+            quoteText = parts[0].trim();
+            quoteAuthor = parts[1].trim() || quoteAuthor;
+          } else if (trimmed.includes(" - ")) {
+            const parts = trimmed.split(" - ");
+            quoteText = parts[0].trim();
+            quoteAuthor = parts[1].trim() || quoteAuthor;
+          }
+
+          if (quoteText) {
+            customQuotesList.push({
+              id: Date.now() + Math.random(),
+              text: quoteText,
+              author: quoteAuthor,
+              packageId: packageId,
+              packageName: packageName
+            });
+            quotesImported++;
           }
         });
-        filePromises.push(promise);
-      }
-    });
+      });
+      filePromises.push(promise);
+    }
 
     await Promise.all(filePromises);
 
