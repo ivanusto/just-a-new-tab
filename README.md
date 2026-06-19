@@ -50,6 +50,16 @@
 ./package-themes.sh pets gaming     # 只打包指定資料夾
 ```
 
+### 金句檔案格式（支援多語系）
+
+金句檔每行一句，格式為 `金句內容 | 作者`（也接受 `金句內容 — 作者` 或 `金句內容 - 作者`；省略作者亦可）。匯入時只會載入「最符合使用者介面語言」的那一個檔案：
+
+- `quotes.txt` — **預設語言**（官方包以此放繁體中文）。
+- `quotes_<語言>.txt` — 對應語言的翻譯，例如 `quotes_en.txt`（英文）、`quotes_zh-TW.txt`、`quotes_ja.txt`。語言碼比對順序為「完整碼 → 主語言碼 → 預設 `quotes.txt`」，找不到對應語言時自動回退到 `quotes.txt`。
+- 也支援 `quotes*.json`（陣列 `[{ "text": "...", "author": "..." }]`）與中文檔名 `金句*.txt` / `金句*.json`。
+
+官方 12 個主題包均已附 `quotes.txt`（繁中）＋ `quotes_en.txt`（英文）兩種語系，可作為自製主題包的範例。要新增語言，只需在資料夾內多放一個 `quotes_<語言>.txt`。
+
 打包完成後：將 `.zip` 上傳至下載主機，再於 `just-new-tab/newtab.js` 的 `OFFICIAL_THEMES` 加入對應項目並執行 `./sync.sh`。產生的 `.zip` 已被 `.gitignore` 排除。
 
 ## 上架封裝
@@ -72,4 +82,4 @@ python package_zip.py   # Windows 無 zip 時的替代方案（純 Python）
 
 ## 版本
 
-目前版本：1.58（定義於各自的 `manifest.json`）
+目前版本：1.60（定義於各自的 `manifest.json`）
