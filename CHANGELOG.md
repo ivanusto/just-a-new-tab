@@ -3,6 +3,18 @@
 本專案的版本更新紀錄。格式參考 [Keep a Changelog](https://keepachangelog.com/)。
 Notable changes to this project. Format based on [Keep a Changelog](https://keepachangelog.com/).
 
+## [1.60] - 2026-06-19
+
+### 多語系金句主題包 + 移除 Firefox 抖動處理 / Multi-language quote packs & Firefox anti-jitter removal
+
+**繁中**
+- 🌐 **金句主題包支援多語系**：官方 12 個主題包除了原本的 `quotes.txt`（繁中），全部新增 `quotes_en.txt`（英文翻譯）。匯入主題包時，會依瀏覽器介面語言自動挑選最符合的金句檔案（找不到對應語言時回退到 `quotes.txt`）。自製主題包只要多放一個 `quotes_<語言>.txt`（如 `quotes_ja.txt`）即可新增語言，詳見 README。
+- ↩️ **移除 Firefox 背景抖動的特例處理**：先前為單一筆電的緩慢縮放抖動，改用內層 `<img>` + 平移式 Ken Burns；經實測其他 Firefox 機器並無此問題，故還原為與 Chrome 一致的 `background-image` + 縮放式 Ken Burns，減少差異與維護成本。
+
+**English**
+- 🌐 **Multi-language quote packs**: all 12 official theme packs now ship an English `quotes_en.txt` alongside the original `quotes.txt`. On import, the quote file best matching the browser UI language is selected (falling back to `quotes.txt`). To add a language to your own pack, just drop in a `quotes_<lang>.txt` (e.g. `quotes_ja.txt`); see the README.
+- ↩️ **Removed the Firefox anti-jitter workaround**: a previous tweak (inner `<img>` + translate-based Ken Burns) targeted slow-zoom jitter seen on a single laptop. Since other Firefox machines don't exhibit it, the background is reverted to the Chrome-identical `background-image` + scale Ken Burns to cut divergence and upkeep.
+
 ## [1.58] - 2026-06-17
 
 ### 世界時鐘 + 天氣 + 輪播同步金句 / World clock, weather & rotation-synced quotes
@@ -109,6 +121,7 @@ Notable changes to this project. Format based on [Keep a Changelog](https://keep
 - Export all settings, shortcuts, custom quotes, RSS subscriptions, and wallpapers (IndexedDB) to a single JSON file.
 - Restore on another device or after a reinstall (with a confirm prompt); wallpaper references are remapped automatically. No sign-in, no cloud.
 
+[1.60]: https://github.com/ivanusto/just-new-tab/releases/tag/v1.60
 [1.58]: https://github.com/ivanusto/just-new-tab/releases/tag/v1.58
 [1.57]: https://github.com/ivanusto/just-new-tab/releases/tag/v1.57
 [1.56]: https://github.com/ivanusto/just-new-tab/releases/tag/v1.56
