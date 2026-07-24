@@ -32,6 +32,11 @@
 - **匯入常用網站**（`newtab.js` 的 `initTopSitesImport`）：透過瀏覽器 `topSites` API 讀取常用／釘選網站，預覽勾選後加入捷徑（與既有捷徑去重）。採選用權限 `topSites`，按下匯入才索取。Chrome 僅能取得「最常造訪」、Firefox 另含釘選 Top Sites。
 - **背景圖片上傳**（`handleUploadedFiles` / `downscaleImageBlob`）：單張上限 25MB；「上傳時自動縮圖」預設開啟，超過 4K（長邊 3840px）會等比縮小後存入 IndexedDB（PNG 維持 PNG、其餘輸出 JPEG），可於背景設定關閉以保留原圖。
 
+## 商店連結 (Store Links)
+
+- **Chrome Web Store:** [Just a New Tab (拾光新分頁)](https://chromewebstore.google.com/detail/just-a-new-tab)
+- **Firefox Add-ons (AMO):** [Just a New Tab (拾光新分頁)](https://addons.mozilla.org/firefox/addon/just-new-tab/)
+
 ## 本機開發 / 載入測試
 
 - Chrome：`chrome://extensions` → 開啟開發者模式 → 載入未封裝項目 → 選 `just-new-tab-chrome/`
