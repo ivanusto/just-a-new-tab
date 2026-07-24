@@ -19,6 +19,7 @@ yarn-error.log*
 dist/
 build/
 web-ext-artifacts/
+publish.config.json
 
 # Logs & temp
 *.log
