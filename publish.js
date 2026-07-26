@@ -12,7 +12,7 @@ const crypto = require('crypto');
 const { execSync } = require('child_process');
 
 const DEFAULT_CWS_EXTENSION_ID = '';
-const AMO_ADDON_ID = 'just-a-new-tab@ivanusto.yblog.org';
+const AMO_ADDON_ID = 'just-a-new-tab-official@ivanusto.yblog.org';
 const AMO_HOST = 'https://addons.mozilla.org';
 
 function loadConfig() {
