@@ -5,7 +5,7 @@
 #
 # Usage: ./sync.sh
 #
-set -euo pipefail
+set -e
 
 cd "$(dirname "$0")"
 
@@ -30,5 +30,6 @@ done
 rsync -a --delete "$SRC/_locales/" "$DST/_locales/"
 rsync -a --delete "$SRC/images/"   "$DST/images/"
 rsync -a --delete "$SRC/icons/"    "$DST/icons/"
+rsync -a --delete "$SRC/js/"       "$DST/js/"
 
 echo "Synced shared files: $SRC -> $DST (manifest.json left untouched)."

@@ -1,12 +1,12 @@
 {
   "manifest_version": 3,
   "name": "__MSG_extName__",
-  "version": "1.60",
+  "version": "1.61",
   "description": "__MSG_extDesc__",
   "default_locale": "zh_TW",
   "browser_specific_settings": {
     "gecko": {
-      "id": "just-new-tab@ivanusto.yblog.org",
+      "id": "just-a-new-tab@ivanusto.yblog.org",
       "data_collection_permissions": {
         "required": ["none"]
       }

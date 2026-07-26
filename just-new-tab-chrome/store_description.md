@@ -33,8 +33,11 @@ Here are the optimized store listing descriptions in both **Traditional Chinese 
     *   **自訂擴充金句庫**：您可以自由輸入任何喜愛的句子與作者，創造專屬於您的正能量資料庫。
     *   **極速無閃爍載入**：特別優化首頁渲染，加載瞬間以本地快取優先呈現，徹底消除 0.x 秒的跳動與版面閃爍。
 *   **⏰ 質感時間與動態問候**
-    *   **毛玻璃時鐘**：採用現代感字體與懸浮毛玻璃背景，清晰呈現目前時間、日期與星期。
+    *   **毛玻璃時鐘**：採用現代感字體與懸浮毛玻璃背景，清晰呈現目前時間、日期與星期，並可切換數字／指針樣式與大小。
+    *   **世界時鐘（最多三個）**：除了本地時鐘，還可加開第二、第三時鐘，固定排列於畫面左／中／右三個位置，方便對照紐約、倫敦、東京等地時間。城市可從內建 20 個常用城市挑選，或自訂輸入任意城市（自動解析時區）。
     *   **動態問候語**：根據一天的時間段（清晨、早晨、中午、下午、晚上、深夜）顯示對應的溫暖問候，並支援輸入您的名字，打造客製化問候。
+*   **🌤️ 即時天氣（選用）**
+    *   在各時鐘下方顯示目前氣溫與天氣狀態。採用免費的 Open-Meteo 服務，**完全不需要瀏覽器定位權限**：本地天氣手動輸入城市即可，世界時鐘則自動顯示該城市天氣。支援 °C／°F 切換。
 *   **🔍 智慧搜尋框**
     *   直接在新分頁搜尋，內建 Google、Bing、DuckDuckGo、Yahoo、Baidu，以及 ChatGPT、Claude、Perplexity 等 AI 引擎，可選擇在目前分頁或新分頁開啟結果。
 *   **🔗 輕量化快捷連結 (Speed Dial)**
@@ -90,8 +93,11 @@ Whether you're starting your morning or working late at night, enjoy a clean des
     *   **Custom Quotes Library**: Add your own favorite quotes and authors. They will rotate randomly along with the default pool.
     *   **Flicker-Free Load**: Optimized rendering fetches quotes instantly from local cache on load, eliminating any 0.x second layout shifts or blinking.
 *   **⏰ Elegant Clock & Dynamic Greeting**
-    *   **Glassmorphic Clock**: Displays the current time, date, and day of the week with a clean, high-contrast, premium font.
+    *   **Glassmorphic Clock**: Displays the current time, date, and day of the week with a clean, premium font; switch between digital/analog styles and sizes.
+    *   **World Clocks (up to three)**: Beyond the local clock, add a second and third clock pinned to three fixed left/center/right slots — handy for checking New York, London, or Tokyo time at a glance. Pick from 20 built-in cities or type any custom city (timezone resolved automatically).
     *   **Smart Greetings**: Dynamically adjusts greeting phrases based on the hour (Morning, Afternoon, Evening, Night) with custom name personalization support.
+*   **🌤️ Live Weather (optional)**
+    *   Shows the current temperature and condition under each clock via the free Open-Meteo service with **no browser geolocation permission required**: type a city for local weather, while world clocks show their own city's weather automatically. Toggle °C/°F.
 *   **🔍 Smart Search Box**
     *   Search right from the new tab with built-in Google, Bing, DuckDuckGo, Yahoo, and Baidu, plus AI engines like ChatGPT, Claude, and Perplexity. Open results in the current or a new tab.
 *   **🔗 Quick Link Shortcuts (Speed Dial)**
