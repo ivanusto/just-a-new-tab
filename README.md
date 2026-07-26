@@ -87,4 +87,4 @@ python package_zip.py   # Windows 無 zip 時的替代方案（純 Python）
 
 ## 版本
 
-目前版本：1.62（定義於各自的 `manifest.json`）
+目前版本：1.63（定義於各自的 `manifest.json`）
