@@ -3,6 +3,20 @@
 本專案的版本更新紀錄。格式參考 [Keep a Changelog](https://keepachangelog.com/)。
 Notable changes to this project. Format based on [Keep a Changelog](https://keepachangelog.com/).
 
+## [1.64] - 2026-07-26
+
+### 核心模組化重構 + AMO 資安規範相容 / Core ES modules refactoring & AMO compliance
+
+**繁中**
+- 🧩 **核心邏輯 ES Modules 模組化重構**：將近 4,700 行的單一 `newtab.js` 檔案，精細拆分為 `js/` 獨立模組（`config`, `storage`, `clock`, `weather`, `quoteSearch`, `quickLinks`, `themesBackgrounds`, `rss`, `remindersCalendar`, `backup`, `uiDrawer`），顯著提升程式碼維護性、架構清晰度與渲染執行效能。
+- 🛡️ **Mozilla AMO 安全性驗證 100% 通過**：全專案全面移除 `innerHTML` 樣板字串指派，改用 W3C 標準 DOM API（`replaceChildren()`, `createElementNS` 等），通過 Mozilla 官方 `addons-linter` 0 錯誤、0 警告嚴格靜態檢測。
+- 🆔 **更新獨立 Gecko Extension ID**：配置專屬 `just-a-new-tab-official@ivanusto.yblog.org` 避免 AMO 資料庫 ID 衝突，並補充 Manifest V3 資料宣告 `data_collection_permissions` (`required: ["none"]`)。
+
+**English**
+- 🧩 **Core ES Modules Refactoring**: Split monolithic 4,700-line `newtab.js` script into structured ES modules in `js/` (`config`, `storage`, `clock`, `weather`, `quoteSearch`, `quickLinks`, `themesBackgrounds`, `rss`, `remindersCalendar`, `backup`, `uiDrawer`), greatly improving code maintainability and performance.
+- 🛡️ **Mozilla AMO Security Compliance**: Removed all `innerHTML` assignments across the codebase and replaced them with safe DOM APIs (`replaceChildren()`, `createElementNS`), passing Mozilla `addons-linter` with 0 errors and 0 warnings.
+- 🆔 **Dedicated Gecko Extension ID**: Configured unique ID `just-a-new-tab-official@ivanusto.yblog.org` and declared MV3 `data_collection_permissions` (`required: ["none"]`).
+
 ## [1.60] - 2026-06-19
 
 ### 多語系金句主題包 + 移除 Firefox 抖動處理 / Multi-language quote packs & Firefox anti-jitter removal
@@ -121,6 +135,7 @@ Notable changes to this project. Format based on [Keep a Changelog](https://keep
 - Export all settings, shortcuts, custom quotes, RSS subscriptions, and wallpapers (IndexedDB) to a single JSON file.
 - Restore on another device or after a reinstall (with a confirm prompt); wallpaper references are remapped automatically. No sign-in, no cloud.
 
+[1.64]: https://github.com/ivanusto/just-new-tab/releases/tag/v1.64
 [1.60]: https://github.com/ivanusto/just-new-tab/releases/tag/v1.60
 [1.58]: https://github.com/ivanusto/just-new-tab/releases/tag/v1.58
 [1.57]: https://github.com/ivanusto/just-new-tab/releases/tag/v1.57
