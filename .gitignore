@@ -19,7 +19,6 @@ yarn-error.log*
 dist/
 build/
 web-ext-artifacts/
-publish.config.json
 
 # Logs & temp
 *.log
@@ -34,3 +33,6 @@ tmp/
 
 # Claude Code memory (synced between machines via QNAP QSync, not git)
 claude-memory/
+
+# Store publishing credentials (used by publish.js)
+publish.config.json

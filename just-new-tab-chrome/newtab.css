@@ -1563,27 +1563,6 @@ select option {
   background-color: rgba(10, 10, 15, 0.45);
 }
 
-#search-engine-select {
-  background: transparent;
-  border: none;
-  color: var(--text-secondary);
-  font-family: var(--font-sans);
-  font-size: 0.85rem;
-  font-weight: 500;
-  outline: none;
-  cursor: pointer;
-  padding-right: 0.6rem;
-  border-right: 1px solid rgba(255, 255, 255, 0.12);
-  margin-right: 0.8rem;
-  height: 24px;
-}
-
-#search-engine-select option {
-  background-color: #121214;
-  color: #fff;
-  padding: 0.5rem;
-}
-
 #search-input {
   flex: 1;
   background: transparent;

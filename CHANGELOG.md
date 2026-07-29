@@ -3,6 +3,20 @@
 本專案的版本更新紀錄。格式參考 [Keep a Changelog](https://keepachangelog.com/)。
 Notable changes to this project. Format based on [Keep a Changelog](https://keepachangelog.com/).
 
+## [1.65] - 2026-07-29
+
+### 修復時鐘失效 + 搜尋改用瀏覽器官方 Search API / Fix broken clock & switch search to the browser Search API
+
+**繁中**
+- 🐛 **修復 1.64 全頁小工具失效（時鐘凍結在 00:00）**：`uiDrawer.js` 誤從 `clock.js` 匯入實際位於 `storage.js` 的 `getClockCity`，導致整個 ES Modules 依賴圖載入失敗、所有 JavaScript 無法執行（Chrome Web Store 審查因此以「Clock 無法運作」退件，違規參照 ID：Red Potassium）。
+- 🔍 **搜尋框改用瀏覽器官方 Search API**：移除自建的搜尋引擎下拉選單（Google／Bing／DuckDuckGo／Yahoo／Baidu／ChatGPT／Claude／Perplexity），改以 `chrome.search.query()`（Firefox 為 `browser.search.query()`）將查詢交給**使用者自己在瀏覽器設定的預設搜尋引擎**，符合 CWS「新分頁不得同時變更搜尋體驗」政策（違規參照 ID：Red Argon）。「在新分頁開啟結果」選項保留。
+- 🔐 新增 `search` 權限（呼叫官方 Search API 所需）；金句點擊搜尋同步改用 Search API。
+
+**English**
+- 🐛 **Fixed all widgets being dead in 1.64 (clock frozen at 00:00)**: `uiDrawer.js` imported `getClockCity` from `clock.js` while it actually lives in `storage.js`, breaking the whole ES module graph so no JavaScript ran (this is what CWS review flagged as "Clock" not working, violation ref Red Potassium).
+- 🔍 **Search box now uses the browser's official Search API**: removed the custom engine dropdown (Google/Bing/DuckDuckGo/Yahoo/Baidu/ChatGPT/Claude/Perplexity); queries now go through `chrome.search.query()` (`browser.search.query()` on Firefox) to **the default search engine the user picked in their browser settings**, complying with the CWS single-purpose policy for new-tab extensions (violation ref Red Argon). The "open results in a new tab" option is kept.
+- 🔐 Added the `search` permission (required by the Search API); quote-click search also goes through the Search API now.
+
 ## [1.64] - 2026-07-26
 
 ### 核心模組化重構 + AMO 資安規範相容 / Core ES modules refactoring & AMO compliance

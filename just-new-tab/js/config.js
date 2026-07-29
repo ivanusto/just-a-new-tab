@@ -92,7 +92,6 @@ export const DEFAULT_SETTINGS = {
   bgAutoRotate: false,
   bgRotateInterval: 180,
   bgRotateSyncQuote: false,
-  searchEngine: "google",
   searchInNewTab: false,
   autoDownscaleUploads: true,
   cloudQuoteSource: "zenquotes",

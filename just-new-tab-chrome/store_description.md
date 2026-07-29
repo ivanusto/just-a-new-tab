@@ -8,7 +8,7 @@ Here are the optimized store listing descriptions in both **Traditional Chinese 
 
 ### 1. 簡短說明 (Short Description)
 *限制 132 字元以內*
-> 開啟新分頁，帶給您一整天的好心情。內建唯美背景輪播、質感時鐘、智慧搜尋框、自訂捷徑、每日金句、RSS 看板、提醒事項與行事曆，並支援主題包匯入與設定備份匯出。
+> 開啟新分頁，帶給您一整天的好心情。內建唯美背景輪播、質感時鐘、搜尋框、自訂捷徑、每日金句、RSS 看板、提醒事項與行事曆，並支援主題包匯入與設定備份匯出。
 
 ---
 
@@ -38,8 +38,8 @@ Here are the optimized store listing descriptions in both **Traditional Chinese 
     *   **動態問候語**：根據一天的時間段（清晨、早晨、中午、下午、晚上、深夜）顯示對應的溫暖問候，並支援輸入您的名字，打造客製化問候。
 *   **🌤️ 即時天氣（選用）**
     *   在各時鐘下方顯示目前氣溫與天氣狀態。採用免費的 Open-Meteo 服務，**完全不需要瀏覽器定位權限**：本地天氣手動輸入城市即可，世界時鐘則自動顯示該城市天氣。支援 °C／°F 切換。
-*   **🔍 智慧搜尋框**
-    *   直接在新分頁搜尋，內建 Google、Bing、DuckDuckGo、Yahoo、Baidu，以及 ChatGPT、Claude、Perplexity 等 AI 引擎，可選擇在目前分頁或新分頁開啟結果。
+*   **🔍 搜尋框**
+    *   直接在新分頁搜尋，透過瀏覽器官方 Search API 使用您在瀏覽器中設定的預設搜尋引擎，可選擇在目前分頁或新分頁開啟結果。
 *   **🔗 輕量化快捷連結 (Speed Dial)**
     *   輕鬆新增、排列與刪除您的常用網頁，卡片會自動抓取網站 Favicon 圖示，兼具美觀與高實用性。可選擇以目前分頁、新分頁或新視窗開啟，並可一鍵從瀏覽器匯入常用網站（Top Sites）。
 *   **📰 RSS 閱讀看板（選用）**
@@ -68,7 +68,7 @@ Here are the optimized store listing descriptions in both **Traditional Chinese 
 
 ### 1. Short Description
 *Within 132 characters*
-> A beautiful new tab: wallpapers, clock, smart search, quick links, daily quotes, RSS, reminders, calendar, plus settings backup.
+> A beautiful new tab: wallpapers, clock, search, quick links, daily quotes, RSS, reminders, calendar, plus settings backup.
 
 ---
 
@@ -98,8 +98,8 @@ Whether you're starting your morning or working late at night, enjoy a clean des
     *   **Smart Greetings**: Dynamically adjusts greeting phrases based on the hour (Morning, Afternoon, Evening, Night) with custom name personalization support.
 *   **🌤️ Live Weather (optional)**
     *   Shows the current temperature and condition under each clock via the free Open-Meteo service with **no browser geolocation permission required**: type a city for local weather, while world clocks show their own city's weather automatically. Toggle °C/°F.
-*   **🔍 Smart Search Box**
-    *   Search right from the new tab with built-in Google, Bing, DuckDuckGo, Yahoo, and Baidu, plus AI engines like ChatGPT, Claude, and Perplexity. Open results in the current or a new tab.
+*   **🔍 Search Box**
+    *   Search right from the new tab. Queries go through the browser's official Search API to the default search engine you've chosen in your browser settings. Open results in the current or a new tab.
 *   **🔗 Quick Link Shortcuts (Speed Dial)**
     *   Add, edit, or delete your most visited websites. Cards automatically fetch website favicons, maintaining a clean and beautiful grid. Open links in the current tab, a new tab, or a new window, and import your browser's top sites in one click.
 *   **📰 RSS Reader Board (optional)**

@@ -1,8 +1,8 @@
 // Just a New Tab - UI Drawer & Visibility Module
-import { settings, saveSettings, isChineseUser, isSimplifiedChinese, quickLinks } from './storage.js';
-import { applyClockConfig, initGreeting, initClock, normalizeClockPositions, refreshClockPositionSelects, setClockPosition, clockEls, REMOTE_CLOCKS, getClockCity, CLOCK_POSITIONS } from './clock.js';
+import { settings, saveSettings, isChineseUser, isSimplifiedChinese, quickLinks, getClockCity } from './storage.js';
+import { applyClockConfig, initGreeting, initClock, normalizeClockPositions, refreshClockPositionSelects, setClockPosition, clockEls, REMOTE_CLOCKS, CLOCK_POSITIONS } from './clock.js';
 import { initWeather } from './weather.js';
-import { initQuote, renderLocalQuoteSynchronously } from './quoteSearch.js';
+import { initQuote, renderLocalQuoteSynchronously, runBrowserSearch } from './quoteSearch.js';
 import { renderQuickLinks, initQuickLinks } from './quickLinks.js';
 import { renderDrawerWallpapers, revokeThumbnails, setRandomBackground, renderDrawerQuotes, renderDrawerThemes, initOfficialThemes } from './themesBackgrounds.js';
 import { renderDrawerRssSubscriptions, loadRssFeeds } from './rss.js';
@@ -190,8 +190,7 @@ export function initQuoteSearch() {
       }
       
       if (query) {
-        const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
-        window.open(searchUrl, "_blank");
+        runBrowserSearch(query, "NEW_TAB");
       }
     });
     quoteWidget.dataset.listenerBound = "true";

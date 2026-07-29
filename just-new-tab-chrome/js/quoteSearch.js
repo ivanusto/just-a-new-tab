@@ -1,6 +1,6 @@
 // Just a New Tab - Quote & Search Module
 import { JUST_QUOTES, EN_QUOTES } from './config.js';
-import { settings, saveSettings, isChineseUser, isSimplifiedChinese } from './storage.js';
+import { settings, isChineseUser, isSimplifiedChinese } from './storage.js';
 
 export function renderLocalQuoteSynchronously() {
   const textEl = document.getElementById("quote-text");
@@ -228,12 +228,21 @@ export function initQuote() {
   }
 }
 
+// Search uses the browser's Search API so queries go to the user's own
+// default search engine (CWS policy: new-tab search must honor user settings).
+export function runBrowserSearch(query, disposition) {
+  if (typeof browser !== "undefined" && browser.search && browser.search.query) {
+    browser.search.query({ text: query, disposition });
+  } else if (typeof chrome !== "undefined" && chrome.search && chrome.search.query) {
+    chrome.search.query({ text: query, disposition });
+  }
+}
+
 export function initSearch() {
   const searchWidget = document.getElementById("search-widget");
   const searchForm = document.getElementById("search-form");
   const searchInput = document.getElementById("search-input");
-  const searchEngineSelect = document.getElementById("search-engine-select");
-  
+
   if (!searchWidget) return;
 
   if (settings.widgets.search !== false) {
@@ -241,67 +250,13 @@ export function initSearch() {
   } else {
     searchWidget.classList.add("widget-hidden");
   }
-  
-  if (settings.searchEngine) {
-    searchEngineSelect.value = settings.searchEngine;
-  } else {
-    settings.searchEngine = "google";
-    searchEngineSelect.value = "google";
-  }
-  
-  if (!searchEngineSelect.dataset.listenerBound) {
-    searchEngineSelect.addEventListener("change", async () => {
-      settings.searchEngine = searchEngineSelect.value;
-      await saveSettings();
-    });
-    searchEngineSelect.dataset.listenerBound = "true";
-  }
-  
+
   if (!searchForm.dataset.listenerBound) {
     searchForm.addEventListener("submit", (e) => {
       e.preventDefault();
       const query = searchInput.value.trim();
       if (!query) return;
-      
-      const engine = searchEngineSelect.value;
-      let url = "";
-      
-      switch (engine) {
-        case "google":
-          url = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
-          break;
-        case "baidu":
-          url = `https://www.baidu.com/s?wd=${encodeURIComponent(query)}`;
-          break;
-        case "bing":
-          url = `https://www.bing.com/search?q=${encodeURIComponent(query)}`;
-          break;
-        case "duckduckgo":
-          url = `https://duckduckgo.com/?q=${encodeURIComponent(query)}`;
-          break;
-        case "yahoo":
-          url = `https://search.yahoo.com/search?p=${encodeURIComponent(query)}`;
-          break;
-        case "chatgpt":
-          url = `https://chatgpt.com/?q=${encodeURIComponent(query)}`;
-          break;
-        case "claude":
-          url = `https://claude.ai/new?q=${encodeURIComponent(query)}`;
-          break;
-        case "perplexity":
-          url = `https://www.perplexity.ai/search?q=${encodeURIComponent(query)}`;
-          break;
-        default:
-          url = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
-      }
-      
-      if (url) {
-        if (settings.searchInNewTab) {
-          window.open(url, "_blank");
-        } else {
-          window.location.href = url;
-        }
-      }
+      runBrowserSearch(query, settings.searchInNewTab ? "NEW_TAB" : "CURRENT_TAB");
     });
     searchForm.dataset.listenerBound = "true";
   }
