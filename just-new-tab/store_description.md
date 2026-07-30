@@ -62,6 +62,22 @@ Here are the optimized store listing descriptions in both **Traditional Chinese 
 *   **安全輕量**：代碼完全由原生 JavaScript 與 CSS 編寫，無任何廣告追蹤，不佔用系統多餘記憶體，讓新分頁開啟如閃電般迅速。
 
 ---
+
+### 📋 更新紀錄 (What's New)
+
+**v1.66**
+- 🎬 修復 Firefox 上背景 Ken Burns 縮放的抖動現象，慢速縮放現在如絲般滑順。
+- 🔍 搜尋引擎選單回歸！可從下拉選單挑選您 Firefox 中已安裝的任一搜尋引擎（透過官方 Search API，預設為您的 Firefox 預設引擎）。
+
+**v1.65**
+- 🐛 修復 1.64 版時鐘與所有小工具無法運作的問題。
+- 🔍 搜尋改以瀏覽器官方 Search API 執行，不再自組搜尋網址。
+
+**v1.64**
+- 🧩 核心程式碼全面模組化重構，提升效能與穩定性。
+- 🛡️ 全面移除 `innerHTML`，通過 Mozilla addons-linter 零錯誤零警告的安全檢測。
+
+---
 ---
 
 ## 🇺🇸 English (英文版)
@@ -120,3 +136,19 @@ Whether you're starting your morning or working late at night, enjoy a clean des
 
 *   **100% Local Storage (Offline-First)**: Your uploaded background images, custom quotes, reminders, and your calendar's private iCal URL are stored locally in the browser (**IndexedDB / localStorage**). The calendar is read-only and reminders are purely local. No data is sent or uploaded to external servers. Your privacy is fully secured.
 *   **Lightweight & Fast**: Built entirely in vanilla HTML/CSS/JS without heavy frameworks. Opens instantly with zero impact on system memory.
+
+---
+
+### 📋 What's New
+
+**v1.66**
+- 🎬 Fixed the Ken Burns background zoom jitter on Firefox — slow zoom is now silky smooth.
+- 🔍 The search engine picker is back! Choose any engine installed in your Firefox from the dropdown (via the official Search API; defaults to your Firefox default engine).
+
+**v1.65**
+- 🐛 Fixed the clock and all widgets being unresponsive in 1.64.
+- 🔍 Search now runs through the browser's official Search API instead of hand-built search URLs.
+
+**v1.64**
+- 🧩 Major internal refactoring into ES modules for better performance and stability.
+- 🛡️ Removed all `innerHTML` usage — passes Mozilla addons-linter with zero errors and warnings.

@@ -62,6 +62,18 @@ Here are the optimized store listing descriptions in both **Traditional Chinese 
 *   **安全輕量**：代碼完全由原生 JavaScript 與 CSS 編寫，無任何廣告追蹤，不佔用系統多餘記憶體，讓新分頁開啟如閃電般迅速。
 
 ---
+
+### 📋 更新紀錄 (What's New)
+
+**v1.65**
+- 🐛 修復 1.64 版時鐘與所有小工具無法運作的問題。
+- 🔍 搜尋改以 Chrome 官方 Search API 執行，使用您在瀏覽器中設定的預設搜尋引擎。
+
+**v1.64**
+- 🧩 核心程式碼全面模組化重構，提升效能與穩定性。
+- 🛡️ 全面移除 `innerHTML`，採用更安全的標準 DOM API。
+
+---
 ---
 
 ## 🇺🇸 English (英文版)
@@ -120,3 +132,15 @@ Whether you're starting your morning or working late at night, enjoy a clean des
 
 *   **100% Local Storage (Offline-First)**: Your uploaded background images, custom quotes, reminders, and your calendar's private iCal URL are stored locally in the browser (**IndexedDB / localStorage**). The calendar is read-only and reminders are purely local. No data is sent or uploaded to external servers. Your privacy is fully secured.
 *   **Lightweight & Fast**: Built entirely in vanilla HTML/CSS/JS without heavy frameworks. Opens instantly with zero impact on system memory.
+
+---
+
+### 📋 What's New
+
+**v1.65**
+- 🐛 Fixed the clock and all widgets being unresponsive in 1.64.
+- 🔍 Search now runs through Chrome's official Search API, using the default search engine you've chosen in your browser settings.
+
+**v1.64**
+- 🧩 Major internal refactoring into ES modules for better performance and stability.
+- 🛡️ Removed all `innerHTML` usage in favor of safe standard DOM APIs.
