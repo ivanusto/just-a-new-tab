@@ -81,6 +81,25 @@ body {
   }
 }
 
+/* Firefox-only: its compositor pixel-snaps slow scale animations, which reads
+   as jitter. A tiny constant rotation makes the transform non-axis-aligned so
+   snapping can't kick in, and translateZ(0) keeps the layer on the GPU. */
+@supports (-moz-appearance: none) {
+  .ken-burns {
+    animation-name: kenburnsPlayFx;
+    will-change: transform;
+  }
+
+  @keyframes kenburnsPlayFx {
+    0% {
+      transform: scale(1.0) translate(0, 0) rotate(0.02deg) translateZ(0);
+    }
+    100% {
+      transform: scale(1.1) translate(-1%, -0.5%) rotate(0.02deg) translateZ(0);
+    }
+  }
+}
+
 .bg-overlay {
   position: absolute;
   top: 0;
@@ -1561,6 +1580,28 @@ select option {
   border-color: var(--accent-color);
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3), var(--shadow-glow);
   background-color: rgba(10, 10, 15, 0.45);
+}
+
+#search-engine-select {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 500;
+  outline: none;
+  cursor: pointer;
+  padding-right: 0.6rem;
+  border-right: 1px solid rgba(255, 255, 255, 0.12);
+  margin-right: 0.8rem;
+  height: 24px;
+  max-width: 9.5rem;
+}
+
+#search-engine-select option {
+  background-color: #121214;
+  color: #fff;
+  padding: 0.5rem;
 }
 
 #search-input {

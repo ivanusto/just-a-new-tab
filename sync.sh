@@ -12,14 +12,14 @@ cd "$(dirname "$0")"
 SRC="just-new-tab"
 DST="just-new-tab-chrome"
 
-# Shared top-level files (manifest.json deliberately excluded)
+# Shared top-level files (manifest.json and store_description.md deliberately
+# excluded — both are maintained separately per browser)
 SHARED_FILES=(
   newtab.html
   newtab.css
   newtab.js
   db.js
   privacy_policy.md
-  store_description.md
 )
 
 for f in "${SHARED_FILES[@]}"; do

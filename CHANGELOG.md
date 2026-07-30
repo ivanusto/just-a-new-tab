@@ -3,6 +3,20 @@
 本專案的版本更新紀錄。格式參考 [Keep a Changelog](https://keepachangelog.com/)。
 Notable changes to this project. Format based on [Keep a Changelog](https://keepachangelog.com/).
 
+## [1.66] - 2026-07-30
+
+### Firefox：修復 Ken Burns 抖動 + 恢復搜尋引擎選單 / Firefox: fix Ken Burns jitter & bring back the engine picker
+
+**繁中**
+- 🎬 **修復 Firefox 背景 Ken Burns 縮放抖動**：Firefox 合成器會對慢速縮放動畫做像素對齊（pixel-snapping），造成一格一格的跳動（Chrome 渲染路徑不同、不受影響）。以 Firefox 專屬規則（`@supports (-moz-appearance: none)`）在動畫中加入 `rotate(0.02deg)` 與 `translateZ(0)`，使變換非軸對齊、強制次像素渲染，實測不再抖動。Chrome 版行為完全不變。
+- 🔍 **Firefox 恢復搜尋引擎選單**：透過 Firefox 官方 `browser.search.get()` 列出您瀏覽器中**已安裝**的搜尋引擎供挑選，並以 `browser.search.search()` 執行搜尋——全程使用官方 Search API、不自組搜尋網址（AMO 合規；1.65 移除選單是 Chrome Web Store 的政策要求，AMO 無此限制）。Chrome 版維持使用瀏覽器預設搜尋引擎。
+- 📝 `store_description.md` 改為各平台獨立維護（同 `manifest.json`）。
+
+**English**
+- 🎬 **Fixed Ken Burns background jitter on Firefox**: Firefox's compositor pixel-snaps slow scale animations, producing visible stepping (Chrome uses a different rendering path and is unaffected). A Firefox-only rule (`@supports (-moz-appearance: none)`) adds `rotate(0.02deg)` and `translateZ(0)` to the animation so the transform is no longer axis-aligned and sub-pixel rendering kicks in. Chrome behavior is untouched.
+- 🔍 **Search engine picker is back on Firefox**: the dropdown now lists the engines **installed in your browser** via Firefox's official `browser.search.get()` and searches with `browser.search.search()` — official Search API all the way, no hand-built search URLs (AMO-compliant; the 1.65 removal was a Chrome Web Store policy requirement that does not apply to AMO). Chrome keeps using the browser's default engine.
+- 📝 `store_description.md` is now maintained per platform (like `manifest.json`).
+
 ## [1.65] - 2026-07-29
 
 ### 修復時鐘失效 + 搜尋改用瀏覽器官方 Search API / Fix broken clock & switch search to the browser Search API

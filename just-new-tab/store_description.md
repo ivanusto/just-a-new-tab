@@ -39,7 +39,7 @@ Here are the optimized store listing descriptions in both **Traditional Chinese 
 *   **🌤️ 即時天氣（選用）**
     *   在各時鐘下方顯示目前氣溫與天氣狀態。採用免費的 Open-Meteo 服務，**完全不需要瀏覽器定位權限**：本地天氣手動輸入城市即可，世界時鐘則自動顯示該城市天氣。支援 °C／°F 切換。
 *   **🔍 搜尋框**
-    *   直接在新分頁搜尋，透過瀏覽器官方 Search API 使用您在瀏覽器中設定的預設搜尋引擎，可選擇在目前分頁或新分頁開啟結果。
+    *   直接在新分頁搜尋，透過 Firefox 官方 Search API 使用您瀏覽器中**已安裝的任一搜尋引擎**——可從下拉選單挑選（預設為您的 Firefox 預設引擎），並可選擇在目前分頁或新分頁開啟結果。
 *   **🔗 輕量化快捷連結 (Speed Dial)**
     *   輕鬆新增、排列與刪除您的常用網頁，卡片會自動抓取網站 Favicon 圖示，兼具美觀與高實用性。可選擇以目前分頁、新分頁或新視窗開啟，並可一鍵從瀏覽器匯入常用網站（Top Sites）。
 *   **📰 RSS 閱讀看板（選用）**
@@ -99,7 +99,7 @@ Whether you're starting your morning or working late at night, enjoy a clean des
 *   **🌤️ Live Weather (optional)**
     *   Shows the current temperature and condition under each clock via the free Open-Meteo service with **no browser geolocation permission required**: type a city for local weather, while world clocks show their own city's weather automatically. Toggle °C/°F.
 *   **🔍 Search Box**
-    *   Search right from the new tab. Queries go through the browser's official Search API to the default search engine you've chosen in your browser settings. Open results in the current or a new tab.
+    *   Search right from the new tab with **any search engine installed in your Firefox** — pick one from the dropdown (defaults to your Firefox default engine) via the official Search API. Open results in the current or a new tab.
 *   **🔗 Quick Link Shortcuts (Speed Dial)**
     *   Add, edit, or delete your most visited websites. Cards automatically fetch website favicons, maintaining a clean and beautiful grid. Open links in the current tab, a new tab, or a new window, and import your browser's top sites in one click.
 *   **📰 RSS Reader Board (optional)**

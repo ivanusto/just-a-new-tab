@@ -302,6 +302,9 @@
   "searchSubmitTitle": {
     "message": "搜索"
   },
+  "searchEngineTitle": {
+    "message": "搜索引擎"
+  },
   "randomizeTitle": {
     "message": "随机切换背景"
   },

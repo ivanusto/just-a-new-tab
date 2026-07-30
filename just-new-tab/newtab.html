@@ -149,6 +149,9 @@
         <div id="search-widget" class="widget-item search-wrapper">
           <form id="search-form">
             <div class="search-input-container">
+              <!-- Firefox only: filled with the browser's installed engines via
+                   browser.search.get(); stays hidden on Chrome. -->
+              <select id="search-engine-select" name="engine" style="display: none" data-i18n-title="searchEngineTitle" title="搜尋引擎"></select>
               <input type="text" name="q" id="search-input" data-i18n="searchPlaceholder" placeholder="搜尋網頁或輸入問題..." autocomplete="off">
               <button type="submit" class="search-submit-btn" data-i18n-title="searchSubmitTitle" title="搜尋">
                 <svg viewBox="0 0 24 24" width="18" height="18">

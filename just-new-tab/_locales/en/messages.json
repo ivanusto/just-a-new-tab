@@ -302,6 +302,9 @@
   "searchSubmitTitle": {
     "message": "Search"
   },
+  "searchEngineTitle": {
+    "message": "Search engine"
+  },
   "randomizeTitle": {
     "message": "Random background"
   },

@@ -302,6 +302,9 @@
   "searchSubmitTitle": {
     "message": "搜尋"
   },
+  "searchEngineTitle": {
+    "message": "搜尋引擎"
+  },
   "randomizeTitle": {
     "message": "隨機切換背景"
   },

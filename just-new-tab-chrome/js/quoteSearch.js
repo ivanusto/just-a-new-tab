@@ -1,6 +1,6 @@
 // Just a New Tab - Quote & Search Module
 import { JUST_QUOTES, EN_QUOTES } from './config.js';
-import { settings, isChineseUser, isSimplifiedChinese } from './storage.js';
+import { settings, saveSettings, isChineseUser, isSimplifiedChinese } from './storage.js';
 
 export function renderLocalQuoteSynchronously() {
   const textEl = document.getElementById("quote-text");
@@ -228,8 +228,10 @@ export function initQuote() {
   }
 }
 
-// Search uses the browser's Search API so queries go to the user's own
-// default search engine (CWS policy: new-tab search must honor user settings).
+// Search goes through the browser's Search API so queries always run on an
+// engine installed in the browser (CWS policy: new-tab search must honor user
+// settings). Chrome only exposes the user's default engine; Firefox can also
+// list installed engines and search with a chosen one.
 export function runBrowserSearch(query, disposition) {
   if (typeof browser !== "undefined" && browser.search && browser.search.query) {
     browser.search.query({ text: query, disposition });
@@ -238,10 +240,42 @@ export function runBrowserSearch(query, disposition) {
   }
 }
 
+// Firefox-only APIs for the engine picker (absent on Chrome).
+function canPickEngine() {
+  return typeof browser !== "undefined" && browser.search &&
+    typeof browser.search.get === "function" &&
+    typeof browser.search.search === "function";
+}
+
+async function populateEngineSelect(engineSelect) {
+  try {
+    const engines = await browser.search.get();
+    if (!engines || !engines.length) return;
+    engineSelect.replaceChildren();
+    engines.forEach((engine) => {
+      const opt = document.createElement("option");
+      opt.value = engine.name;
+      opt.textContent = engine.name;
+      engineSelect.appendChild(opt);
+    });
+    const saved = settings.searchEngine;
+    if (saved && engines.some((engine) => engine.name === saved)) {
+      engineSelect.value = saved;
+    } else {
+      const def = engines.find((engine) => engine.isDefault);
+      if (def) engineSelect.value = def.name;
+    }
+    engineSelect.style.display = "";
+  } catch (e) {
+    engineSelect.style.display = "none";
+  }
+}
+
 export function initSearch() {
   const searchWidget = document.getElementById("search-widget");
   const searchForm = document.getElementById("search-form");
   const searchInput = document.getElementById("search-input");
+  const engineSelect = document.getElementById("search-engine-select");
 
   if (!searchWidget) return;
 
@@ -251,12 +285,28 @@ export function initSearch() {
     searchWidget.classList.add("widget-hidden");
   }
 
+  if (engineSelect && canPickEngine()) {
+    populateEngineSelect(engineSelect);
+    if (!engineSelect.dataset.listenerBound) {
+      engineSelect.addEventListener("change", async () => {
+        settings.searchEngine = engineSelect.value;
+        await saveSettings();
+      });
+      engineSelect.dataset.listenerBound = "true";
+    }
+  }
+
   if (!searchForm.dataset.listenerBound) {
     searchForm.addEventListener("submit", (e) => {
       e.preventDefault();
       const query = searchInput.value.trim();
       if (!query) return;
-      runBrowserSearch(query, settings.searchInNewTab ? "NEW_TAB" : "CURRENT_TAB");
+      const disposition = settings.searchInNewTab ? "NEW_TAB" : "CURRENT_TAB";
+      if (canPickEngine() && engineSelect && engineSelect.value) {
+        browser.search.search({ query, engine: engineSelect.value, disposition });
+      } else {
+        runBrowserSearch(query, disposition);
+      }
     });
     searchForm.dataset.listenerBound = "true";
   }
