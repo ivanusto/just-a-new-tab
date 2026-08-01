@@ -65,6 +65,9 @@ Here are the optimized store listing descriptions in both **Traditional Chinese 
 
 ### 📋 更新紀錄 (What's New)
 
+**v1.66**
+- 🔧 內部維護更新，與 Firefox 版本同步；Chrome 版功能與行為不變。
+
 **v1.65**
 - 🐛 修復 1.64 版時鐘與所有小工具無法運作的問題。
 - 🔍 搜尋改以 Chrome 官方 Search API 執行，使用您在瀏覽器中設定的預設搜尋引擎。
@@ -136,6 +139,9 @@ Whether you're starting your morning or working late at night, enjoy a clean des
 ---
 
 ### 📋 What's New
+
+**v1.66**
+- 🔧 Internal maintenance release to keep version parity with Firefox; no functional changes on Chrome.
 
 **v1.65**
 - 🐛 Fixed the clock and all widgets being unresponsive in 1.64.
