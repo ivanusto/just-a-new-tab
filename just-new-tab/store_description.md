@@ -65,6 +65,9 @@ Here are the optimized store listing descriptions in both **Traditional Chinese 
 
 ### 📋 更新紀錄 (What's New)
 
+**v1.67**
+- 📌 修正在新版 Firefox 將新分頁「釘選到工作列」後，開啟時只顯示一串檔案清單的問題；現在會正常開啟新分頁。
+
 **v1.66**
 - 🎬 修復 Firefox 上背景 Ken Burns 縮放的抖動現象，慢速縮放現在如絲般滑順。
 - 🔍 搜尋引擎選單回歸！可從下拉選單挑選您 Firefox 中已安裝的任一搜尋引擎（透過官方 Search API，預設為您的 Firefox 預設引擎）。
@@ -140,6 +143,9 @@ Whether you're starting your morning or working late at night, enjoy a clean des
 ---
 
 ### 📋 What's New
+
+**v1.67**
+- 📌 Fixed pinning the new tab to the taskbar in recent Firefox versions opening a raw file listing; the pinned app now opens the new tab page.
 
 **v1.66**
 - 🎬 Fixed the Ken Burns background zoom jitter on Firefox — slow zoom is now silky smooth.

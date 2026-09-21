@@ -3,6 +3,18 @@
 本專案的版本更新紀錄。格式參考 [Keep a Changelog](https://keepachangelog.com/)。
 Notable changes to this project. Format based on [Keep a Changelog](https://keepachangelog.com/).
 
+## [1.67] - 2026-09-21
+
+### Firefox：修正「釘選到工作列」開成檔案清單 / Firefox: fix "pin to taskbar" opening a file listing
+
+**繁中**
+- 📌 **修正 Firefox Taskbar Tabs 釘選後開成檔案清單**：新版 Firefox（Windows）會在新分頁網址列提供「釘選到工作列」。頁面沒有 Web App Manifest 時，Firefox 以擴充套件根目錄（`moz-extension://<UUID>/`）當作起始網址，釘選後打開只看到擴充套件的檔案清單。現在 `newtab.html` 以 `<link rel="manifest">` 宣告新增的 `app.webmanifest`，其 `start_url` 固定為 `newtab.html`，釘選後會正常開啟新分頁。已經釘選過的使用者請先取消釘選再重新釘選。擴充套件無法隱藏 Firefox 的釘選按鈕本身（瀏覽器寫死支援 `moz-extension`）。
+- 🔧 `sync.sh` 與 `package_zip.py` 納入 `app.webmanifest`。Chrome 版行為不變。
+
+**English**
+- 📌 **Fixed Firefox Taskbar Tabs opening a file listing**: recent Firefox on Windows offers "pin to taskbar" in the address bar of the new tab. Without a Web App Manifest, Firefox used the extension root (`moz-extension://<UUID>/`) as the start URL, so the pinned app opened a raw listing of the extension's files. `newtab.html` now links a new `app.webmanifest` whose `start_url` is `newtab.html`, so the pinned app opens the new tab page. If you already pinned it, unpin and pin again. Extensions cannot hide Firefox's pin button itself (the browser hard-codes support for `moz-extension`).
+- 🔧 `sync.sh` and `package_zip.py` now include `app.webmanifest`. Chrome behavior is unchanged.
+
 ## [1.66] - 2026-07-30
 
 ### Firefox：修復 Ken Burns 抖動 + 恢復搜尋引擎選單 / Firefox: fix Ken Burns jitter & bring back the engine picker
@@ -163,6 +175,9 @@ Notable changes to this project. Format based on [Keep a Changelog](https://keep
 - Export all settings, shortcuts, custom quotes, RSS subscriptions, and wallpapers (IndexedDB) to a single JSON file.
 - Restore on another device or after a reinstall (with a confirm prompt); wallpaper references are remapped automatically. No sign-in, no cloud.
 
+[1.67]: https://github.com/ivanusto/just-new-tab/releases/tag/v1.67
+[1.66]: https://github.com/ivanusto/just-new-tab/releases/tag/v1.66
+[1.65]: https://github.com/ivanusto/just-new-tab/releases/tag/v1.65
 [1.64]: https://github.com/ivanusto/just-new-tab/releases/tag/v1.64
 [1.60]: https://github.com/ivanusto/just-new-tab/releases/tag/v1.60
 [1.58]: https://github.com/ivanusto/just-new-tab/releases/tag/v1.58

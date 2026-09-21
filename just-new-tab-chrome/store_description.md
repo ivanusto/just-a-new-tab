@@ -65,6 +65,9 @@ Here are the optimized store listing descriptions in both **Traditional Chinese 
 
 ### 📋 更新紀錄 (What's New)
 
+**v1.67**
+- 🔧 內部維護更新，與 Firefox 版本同步；Chrome 版功能與行為不變。
+
 **v1.66**
 - 🔧 內部維護更新，與 Firefox 版本同步；Chrome 版功能與行為不變。
 
@@ -139,6 +142,9 @@ Whether you're starting your morning or working late at night, enjoy a clean des
 ---
 
 ### 📋 What's New
+
+**v1.67**
+- 🔧 Internal maintenance release to keep version parity with Firefox; no functional changes on Chrome.
 
 **v1.66**
 - 🔧 Internal maintenance release to keep version parity with Firefox; no functional changes on Chrome.

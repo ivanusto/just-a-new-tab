@@ -20,6 +20,7 @@ SHARED_FILES=(
   newtab.js
   db.js
   privacy_policy.md
+  app.webmanifest
 )
 
 for f in "${SHARED_FILES[@]}"; do

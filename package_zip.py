@@ -50,4 +50,5 @@ with zipfile.ZipFile(ff) as z:
     assert "manifest.json" in names, "manifest.json not at root!"
     assert not any(n.lower().endswith(".md") for n in names), "md leaked into package"
     assert "newtab.js" in names and "db.js" in names
+    assert "app.webmanifest" in names, "app.webmanifest missing (Firefox taskbar pin fix)"
 print("Sanity OK: root manifest.json present, .md excluded.")
